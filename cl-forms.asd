@@ -7,7 +7,7 @@
   :license "MIT"
   :depends-on (#:alexandria
                #:cl-ppcre
-               #:hunchentoot)
+               #:hunchentoot
+	       #:clavier)
   :components ((:file "package")
                (:file "cl-forms")))
-
