@@ -38,7 +38,11 @@
      (field forms::string-form-field) form)
   (with-html-output (*html*)
     (:input :type "text"
-	    :name (forms::form-field-name field form))))
+	    :name (forms::form-field-name field form)
+	    :placeholder (forms::field-empty-value field)
+	    (when (forms::field-value field)
+	      (funcall (forms::field-formatter field)
+		       (forms::field-value field))))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -55,3 +59,21 @@
   (with-html-output (*html*)
     (:input :type "submit"
 	    :value (or (forms::field-label field) "Submit"))))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (field forms::choice-form-field) form)
+  (let ((selected-value (forms::field-key-and-value field)))
+    (with-html-output (*html*)
+      (:select
+       :name (forms::form-field-name field form)
+       (loop for (key . choice) in (forms::field-choices-alist field)
+	  do
+	    (htm
+	     (:option :value (princ-to-string key)
+		      :selected (when (equalp (first selected-value)
+					      key)
+				  "selected")
+		      (str (if (forms::field-formatter field)
+			       (funcall (forms::field-formatter field)
+					choice))))))))))

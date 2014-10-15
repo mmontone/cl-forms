@@ -6,6 +6,7 @@
 (forms:defform simple-form (:action "/post")
   ((name :string :value "")
    (ready :boolean :value t)
+   (sex :choice :choices (list "Male" "Female") :value "Male")
    (submit :submit :label "Create")))
 
 (hunchentoot:define-easy-handler (simple-form :uri "/") ()
@@ -17,8 +18,9 @@
   (let ((form (forms:get-form 'simple-form)))
     (forms::handle-request form)
     (forms::validate-form form)
-    (forms::with-form-fields (name ready) form
+    (forms::with-form-fields (name ready sex) form
       (who:with-html-output-to-string (html)
 	(:ul 
 	 (:li (who:fmt "Name: ~A" (forms::field-value name)))
-	 (:li (who:fmt "Ready: ~A" (forms::field-value ready))))))))
+	 (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
+	 (:li (who:fmt "Sex: ~A" (forms::field-value sex))))))))

@@ -109,6 +109,10 @@
 		:initform nil
 		:accessor field-empty-value
 		:documentation "Value to use when the field value is nil")
+   (formatter :initarg :formatter
+	      :initform #'princ-to-string
+	      :accessor field-formatter
+	      :documentation "The field formatter")
    (validator :initarg :validator
 	      :initform nil
 	      :accessor field-validator
@@ -138,6 +142,12 @@
 	 :accessor field-trim-p
 	 :documentation "Trim the input"))
   (:documentation "A form field"))
+
+(defmethod print-object ((field form-field) stream)
+  (print-unreadable-object (field stream :type t :identity t)
+    (format stream "~A value: ~A"
+	    (field-name field)
+	    (field-value field))))
 
 (defun add-field (form field)
   (setf (form-fields form)
@@ -178,8 +188,25 @@
    (multiple :initarg :multiple
 	     :initform nil
 	     :accessor field-multiple
-	     :documentation "If true, the user will be able to select multiple options (as opposed to choosing just one option). Depending on the value of the expanded option, this will render either a select tag or checkboxes if true and a select tag or radio buttons if false.")) 
+	     :documentation "If true, the user will be able to select multiple options (as opposed to choosing just one option). Depending on the value of the expanded option, this will render either a select tag or checkboxes if true and a select tag or radio buttons if false.")
+   (key-reader :initarg :key-reader
+	       :initform #'identity
+	       :accessor field-key-reader
+	       :documentation "Function to read the option key from the request")) 
   (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes."))
+
+(defmethod initialize-instance :after ((field choice-form-field) &rest initargs)
+  ;; Initialize the key reader and writer
+  (let ((choices (field-choices-alist field)))
+    (let ((choice-key (first (first choices))))
+      (cond
+	((stringp choice-key)
+	 (setf (field-key-reader field) #'identity))
+	((integerp choice-key)
+	 (setf (field-key-reader field) #'parse-integer))
+	((keywordp choice-key)
+	 (setf (field-key-reader field) #'alexandria:make-keyword))
+	(t (error "Invalid key ~A" choice-key))))))	
 
 (defun form-field-name (form-field &optional (form *form*))
   (format nil "~A-~A" (form-name form) (field-name form-field)))
@@ -265,3 +292,35 @@
 
 (defmethod make-form-field ((field-type (eql :submit)) &rest args)
   (apply #'make-instance 'submit-form-field args))
+
+(defmethod make-form-field ((field-type (eql :choice)) &rest args)
+  (apply #'make-instance 'choice-form-field args))
+
+(defun alistp (alist)
+  (and (listp alist)           ; a list
+       (every #'consp alist)))
+
+(defmethod field-choices-alist ((field choice-form-field))
+  (let ((choices (field-choices field)))
+    (if (alistp choices)
+	choices
+	(mapcar (lambda (choice)
+		  (cons (sxhash choice)
+			choice))
+		choices))))
+
+(defmethod field-key-and-value ((field choice-form-field))
+  (when (field-value field)
+    (if (alistp (field-choices field))
+	(find (field-value field)
+	      (field-choices field)
+	      :key #'cdr
+	      :test #'equalp)
+	(cons (sxhash (field-value field))
+	      (field-value field)))))
+
+(defmethod field-read-from-request ((field choice-form-field) form)
+  (setf (field-value field)
+	(cdr (assoc (funcall (field-key-reader field)
+			     (hunchentoot:post-parameter (form-field-name field form)))
+		    (field-choices-alist field)))))
