@@ -1,20 +1,22 @@
 (defpackage :forms.test.who
   (:use :cl :forms))
 
+(in-package :forms.test.who)
+
 (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port 2021))
 
-(forms:defform simple-form (:action "/post")
+(forms:defform simple-form (:action "/simple-form/post")
   ((name :string :value "")
    (ready :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
    (submit :submit :label "Create")))
 
-(hunchentoot:define-easy-handler (simple-form :uri "/") ()
+(hunchentoot:define-easy-handler (simple-form :uri "/simple-form") ()
   (let ((form (forms::get-form 'simple-form)))
     (forms:with-form-renderer :who
       (forms:render-form form))))
 
-(hunchentoot:define-easy-handler (post-form :uri "/post" :default-request-type :post) ()
+(hunchentoot:define-easy-handler (simple-form-post :uri "/simple-form/post" :default-request-type :post) ()
   (let ((form (forms:get-form 'simple-form)))
     (forms::handle-request form)
     (forms::validate-form form)
@@ -24,3 +26,54 @@
 	 (:li (who:fmt "Name: ~A" (forms::field-value name)))
 	 (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
 	 (:li (who:fmt "Sex: ~A" (forms::field-value sex))))))))
+
+(defclass person ()
+  ((name :initarg :name
+	 :accessor person-name
+	 :initform nil)
+   (single :initarg :single
+	   :accessor person-single
+	   :initform t)
+   (sex :initarg :sex
+	:accessor person-sex
+	:initform :male)))
+
+(forms:defform-builder model-form (person)
+  (make-instance 'forms::form
+		 :name 'model-form
+		 :model person
+		 :action "/model-form/post"
+		 :fields (forms::make-form-fields
+			  `((name :string :label "Name"
+				  :accessor person-name)
+			    (single :boolean :label "Single"
+				    :accessor person-single)
+			    (sex :choice :label "Sex"
+				 :choices (:male :female)
+				 :accessor person-sex
+				 :formatter format-sex)
+			    (submit :submit :label "Update")))))
+
+(defun format-sex (sex)
+  (if (equalp sex :male) "Male" "Female"))
+
+(hunchentoot:define-easy-handler (model-form :uri "/model-form") ()
+  (let ((person (make-instance 'person
+			       :name "Foo"
+			       :single t
+			       :sex :male)))
+    (let ((form (forms::get-form 'model-form person)))
+      (forms:with-form-renderer :who
+	(forms:render-form form)))))
+
+(hunchentoot:define-easy-handler (model-form-post :uri "/model-form/post"
+						  :default-request-type :post) ()
+  (let ((person (make-instance 'person)))
+    (let ((form (forms:get-form 'model-form person)))
+      (forms::handle-request form)
+      (forms::validate-form form)
+      (who:with-html-output-to-string (html)
+	(:ul 
+	 (:li (who:fmt "Name: ~A" (person-name person)))
+	 (:li (who:fmt "Single: ~A" (person-single person)))
+	 (:li (who:fmt "Sex: ~A" (person-sex person))))))))

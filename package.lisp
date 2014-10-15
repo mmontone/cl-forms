@@ -6,5 +6,6 @@
   (:export :with-form
 	   :with-form-renderer
 	   :defform
+	   :defform-builder
 	   :get-form
 	   :render-form))

@@ -31,6 +31,14 @@
 						 `(cons ',field-name (make-form-field ,field-type :name ,(string field-name) ,@field-args)))))
 			  ,@args))))
 
+(defmacro defform-builder (form-name args &body body)
+  (alexandria:with-unique-names (form)
+    `(setf (get ',form-name :form)
+	   (lambda ,args
+	     (let ((,form (progn ,@body)))
+	       (setf (form-name ,form) ',form-name)
+	       ,form)))))
+
 (defun make-form (name fields &rest options)
   (apply #'make-instance
 	 'form
@@ -44,8 +52,8 @@
        (destructuring-bind (field-name field-type &rest field-args) field
 	 (cons field-name (apply #'make-form-field field-type :name (string field-name) field-args)))))
 
-(defun get-form (name)
-  (funcall (get name :form)))
+(defun get-form (name &rest args)
+  (apply (get name :form) args))
 
 (defmacro with-form-fields (fields form &body body)
   `(let ,(loop for field in fields
@@ -92,6 +100,11 @@
 	    (form-name form)
 	    (form-action form))))
 
+(defmethod initialize-instance :after ((form form) &rest initargs)
+  (loop for field in (form-fields form)
+     do
+       (setf (field-form (cdr field)) form)))
+
 (defclass form-field ()
   ((name :initarg :name
 	 :initform (error "Provide the field name")
@@ -102,7 +115,6 @@
 	  :accessor field-label
 	  :documentation "The field label")
    (value :initarg :value
-	  :initform nil
 	  :accessor field-value
 	  :documentation "Field value")
    (empty-value :initarg :empty-value
@@ -140,7 +152,11 @@
    (trim :initarg :trim-p
 	 :initform t
 	 :accessor field-trim-p
-	 :documentation "Trim the input"))
+	 :documentation "Trim the input")
+   (form :initarg :form
+	 :initform nil
+	 :accessor field-form
+	 :documentation "The form the field belongs to"))
   (:documentation "A form field"))
 
 (defmethod print-object ((field form-field) stream)
@@ -152,6 +168,19 @@
 (defun add-field (form field)
   (setf (form-fields form)
 	(append (form-fields form) field)))
+
+(defmethod field-value ((field form-field))
+  (if (field-accessor field)
+      (funcall (fdefinition (field-accessor field))
+	       (form-model (field-form field)))
+      (slot-value field 'value)))
+
+(defmethod (setf field-value) (value (field form-field))
+  (if (field-accessor field)
+      (funcall (fdefinition `(setf ,(field-accessor field)))
+	       value
+	       (form-model (field-form field)))
+      (setf (slot-value field 'value) value)))     
 
 (defclass string-form-field (form-field)
   ()
