@@ -221,11 +221,22 @@
   (renderer-render-form *form-renderer* form))
 
 (defun render-field (field &optional (form *form*))
-  (renderer-render-form *form-renderer* field form))
+  (renderer-render-field *form-renderer* field form))
+
+(defun render-field-label (field &optional (form *form*))
+  (renderer-render-field-label *form-renderer* field form))
+
+(defun render-field-errors (field &optional (form *form*))
+  (renderer-render-field-errors *form-renderer* field form))
+
+(defun render-field-widget (field &optional (form *form*))
+  (renderer-render-field-widget *form-renderer* field form))
 
 (defgeneric renderer-render-form (renderer form))
-
 (defgeneric renderer-render-field (renderer field form))
+(defgeneric renderer-render-field-label (renderer field form))
+(defgeneric renderer-render-field-errors (renderer field form))
+(defgeneric renderer-render-field-widget (renderer field form))
 
 (defun handle-request (&optional (form *form*))
   (loop for field in (form-fields form)
