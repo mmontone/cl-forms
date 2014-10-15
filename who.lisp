@@ -27,6 +27,9 @@
      (str (or (forms::field-label field)
 	      (forms::field-name field))))))
 
+(defmethod forms::renderer-render-field-label ((renderer (eql :who)) (field forms::submit-form-field) form)
+  )
+
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who)) field form)
   )
 
