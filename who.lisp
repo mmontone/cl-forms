@@ -74,6 +74,5 @@
 		      :selected (when (equalp (first selected-value)
 					      key)
 				  "selected")
-		      (str (if (forms::field-formatter field)
-			       (funcall (forms::field-formatter field)
-					choice))))))))))
+		      (str (funcall (forms::field-formatter field)
+					choice)))))))))
