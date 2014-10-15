@@ -31,6 +31,19 @@
 						 `(cons ',field-name (make-form-field ,field-type :name ,(string field-name) ,@field-args)))))
 			  ,@args))))
 
+(defun make-form (name fields &rest options)
+  (apply #'make-instance
+	 'form
+	 :name name
+	 :fields (make-form-fields fields)
+	 options))
+
+(defun make-form-fields (fields)
+  (loop for field in fields
+     collect
+       (destructuring-bind (field-name field-type &rest field-args) field
+	 (cons field-name (apply #'make-form-field field-type :name (string field-name) field-args)))))
+
 (defun get-form (name)
   (funcall (get name :form)))
 
@@ -58,7 +71,19 @@
    (fields :initarg :fields
 	   :initform nil
 	   :accessor form-fields
-	   :documentation "Form fields"))
+	   :documentation "Form fields")
+   (model :initarg :model
+	  :initform nil
+	  :accessor form-model
+	  :documentation "The form model object")
+   (csrf-protection :initarg :csrf-protection-p
+		    :initform t
+		    :accessor form-csrf-protection-p
+		    :documentation "T when csrf protection is enabled")
+   (csrf-field-name :initarg :csrf-field-name
+		    :initform "_token"
+		    :accessor form-csrf-field-name
+		    :documentation "csrf field name"))	    
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
