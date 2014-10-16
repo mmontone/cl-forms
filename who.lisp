@@ -6,8 +6,13 @@
 
 (defvar *html*)
 
+(defmethod forms::call-with-form-renderer ((renderer (eql :who)) function)
+  (let ((forms::*form-renderer* renderer))
+    (with-html-output-to-string (*html*)
+      (funcall function))))
+
 (defmethod forms::renderer-render-form ((renderer (eql :who)) form)
-  (with-html-output-to-string (*html*)
+  (with-html-output (*html*)
     (:form :action (forms::form-action form)
 	   :method (symbol-name (forms::form-method form))
 	   (loop for field in (forms::form-fields form)

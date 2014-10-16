@@ -6,7 +6,7 @@
 (defvar *default-form-renderer* :who)
 (defvar *form* nil "The current form")
 
-(defun call-with-form-renderer (renderer function)
+(defmethod call-with-form-renderer (renderer function)
   (let ((*form-renderer* renderer))
     (funcall function)))
 

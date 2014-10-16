@@ -4,5 +4,6 @@
   :author "Mariano Montone"
   :license "MIT"
   :depends-on (#:cl-forms
+	       #:cl-forms.who
 	       #:djula)
   :components ((:file "djula")))
