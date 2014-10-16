@@ -1,3 +1,22 @@
 Djula template
 
 {% form form %}
+
+{% form-start form %}
+{% form-row form name %}
+{% form-row form ready %}
+{% form-row form sex %}
+{% form-row form submit %}
+{% form-end form %}
+
+{% form-start form %}
+<div>
+    <label>
+	{% form-field-label form name %}
+    </label>
+    {% form-field-widget form name %}
+</div>
+{% form-row form ready %}
+{% form-row form sex %}
+{% form-row form submit %}
+{% form-end form %}
