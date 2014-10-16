@@ -221,7 +221,11 @@
    (key-reader :initarg :key-reader
 	       :initform #'identity
 	       :accessor field-key-reader
-	       :documentation "Function to read the option key from the request")) 
+	       :documentation "Function to read the option key from the request")
+   (hash-function :initarg :hash-function
+		  :initform #'sxhash
+		  :accessor field-hash-function
+		  :documentation "The function to use for choices key")) 
   (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes."))
 
 (defmethod initialize-instance :after ((field choice-form-field) &rest initargs)
@@ -334,7 +338,8 @@
     (if (alistp choices)
 	choices
 	(mapcar (lambda (choice)
-		  (cons (sxhash choice)
+		  (cons (funcall (field-hash-function field)
+				 choice)
 			choice))
 		choices))))
 
@@ -345,7 +350,8 @@
 	      (field-choices field)
 	      :key #'cdr
 	      :test #'equalp)
-	(cons (sxhash (field-value field))
+	(cons (funcall (field-hash-function field)
+		       (field-value field))
 	      (field-value field)))))
 
 (defmethod field-read-from-request ((field choice-form-field) form)
