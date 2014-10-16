@@ -4,33 +4,33 @@
 
 (in-package :forms.qimt)
 
-(defmethod forms::renderer-render-form ((renderer (eql :qimt)) form)
+(defmethod forms::renderer-render-form ((renderer (eql :qimt)) form &rest args)
   (<form (<action= (forms::form-action form))
 	 (<method= (symbol-name (forms::form-method form)))
 	 (loop for field in (forms::form-fields form)
 	    do
 	      (forms::renderer-render-field renderer (cdr field) form))))
 
-(defmethod forms::renderer-render-field ((renderer (eql :qimt)) field form)
+(defmethod forms::renderer-render-field ((renderer (eql :qimt)) field form &rest args)
   (<div
     (forms::renderer-render-field-label renderer field form)
     (forms::renderer-render-field-errors renderer field form)
     (forms::renderer-render-field-widget renderer field form)))
 
-(defmethod forms::renderer-render-field-label ((renderer (eql :qimt)) field form)
+(defmethod forms::renderer-render-field-label ((renderer (eql :qimt)) field form &rest args)
   (<label
     (xd (or (forms::field-label field)
 	    (forms::field-name field)))))
 
-(defmethod forms::renderer-render-field-label ((renderer (eql :qimt)) (field forms::submit-form-field) form)
+(defmethod forms::renderer-render-field-label ((renderer (eql :qimt)) (field forms::submit-form-field) form &rest args)
   )
 
-(defmethod forms::renderer-render-field-errors ((renderer (eql :qimt)) field form)
+(defmethod forms::renderer-render-field-errors ((renderer (eql :qimt)) field form &rest args)
   )
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
-     (field forms::string-form-field) form)
+     (field forms::string-form-field) form &rest args)
   (<input (<type= "text")
 	  (<name= (forms::form-field-name field form))
 	  #+nil(when (forms::field-empty-value field)
@@ -49,13 +49,13 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
-     (field forms::submit-form-field) form)
+     (field forms::submit-form-field) form &rest args)
   (<input (<type= "submit")
 	  (<value= (or (forms::field-label field) "Submit"))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
-     (field forms::choice-form-field) form)
+     (field forms::choice-form-field) form &rest args)
   (let ((selected-value (forms::field-key-and-value field)))
     (<select
        (<name= (forms::form-field-name field form))

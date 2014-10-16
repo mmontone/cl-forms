@@ -277,26 +277,26 @@
    (form-fields-views :accessor form-fields-views
 		      :documentation "The views for each of the fields")))
   
-(defun render-form (&optional (form *form*))
-  (renderer-render-form *form-renderer* form))
+(defun render-form (&optional (form *form*) &rest args)
+  (apply #'renderer-render-form *form-renderer* form args))
 
-(defun render-field (field &optional (form *form*))
-  (renderer-render-field *form-renderer* field form))
+(defun render-field (field &optional (form *form*) &rest args)
+  (apply #'renderer-render-field *form-renderer* field form args))
 
-(defun render-field-label (field &optional (form *form*))
-  (renderer-render-field-label *form-renderer* field form))
+(defun render-field-label (field &optional (form *form*) &rest args)
+  (apply #'renderer-render-field-label *form-renderer* field form args))
 
-(defun render-field-errors (field &optional (form *form*))
-  (renderer-render-field-errors *form-renderer* field form))
+(defun render-field-errors (field &optional (form *form*) &rest args)
+  (apply #'renderer-render-field-errors *form-renderer* field form args))
 
-(defun render-field-widget (field &optional (form *form*))
-  (renderer-render-field-widget *form-renderer* field form))
+(defun render-field-widget (field &optional (form *form*) &rest args)
+  (apply #'renderer-render-field-widget *form-renderer* field form args))
 
-(defgeneric renderer-render-form (renderer form))
-(defgeneric renderer-render-field (renderer field form))
-(defgeneric renderer-render-field-label (renderer field form))
-(defgeneric renderer-render-field-errors (renderer field form))
-(defgeneric renderer-render-field-widget (renderer field form))
+(defgeneric renderer-render-form (renderer form &rest args))
+(defgeneric renderer-render-field (renderer field form &rest args))
+(defgeneric renderer-render-field-label (renderer field form &rest args))
+(defgeneric renderer-render-field-errors (renderer field form &rest args))
+(defgeneric renderer-render-field-widget (renderer field form &rest argss))
 
 (defun handle-request (&optional (form *form*))
   (loop for field in (form-fields form)

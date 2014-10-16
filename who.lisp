@@ -11,7 +11,7 @@
     (with-html-output-to-string (*html*)
       (funcall function))))
 
-(defmethod forms::renderer-render-form ((renderer (eql :who)) form)
+(defmethod forms::renderer-render-form ((renderer (eql :who)) form &rest args)
   (with-html-output (*html*)
     (:form :action (forms::form-action form)
 	   :method (symbol-name (forms::form-method form))
@@ -19,28 +19,28 @@
 	      do
 		(forms::renderer-render-field renderer (cdr field) form)))))
 
-(defmethod forms::renderer-render-field ((renderer (eql :who)) field form)
+(defmethod forms::renderer-render-field ((renderer (eql :who)) field form &rest args)
   (with-html-output (*html*)
     (:div
      (forms::renderer-render-field-label renderer field form)
      (forms::renderer-render-field-errors renderer field form)
      (forms::renderer-render-field-widget renderer field form))))
 
-(defmethod forms::renderer-render-field-label ((renderer (eql :who)) field form)
+(defmethod forms::renderer-render-field-label ((renderer (eql :who)) field form &rest args)
   (with-html-output (*html*)
     (:label
      (str (or (forms::field-label field)
 	      (forms::field-name field))))))
 
-(defmethod forms::renderer-render-field-label ((renderer (eql :who)) (field forms::submit-form-field) form)
+(defmethod forms::renderer-render-field-label ((renderer (eql :who)) (field forms::submit-form-field) form &rest args)
   )
 
-(defmethod forms::renderer-render-field-errors ((renderer (eql :who)) field form)
+(defmethod forms::renderer-render-field-errors ((renderer (eql :who)) field form &rest args)
   )
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
-     (field forms::string-form-field) form)
+     (field forms::string-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "text"
 	    :name (forms::form-field-name field form)
@@ -51,7 +51,7 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
-     (field forms::boolean-form-field) form)
+     (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"
 	    :name (forms::form-field-name field form)
@@ -60,14 +60,14 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
-     (field forms::submit-form-field) form)
+     (field forms::submit-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "submit"
 	    :value (or (forms::field-label field) "Submit"))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
-     (field forms::choice-form-field) form)
+     (field forms::choice-form-field) form &rest args)
   (let ((selected-value (forms::field-key-and-value field)))
     (with-html-output (*html*)
       (:select
