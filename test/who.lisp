@@ -77,3 +77,42 @@
 	 (:li (who:fmt "Name: ~A" (person-name person)))
 	 (:li (who:fmt "Single: ~A" (person-single person)))
 	 (:li (who:fmt "Sex: ~A" (person-sex person))))))))
+
+;; Choices widget test
+
+(forms:defform choices-form (:action "/choices-form/post")
+  ((sex :choice
+	:choices (list "Male" "Female")
+	:value "Male")
+   (sex2 :choice
+	 :choices (list "Male" "Female")
+	 :value "Female"
+	 :expanded t)
+   (choices :choice
+	    :choices (list "Foo" "Bar")
+	    :value (list "Foo")
+	    :multiple t)
+   (choices2 :choice
+	     :choices (list "Foo" "Bar")
+	     :value (list "Bar")
+	     :multiple t
+	     :expanded  t)
+   (submit :submit :label "Ok")))
+
+(hunchentoot:define-easy-handler (choices-form :uri "/choices-form") ()
+  (let ((form (forms::get-form 'choices-form)))
+    (forms:with-form-renderer :who
+      (forms:render-form form))))
+
+(hunchentoot:define-easy-handler (choices-form-post :uri "/choices-form/post" :default-request-type :post) ()
+  (let ((form (forms:get-form 'choices-form)))
+    (forms::handle-request form)
+    (forms::validate-form form)
+    (forms::with-form-field-values (sex sex2 choices choices2) form
+      (who:with-html-output-to-string (html)
+	(:ul 
+	 (:li (who:fmt "Sex: ~A" sex))
+	 (:li (who:fmt "Sex2: ~A" sex2))
+	 (:li (who:fmt "Choices: ~A" choices))
+	 (:li (who:fmt "Choices2: ~A" choices2)))))))
+

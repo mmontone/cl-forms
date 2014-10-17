@@ -68,16 +68,65 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (field forms::choice-form-field) form &rest args)
-  (let ((selected-value (forms::field-key-and-value field)))
-    (with-html-output (*html*)
-      (:select
-       :name (forms::form-field-name field form)
-       (loop for (key . choice) in (forms::field-choices-alist field)
-	  do
-	    (htm
-	     (:option :value (princ-to-string key)
-		      :selected (when (equalp (first selected-value)
+  (cond
+    ((and (forms::field-expanded field)
+	  (forms::field-multiple field))
+     (let ((selected-keys (mapcar #'first (forms::field-keys-and-values field))))
+       ;; Render checkboxes
+       (with-html-output (*html*)
+	 (loop for (key . choice) in (forms::field-choices-alist field)
+	    do
+	      (htm
+	       (:input :type "checkbox" :name (forms::form-field-name field form)
+		       :value key
+		       :checked (when (member key selected-keys)
+				  "checked")
+		       (str (funcall (forms::field-formatter field)
+				     choice))))))))
+    ((and (forms::field-expanded field)
+	  (not (forms::field-multiple field)))
+     ;; Render radio buttons
+     (let ((selected-value (forms::field-key-and-value field)))
+       (with-html-output (*html*)
+	 (loop for (key . choice) in (forms::field-choices-alist field)
+	    do
+	      (htm
+	       (:input :type "radio" :name (forms::form-field-name field form)
+		       :value (princ-to-string key)
+		       :checked (when (equalp (first selected-value)
 					      key)
-				  "selected")
-		      (str (funcall (forms::field-formatter field)
-					choice)))))))))
+				  "checked")
+		       (str (funcall (forms::field-formatter field)
+				     choice))))))))
+    ((and (not (forms::field-expanded field))
+	  (forms::field-multiple field))
+     ;; A multiple select box
+     (let ((selected-keys (mapcar #'first (forms::field-keys-and-values field))))
+       (with-html-output (*html*)
+	 (:select
+	  :name (forms::form-field-name field form)
+	  :multiple "multiple"
+	  (loop for (key . choice) in (forms::field-choices-alist field)
+	     do
+	       (htm
+		(:option :value (princ-to-string key)
+			 :selected (when (member key selected-keys)
+				     "selected")
+			 (str (funcall (forms::field-formatter field)
+				       choice)))))))))
+    ((and (not (forms::field-expanded field))
+	  (not (forms::field-multiple field)))
+     ;; A single select box
+     (let ((selected-value (forms::field-key-and-value field)))
+       (with-html-output (*html*)
+	 (:select
+	  :name (forms::form-field-name field form)
+	  (loop for (key . choice) in (forms::field-choices-alist field)
+	     do
+	       (htm
+		(:option :value (princ-to-string key)
+			 :selected (when (equalp (first selected-value)
+						 key)
+				     "selected")
+			 (str (funcall (forms::field-formatter field)
+				       choice)))))))))))

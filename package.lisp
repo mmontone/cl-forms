@@ -8,4 +8,6 @@
 	   :defform
 	   :defform-builder
 	   :get-form
-	   :render-form))
+	   :render-form
+	   :with-form-fields
+	   :with-form-field-values))
