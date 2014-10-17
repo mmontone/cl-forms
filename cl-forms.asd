@@ -9,5 +9,14 @@
                #:cl-ppcre
                #:hunchentoot
 	       #:clavier)
-  :components ((:file "package")
-               (:file "cl-forms")))
+  :components ((:module :src
+			:components
+			((:file "package")
+			 (:file "cl-forms")
+			 (:module :fields
+				  :components
+				  ((:file "string")
+				   (:file "boolean")
+				   (:file "choice")
+				   (:file "submit")))))))
+	       

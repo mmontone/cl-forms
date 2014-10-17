@@ -41,7 +41,7 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
-     (field forms::boolean-form-field) form)
+     (field forms::boolean-form-field) form &rest args)
   (<input (<type= "checkbox")
 	  (<name= (forms::form-field-name field form))
 	  (when (forms::field-value field)

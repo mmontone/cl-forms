@@ -5,4 +5,7 @@
   :license "MIT"
   :depends-on (#:cl-forms
 	       #:cl-who)
-  :components ((:file "who")))
+  :components ((:module :renderer
+			:pathname "src/renderer/"
+			:components
+			((:file "who")))))

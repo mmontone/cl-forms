@@ -5,4 +5,7 @@
   :license "MIT"
   :depends-on (#:cl-forms
 	       #:qimt)
-  :components ((:file "qimt")))
+  :components ((:module :renderer
+			:pathname "src/renderer/"
+			:components
+			((:file "qimt")))))

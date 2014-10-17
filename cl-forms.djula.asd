@@ -6,4 +6,7 @@
   :depends-on (#:cl-forms
 	       #:cl-forms.who
 	       #:djula)
-  :components ((:file "djula")))
+  :components ((:module :renderer
+			:pathname "src/renderer/"
+			:components
+			((:file "djula")))))
