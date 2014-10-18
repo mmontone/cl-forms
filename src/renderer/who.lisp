@@ -13,6 +13,12 @@
 
 (defmethod forms::renderer-render-form ((renderer (eql :who)) form &rest args)
   (with-html-output (*html*)
+    (when (forms::form-errors form)
+      (htm
+       (:ul
+	(loop for error in (forms::form-errors form)
+	     do
+	     (htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error))))))))
     (:form :action (forms::form-action form)
 	   :method (symbol-name (forms::form-method form))
 	   (loop for field in (forms::form-fields form)
@@ -36,7 +42,14 @@
   )
 
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who)) field form &rest args)
-  )
+  (let ((errors (cdr (assoc (forms::field-name field)
+			    (forms::form-errors form)
+			    :test #'equalp
+			    :key #'string))))
+    (when errors
+      (with-html-output (*html*)
+	(:div :class "errors"
+	 (fmt "~{~A~^, ~}" errors))))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -45,6 +58,7 @@
     (:input :type "text"
 	    :name (forms::form-field-name field form)
 	    :placeholder (forms::field-empty-value field)
+	    :value
 	    (when (forms::field-value field)
 	      (funcall (forms::field-formatter field)
 		       (forms::field-value field))))))

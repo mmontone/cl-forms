@@ -5,6 +5,11 @@
 (in-package :forms.qimt)
 
 (defmethod forms::renderer-render-form ((renderer (eql :qimt)) form &rest args)
+  (when (forms::form-errors form)
+    (<ul
+      (loop for error in (forms::form-errors form)
+	 do
+	   (<li (fxd "~A: ~{~A~^, ~}" (first error) (cdr error))))))
   (<form (<action= (forms::form-action form))
 	 (<method= (symbol-name (forms::form-method form)))
 	 (loop for field in (forms::form-fields form)
@@ -36,8 +41,9 @@
 	  #+nil(when (forms::field-empty-value field)
 		 (<placeholder= (forms::field-empty-value field)))
 	  (when (forms::field-value field)
-	    (funcall (forms::field-formatter field)
-		     (forms::field-value field)))))
+	    (<value=
+	     (funcall (forms::field-formatter field)
+		      (forms::field-value field))))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))

@@ -213,7 +213,8 @@
 	     (let ((errors
 		    (validate-form-field (cdr field))))
 	       (when errors
-		 (cons field errors))))))
+		 (list (cons (car field) errors))))))
+  (null (form-errors form)))
   
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* form args))

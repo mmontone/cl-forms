@@ -135,4 +135,25 @@
   (forms::validate-form form)
   (setf (forms::field-value (forms::get-field form 'ready))
 	"foo")
-  (forms::validate-form form))
+  (forms::validate-form form)
+  (forms::form-errors form))
+
+(hunchentoot:define-easy-handler (validated-form :uri "/validated-form") ()
+  (let ((form (forms::get-form 'validated-form)))
+    (forms:with-form-renderer :who
+      (forms:render-form form))))
+
+(hunchentoot:define-easy-handler (validated-form-post :uri "/validated-form/post" :default-request-type :post) ()
+  (let ((form (forms:get-form 'validated-form)))
+    (forms::handle-request form)
+    (if (forms::validate-form form)
+	;; The form is valid
+	(forms::with-form-fields (name ready sex) form
+	  (who:with-html-output-to-string (html)
+	    (:ul 
+	     (:li (who:fmt "Name: ~A" (forms::field-value name)))
+	     (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
+	     (:li (who:fmt "Sex: ~A" (forms::field-value sex))))))
+	;; The form is not valid
+	(forms:with-form-renderer :who
+	  (forms:render-form form)))))
