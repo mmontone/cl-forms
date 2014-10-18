@@ -2,7 +2,7 @@
 
 (defclass boolean-form-field (form-field)
   ()
-  (:default-initargs :validator (clavier:is-a-boolean))
+  (:default-initargs :constraints (list (clavier:is-a-boolean)))
   (:documentation "A boolean input"))
 
 (defmethod field-read-from-request ((field boolean-form-field) form)

@@ -96,7 +96,10 @@
    (csrf-field-name :initarg :csrf-field-name
 		    :initform "_token"
 		    :accessor form-csrf-field-name
-		    :documentation "csrf field name"))	    
+		    :documentation "csrf field name")
+   (errors :initform nil
+	   :accessor form-errors
+	   :documentation "Form errors after validation"))	    
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
@@ -130,10 +133,10 @@
 	      :initform #'princ-to-string
 	      :accessor field-formatter
 	      :documentation "The field formatter")
-   (validator :initarg :validator
+   (constraints :initarg :constraints
 	      :initform nil
-	      :accessor field-validator
-	      :documentation "The field validator")
+	      :accessor field-constraints
+	      :documentation "The field constraints")
    (required :initarg :required-p
 	     :initform t
 	     :accessor field-required-p
@@ -193,13 +196,24 @@
 (defgeneric validate-form-field (form-field))
 
 (defmethod validate-form-field ((form-field form-field))
-  (when (field-validator form-field)
-    (funcall (field-validator form-field)
-	     (field-value form-field))))
+  (let ((errors nil))
+    (loop for constraint in (field-constraints form-field)
+	 do
+	 (multiple-value-bind (valid-p error-msg)
+	     (funcall constraint
+		      (field-value form-field))
+	 (when (not valid-p)
+	   (push error-msg errors))))
+    errors))
 
 (defun validate-form (&optional (form *form*))
-  (loop for field in (form-fields form)
-       do (validate-form-field (cdr field))))
+  (setf (form-errors form)
+	(loop for field in (form-fields form)
+	   appending
+	     (let ((errors
+		    (validate-form-field (cdr field))))
+	       (when errors
+		 (cons field errors))))))
   
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* form args))

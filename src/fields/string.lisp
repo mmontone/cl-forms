@@ -2,12 +2,12 @@
 
 (defclass string-form-field (form-field)
   ()
-  (:default-initargs :validator (clavier:is-a-string))
+  (:default-initargs :constraints (list (clavier:is-a-string)))
   (:documentation "A string input field"))
 
 (defclass text-form-field (string-form-field)
   ()
-  (:default-initargs :validator (clavier:is-a-string))
+  (:default-initargs :constraints (list (clavier:is-a-string)))
   (:documentation "A text field. Renders as a text area"))
 
 (defmethod validate-form-field ((form-field string-form-field))
@@ -22,4 +22,3 @@
 
 (defmethod make-form-field ((field-type (eql :string)) &rest args)
   (apply #'make-instance 'string-form-field args))
-

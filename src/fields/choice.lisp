@@ -38,7 +38,31 @@
 	 (setf (field-key-reader field) #'parse-integer))
 	((keywordp choice-key)
 	 (setf (field-key-reader field) #'alexandria:make-keyword))
-	(t (error "Invalid key ~A" choice-key))))))
+	(t (error "Invalid key ~A" choice-key)))))
+  ;; Add the choices constraint
+  (push 
+   (make-instance 'choice-field-validator
+		  :field field)
+   (field-constraints field)))
+
+(defclass field-validator (clavier::validator)
+  ((field :initarg :field
+	  :initform (error "Provide the field")
+	  :accessor validator-field
+	  :documentation "The validator field"))
+  (:metaclass closer-mop:funcallable-standard-class)
+  (:documentation "Generic field validator. Needs a field to be initialized"))
+
+(defclass choice-field-validator (field-validator)
+  ()
+  (:metaclass closer-mop:funcallable-standard-class)
+  (:default-initargs :message "The option is not valid"))
+
+(defmethod clavier::%validate ((validator choice-field-validator) object &rest args)
+  (let ((valid-choices (field-choices (validator-field validator))))
+    (every (lambda (elem)
+	     (member elem valid-choices))
+	   object)))
 
 (defmethod make-form-field ((field-type (eql :choice)) &rest args)
   (apply #'make-instance 'choice-form-field args))
