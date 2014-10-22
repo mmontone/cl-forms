@@ -69,7 +69,11 @@
   (cdr (assoc field-name (form-fields form))))
 
 (defclass form ()
-  ((name :initarg :name
+  ((id :initarg :id
+       :accessor form-id
+       :initform (string (gensym))
+       :documentation "The form id")
+   (name :initarg :name
 	 :accessor form-name
 	 :initform (error "Provide a name for the form")
 	 :documentation "The form name")
@@ -99,7 +103,11 @@
 		    :documentation "csrf field name")
    (errors :initform nil
 	   :accessor form-errors
-	   :documentation "Form errors after validation"))	    
+	   :documentation "Form errors after validation")
+   (client-validation :initarg :client-validation
+		      :initform t
+		      :accessor client-validation
+		      :documentation "When T, form client validation is enabled"))	    
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
@@ -161,6 +169,10 @@
 	 :initform t
 	 :accessor field-trim-p
 	 :documentation "Trim the input")
+   (validation-triggers :initarg :validation-triggers
+			:initform nil
+			:accessor field-validation-triggers
+			:documentation "Client side validation triggers. A list of :change, :focus, :focusout, :focusin, etc")
    (form :initarg :form
 	 :initform nil
 	 :accessor field-form

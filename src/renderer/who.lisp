@@ -15,15 +15,22 @@
   (with-html-output (*html*)
     (when (forms::form-errors form)
       (htm
-       (:ul
+       (:ul :class "errors"
 	(loop for error in (forms::form-errors form)
 	     do
 	     (htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error))))))))
-    (:form :action (forms::form-action form)
+    (:form :id (forms::form-id form)
+	   :action (forms::form-action form)
 	   :method (symbol-name (forms::form-method form))
 	   (loop for field in (forms::form-fields form)
 	      do
 		(forms::renderer-render-field renderer (cdr field) form)))))
+
+(defmethod forms::renderer-render-form :after ((renderer (eql :who)) form &rest args)
+  (when (forms::client-validation form)
+    (with-html-output (*html*)
+      (:script :type "text/javascript"
+	       (fmt "$('#~A').parsley();" (forms::form-id form))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who)) field form &rest args)
   (with-html-output (*html*)
@@ -54,14 +61,16 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (field forms::string-form-field) form &rest args)
-  (with-html-output (*html*)
-    (:input :type "text"
-	    :name (forms::form-field-name field form)
-	    :placeholder (forms::field-empty-value field)
-	    :value
-	    (when (forms::field-value field)
-	      (funcall (forms::field-formatter field)
-		       (forms::field-value field))))))
+  (format *html* "<input type=\"text\"")
+  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (forms::field-empty-value field)
+    (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
+  (renderer-render-field-attributes renderer field form)
+  (when (forms::field-value field)
+  (format *html* " value=\"~A\""
+	  (funcall (forms::field-formatter field)
+		   (forms::field-value field)))
+  (format *html* "></input>")))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -144,3 +153,21 @@
 				     "selected")
 			 (str (funcall (forms::field-formatter field)
 				       choice)))))))))))
+
+;; Attributes and constraints
+(defmethod renderer-render-field-attributes ((renderer (eql :who))
+					     field form)
+  (when (forms::client-validation form)
+    (when (forms::field-required-p field)
+      (format *html* " data-parsley-required=\"true\""))
+    (loop for constraint in (forms::field-constraints field)
+       do (renderer-render-field-constraint renderer constraint field form))))
+
+(defmethod renderer-render-field-constraint (renderer constraint field form))
+(defmethod renderer-render-field-constraint ((renderer (eql :who))
+					     (constraint clavier:length-validator)
+					     field form)
+  (when (clavier::validator-min constraint)
+    (format *html* " data-parsley-minlength=\"~A\"" (clavier::validator-min constraint)))
+  (when (clavier::validator-max constraint)
+    (format *html* " data-parsley-maxlength=\"~A\"" (clavier::validator-max constraint))))
