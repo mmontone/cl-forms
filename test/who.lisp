@@ -175,17 +175,20 @@
 						  (asdf:system-relative-pathname :cl-forms "bower_components/"))
  hunchentoot:*dispatch-table*)
 
+(defmacro with-html-page (&body body)
+  `(who:with-html-output (forms.who::*html*)
+     (:html
+      (:title "Client side validation test")
+      (:link :rel "stylesheet" :type "text/css" :href "/static/parsleyjs/src/parsley.css")
+      (:script :type "text/javascript" :src "/static/jquery/dist/jquery.js")
+      (:script :type "text/javascript" :src "/static/parsleyjs/dist/parsley.js")
+      (:body ,@body))))
+
 (hunchentoot:define-easy-handler (client-validation :uri "/client-validation") ()
   (let ((form (forms::get-form 'client-validated-form)))
     (forms:with-form-renderer :who
-      (who:with-html-output (forms.who::*html*)
-	(:html
-	 (:title "Client side validation test")
-	 (:link :rel "stylesheet" :type "text/css" :href "/static/parsleyjs/src/parsley.css")
-	 (:script :type "text/javascript" :src "/static/jquery/dist/jquery.js")
-	 (:script :type "text/javascript" :src "/static/parsleyjs/dist/parsley.js")
-	 (:body
-	  (forms:render-form form)))))))
+      (with-html-page
+	(forms:render-form form)))))
 
 (hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
   (let ((form (forms:get-form 'client-validated-form)))
@@ -200,4 +203,5 @@
 	     (:li (who:fmt "Sex: ~A" (forms::field-value sex))))))
 	;; The form is not valid
 	(forms:with-form-renderer :who
-	  (forms:render-form form)))))
+	  (with-html-page
+	    (forms:render-form form))))))
