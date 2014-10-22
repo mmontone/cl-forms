@@ -13,12 +13,7 @@
 
 (defmethod forms::renderer-render-form ((renderer (eql :who)) form &rest args)
   (with-html-output (*html*)
-    (when (forms::form-errors form)
-      (htm
-       (:ul :class "errors"
-            (loop for error in (forms::form-errors form)
-               do
-                 (htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error))))))))
+    (apply #'forms::renderer-render-form-errors renderer form args)
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
            :method (symbol-name (forms::form-method form))
@@ -36,6 +31,14 @@
     (with-html-output (*html*)
       (:script :type "text/javascript"
                (fmt "$('#~A').parsley();" (forms::form-id form))))))
+
+(defmethod forms::renderer-render-form-errors ((renderer (eql :who)) form &rest args)
+  (when (forms::form-errors form)
+    (with-html-output (*html*)
+      (:ul :class "errors"
+	   (loop for error in (forms::form-errors form)
+	      do
+		(htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error)))))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who)) field form &rest args)
   (with-html-output (*html*)
