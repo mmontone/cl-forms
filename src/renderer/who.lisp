@@ -22,6 +22,11 @@
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
            :method (symbol-name (forms::form-method form))
+	   (when (forms::form-csrf-protection-p form)
+	     (let ((token (forms::set-form-session-csrf-token form)))
+	       (htm
+		(:input :name (forms::form-csrf-field-name form)
+			:type "hidden" :value token))))	     
            (loop for field in (forms::form-fields form)
               do
                 (forms::renderer-render-field renderer (cdr field) form)))))

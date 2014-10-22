@@ -121,6 +121,11 @@
      do
        (setf (field-form (cdr field)) form)))
 
+(defmethod make-csrf-token ((form form))
+  (ironclad:byte-array-to-hex-string
+   (ironclad:ascii-string-to-byte-array
+    (princ-to-string (uuid:make-v4-uuid)))))
+
 (defclass form-field ()
   ((name :initarg :name
 	 :initform (error "Provide the field name")
@@ -219,6 +224,17 @@
 	   (push error-msg errors))))
     errors))
 
+(defmethod form-session-csrf-entry ((form form))
+  (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
+
+(defmethod get-form-session-csrf-token ((form form))
+  (hunchentoot:session-value (form-session-csrf-entry form)))
+
+(defmethod set-form-session-csrf-token ((form form))
+  (hunchentoot:start-session)
+  (setf (hunchentoot:session-value (form-session-csrf-entry form))
+	(make-csrf-token form)))
+
 (defun validate-form (&optional (form *form*))
   (setf (form-errors form)
 	(loop for field in (form-fields form)
@@ -251,6 +267,13 @@
 (defgeneric renderer-render-field-widget (renderer field form &rest argss))
 
 (defun handle-request (&optional (form *form*))
+  (when (form-csrf-protection-p form)
+    ;; Check the csrf token
+    (let ((session-token (get-form-session-csrf-token form)))
+      (when (or (not session-token)
+		(not (equalp session-token
+			     (hunchentoot:post-parameter (form-csrf-field-name form)))))
+	(error "Invalid CSRF token"))))
   (loop for field in (form-fields form)
        do (field-read-from-request (cdr field) form)))
 

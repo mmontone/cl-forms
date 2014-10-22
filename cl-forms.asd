@@ -8,6 +8,8 @@
   :depends-on (#:alexandria
                #:cl-ppcre
                #:hunchentoot
+	       #:ironclad
+	       #:uuid
 	       #:clavier)
   :components ((:module :src
 			:components
