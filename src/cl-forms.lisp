@@ -131,6 +131,7 @@
 	  :accessor field-label
 	  :documentation "The field label")
    (value :initarg :value
+	  :initform nil
 	  :accessor field-value
 	  :documentation "Field value")
    (empty-value :initarg :empty-value

@@ -121,8 +121,10 @@
   ((name :string :value "" :constraints (list (clavier:is-a-string)
 					      (clavier:not-blank)
 					      (clavier:len :max 5)))
-   (ready :boolean :value t)
+   (single :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
+   (age :integer)
+   (email :email)
    (submit :submit :label "Create")))
 
 (let ((form (forms:get-form 'validated-form)))
@@ -149,12 +151,14 @@
     (forms::handle-request form)
     (if (forms::validate-form form)
 	;; The form is valid
-	(forms::with-form-fields (name ready sex) form
+	(forms::with-form-field-values (name single sex age email) form
 	  (who:with-html-output-to-string (html)
 	    (:ul 
-	     (:li (who:fmt "Name: ~A" (forms::field-value name)))
-	     (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
-	     (:li (who:fmt "Sex: ~A" (forms::field-value sex))))))
+	     (:li (who:fmt "Name: ~A" name))
+	     (:li (who:fmt "Single: ~A" single))
+	     (:li (who:fmt "Sex: ~A" sex))
+	     (:li (who:fmt "Age: ~A" age))
+	     (:li (who:fmt "Email: ~A" email)))))
 	;; The form is not valid
 	(forms:with-form-renderer :who
 	  (forms:render-form form)))))
@@ -166,8 +170,10 @@
   ((name :string :value "" :constraints (list (clavier:is-a-string)
 					      (clavier:not-blank)
 					      (clavier:len :max 5)))
-   (ready :boolean :value t)
+   (single :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
+   (age :integer)
+   (email :email)
    (submit :submit :label "Create")))
 
 (push
@@ -195,12 +201,14 @@
     (forms::handle-request form)
     (if (forms::validate-form form)
 	;; The form is valid
-	(forms::with-form-fields (name ready sex) form
+	(forms::with-form-field-values (name single sex age email) form
 	  (who:with-html-output-to-string (html)
 	    (:ul 
-	     (:li (who:fmt "Name: ~A" (forms::field-value name)))
-	     (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
-	     (:li (who:fmt "Sex: ~A" (forms::field-value sex))))))
+	     (:li (who:fmt "Name: ~A" name))
+	     (:li (who:fmt "Single: ~A" single))
+	     (:li (who:fmt "Sex: ~A" sex))
+	     (:li (who:fmt "Age: ~A" age))
+	     (:li (who:fmt "Email: ~A" email)))))
 	;; The form is not valid
 	(forms:with-form-renderer :who
 	  (with-html-page

@@ -17,6 +17,8 @@
 				  :components
 				  ((:file "string")
 				   (:file "boolean")
+				   (:file "email")
+				   (:file "integer")
 				   (:file "choice")
 				   (:file "submit")))))))
 	       

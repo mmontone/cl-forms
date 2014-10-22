@@ -2,12 +2,10 @@
 
 (defclass string-form-field (form-field)
   ()
-  (:default-initargs :constraints (list (clavier:is-a-string)))
   (:documentation "A string input field"))
 
 (defclass text-form-field (string-form-field)
   ()
-  (:default-initargs :constraints (list (clavier:is-a-string)))
   (:documentation "A text field. Renders as a text area"))
 
 (defmethod validate-form-field ((form-field string-form-field))
