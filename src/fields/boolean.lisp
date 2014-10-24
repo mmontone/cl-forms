@@ -2,8 +2,17 @@
 
 (defclass boolean-form-field (form-field)
   ()
-  (:default-initargs :constraints (list (clavier:is-a-boolean)))
   (:documentation "A boolean input"))
+
+(defmethod validate-form-field ((form-field boolean-form-field))
+  (multiple-value-bind (valid-p error)
+      (funcall (clavier:is-a-boolean "~A should be a boolean" (field-name form-field))
+	       (field-value form-field))
+    (multiple-value-bind (valid-constraints-p errors)
+	(call-next-method)
+      (values (and valid-p valid-constraints-p)
+	      (if error (cons error errors)
+		  errors)))))
 
 (defmethod field-read-from-request ((field boolean-form-field) form)
   (setf (field-value field)

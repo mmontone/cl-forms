@@ -9,10 +9,14 @@
   (:documentation "A text field. Renders as a text area"))
 
 (defmethod validate-form-field ((form-field string-form-field))
-  (and
+  (multiple-value-bind (valid-p error)
    (funcall (clavier:is-a-string "~A should be a string" (field-name form-field))
 	    (field-value form-field))
-   (call-next-method)))
+    (multiple-value-bind (valid-constraints-p errors)
+	(call-next-method)
+      (values (and valid-p valid-constraints-p)
+	      (if error (cons error errors)
+		  errors)))))
 
 (defmethod field-read-from-request ((field string-form-field) form)
   (setf (field-value field)

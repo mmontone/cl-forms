@@ -222,7 +222,8 @@
 		      (field-value form-field))
 	 (when (not valid-p)
 	   (push error-msg errors))))
-    errors))
+    (values (not errors)
+	    errors)))
 
 (defmethod form-session-csrf-entry ((form form))
   (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
@@ -239,12 +240,13 @@
   (setf (form-errors form)
 	(loop for field in (form-fields form)
 	   appending
-	     (let ((errors
-		    (validate-form-field (cdr field))))
+	     (multiple-value-bind (valid-p errors)
+		    (validate-form-field (cdr field))
 	       (when errors
 		 (list (cons (car field) errors))))))
-  (null (form-errors form)))
-  
+  (values (null (form-errors form))
+	  (form-errors form)))
+
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* form args))
 
