@@ -136,7 +136,7 @@
   (setf (forms::field-value (forms::get-field form 'name))
 	"asdfasdf")
   (forms::validate-form form)
-  (setf (forms::field-value (forms::get-field form 'ready))
+  (setf (forms::field-value (forms::get-field form 'single))
 	"foo")
   (forms::validate-form form)
   (forms::form-errors form))
