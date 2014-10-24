@@ -5,10 +5,14 @@
   (:documentation "An integer input field"))
 
 (defmethod validate-form-field ((form-field integer-form-field))
-  (and
+  (multiple-value-bind (valid-p error)
    (funcall (clavier:is-an-integer "~A is not an integer" (field-name form-field))
 	    (field-value form-field))
-   (call-next-method)))
+    (multiple-value-bind (valid-constraints-p errors)
+	(call-next-method)
+      (values (and valid-p valid-constraints-p)
+	      (if error (cons error errors)
+		  errors)))))
 
 (defmethod field-read-from-request ((field integer-form-field) form)
   (setf (field-value field)

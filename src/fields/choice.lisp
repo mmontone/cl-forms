@@ -24,7 +24,11 @@
    (hash-function :initarg :hash-function
 		  :initform #'sxhash
 		  :accessor field-hash-function
-		  :documentation "The function to use for choices key")) 
+		  :documentation "The function to use for choices key")
+   (test :initarg :test
+	 :initform #'eql
+	 :accessor field-test
+	 :documentation "Function to test equality between choices")) 
   (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes."))
 
 (defmethod initialize-instance :after ((field choice-form-field) &rest initargs)
@@ -60,9 +64,14 @@
 
 (defmethod clavier::%validate ((validator choice-field-validator) object &rest args)
   (let ((valid-choices (field-choices (validator-field validator))))
-    (every (lambda (elem)
-	     (member elem valid-choices))
-	   object)))
+    (if (forms::field-multiple (validator-field validator))
+	(every (lambda (elem)
+		 (member elem valid-choices :test
+			 (field-test (validator-field validator))))
+	       object)
+	(member object valid-choices :test
+		(field-test
+		 (validator-field validator))))))
 
 (defmethod make-form-field ((field-type (eql :choice)) &rest args)
   (apply #'make-instance 'choice-form-field args))

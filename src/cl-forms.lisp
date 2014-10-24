@@ -213,15 +213,26 @@
 
 (defgeneric validate-form-field (form-field))
 
+(defmethod validate-form-field :around ((form-field form-field))
+  (cond
+    ((and (field-required-p form-field)
+	  (null (field-value form-field)))
+     (values nil
+	     (list (format nil "~A is required" (field-name form-field)))))
+    ((and (not (field-required-p form-field))
+	  (null (field-value form-field)))
+     (values t nil))
+    (t (call-next-method))))
+    
 (defmethod validate-form-field ((form-field form-field))
   (let ((errors nil))
     (loop for constraint in (field-constraints form-field)
-	 do
+       do
 	 (multiple-value-bind (valid-p error-msg)
 	     (funcall constraint
 		      (field-value form-field))
-	 (when (not valid-p)
-	   (push error-msg errors))))
+	   (when (not valid-p)
+	     (push error-msg errors))))
     (values (not errors)
 	    errors)))
 
@@ -242,7 +253,7 @@
 	   appending
 	     (multiple-value-bind (valid-p errors)
 		    (validate-form-field (cdr field))
-	       (when errors
+	       (when (not valid-p)
 		 (list (cons (car field) errors))))))
   (values (null (form-errors form))
 	  (form-errors form)))
