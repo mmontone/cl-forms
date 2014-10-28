@@ -96,6 +96,20 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (field forms::url-form-field) form &rest args)
+  (format *html* "<input type=\"url\"")
+  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (forms::field-empty-value field)
+    (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
+  (renderer-render-field-attributes renderer field form)
+  (when (forms::field-value field)
+    (format *html* " value=\"~A\""
+            (funcall (forms::field-formatter field)
+                     (forms::field-value field))))
+  (format *html* "></input>"))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
      (field forms::integer-form-field) form &rest args)
   (format *html* "<input type=\"number\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))

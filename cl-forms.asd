@@ -20,6 +20,7 @@
 				  ((:file "string")
 				   (:file "boolean")
 				   (:file "email")
+				   (:file "url")
 				   (:file "integer")
 				   (:file "choice")
 				   (:file "submit")))))))
