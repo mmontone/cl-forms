@@ -65,8 +65,11 @@
 	      collect `(,field (field-value (get-field ,form ',field))))
      ,@body))
 
-(defun get-field (form field-name)
-  (cdr (assoc field-name (form-fields form))))
+(defun get-field (form field-name &optional (error-p t))
+  (or 
+   (cdr (assoc field-name (form-fields form)))
+   (when error-p
+     (error "Field ~A not found in ~A" field-name form))))
 
 (defclass form ()
   ((id :initarg :id
@@ -261,8 +264,11 @@
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 
+(defun render-form-errors (&optional (form *form*) &rest args)
+  (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args))
+
 (defun render-field (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field *form-renderer* *form-theme* *form-theme* field form args))
+  (apply #'renderer-render-field *form-renderer* *form-theme* field form args))
 
 (defun render-field-label (field &optional (form *form*) &rest args)
   (apply #'renderer-render-field-label *form-renderer* *form-theme* field form args))
