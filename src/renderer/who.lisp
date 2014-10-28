@@ -11,9 +11,11 @@
     (with-html-output-to-string (*html*)
       (funcall function))))
 
-(defmethod forms::renderer-render-form ((renderer (eql :who)) form &rest args)
+(defmethod forms::renderer-render-form ((renderer (eql :who))
+					(theme forms::default-form-theme)
+					form &rest args)
   (with-html-output (*html*)
-    (apply #'forms::renderer-render-form-errors renderer form args)
+    (apply #'forms::renderer-render-form-errors renderer theme form args)
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
            :method (symbol-name (forms::form-method form))
@@ -24,15 +26,19 @@
 			:type "hidden" :value token))))	     
            (loop for field in (forms::form-fields form)
               do
-                (forms::renderer-render-field renderer (cdr field) form)))))
+                (forms::renderer-render-field renderer theme (cdr field) form)))))
 
-(defmethod forms::renderer-render-form :after ((renderer (eql :who)) form &rest args)
+(defmethod forms::renderer-render-form :after ((renderer (eql :who))
+					       (theme forms::default-form-theme)
+					       form &rest args)
   (when (forms::client-validation form)
     (with-html-output (*html*)
       (:script :type "text/javascript"
                (fmt "$('#~A').parsley();" (forms::form-id form))))))
 
-(defmethod forms::renderer-render-form-errors ((renderer (eql :who)) form &rest args)
+(defmethod forms::renderer-render-form-errors ((renderer (eql :who))
+					       (theme forms::default-form-theme)
+					       form &rest args)
   (when (forms::form-errors form)
     (with-html-output (*html*)
       (:ul :class "errors"
@@ -40,23 +46,32 @@
 	      do
 		(htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error)))))))))
 
-(defmethod forms::renderer-render-field ((renderer (eql :who)) field form &rest args)
+(defmethod forms::renderer-render-field ((renderer (eql :who))
+					 (theme forms::default-form-theme)
+					 field form &rest args)
   (with-html-output (*html*)
     (:div
-     (forms::renderer-render-field-label renderer field form)
-     (forms::renderer-render-field-errors renderer field form)
-     (forms::renderer-render-field-widget renderer field form))))
+     (forms::renderer-render-field-label renderer theme field form)
+     (forms::renderer-render-field-errors renderer theme field form)
+     (forms::renderer-render-field-widget renderer theme field form))))
 
-(defmethod forms::renderer-render-field-label ((renderer (eql :who)) field form &rest args)
+(defmethod forms::renderer-render-field-label ((renderer (eql :who))
+					       (theme forms::default-form-theme)
+					       field form &rest args)
   (with-html-output (*html*)
     (:label
      (str (or (forms::field-label field)
               (forms::field-name field))))))
 
-(defmethod forms::renderer-render-field-label ((renderer (eql :who)) (field forms::submit-form-field) form &rest args)
+(defmethod forms::renderer-render-field-label ((renderer (eql :who))
+					       theme
+					       (field forms::submit-form-field)
+					       form &rest args)
   )
 
-(defmethod forms::renderer-render-field-errors ((renderer (eql :who)) field form &rest args)
+(defmethod forms::renderer-render-field-errors ((renderer (eql :who))
+						(theme forms::default-form-theme)
+						field form &rest args)
   (let ((errors (cdr (assoc (forms::field-name field)
                             (forms::form-errors form)
                             :test #'equalp
@@ -68,12 +83,14 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
-     (field forms::string-form-field) form &rest args)
+     (theme forms::default-form-theme)
+     (field forms::string-form-field)
+     form &rest args)
   (format *html* "<input type=\"text\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
-  (renderer-render-field-attributes renderer field form)
+  (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (funcall (forms::field-formatter field)
@@ -82,12 +99,13 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::email-form-field) form &rest args)
   (format *html* "<input type=\"email\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
-  (renderer-render-field-attributes renderer field form)
+  (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (funcall (forms::field-formatter field)
@@ -96,12 +114,13 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::url-form-field) form &rest args)
   (format *html* "<input type=\"url\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
-  (renderer-render-field-attributes renderer field form)
+  (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (funcall (forms::field-formatter field)
@@ -110,12 +129,13 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::integer-form-field) form &rest args)
   (format *html* "<input type=\"number\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
-  (renderer-render-field-attributes renderer field form)
+  (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (funcall (forms::field-formatter field)
@@ -124,6 +144,7 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"
@@ -133,6 +154,7 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::submit-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "submit"
@@ -140,6 +162,7 @@
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::choice-form-field) form &rest args)
   (cond
     ((and (forms::field-expanded field)
@@ -206,6 +229,7 @@
 
 ;; Attributes and constraints
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
+					     theme
                                              field form)
   (when (forms::client-validation form)
     (when (forms::field-required-p field)
@@ -214,6 +238,7 @@
        do (renderer-render-field-constraint renderer constraint field form))))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
+					     theme
 					     (field forms::integer-form-field)
 					     form)
   (format *html* " data-parsley-type=\"integer\"")

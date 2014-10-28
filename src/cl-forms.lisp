@@ -259,25 +259,25 @@
 	  (form-errors form)))
 
 (defun render-form (&optional (form *form*) &rest args)
-  (apply #'renderer-render-form *form-renderer* form args))
+  (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 
 (defun render-field (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field *form-renderer* field form args))
+  (apply #'renderer-render-field *form-renderer* *form-theme* *form-theme* field form args))
 
 (defun render-field-label (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field-label *form-renderer* field form args))
+  (apply #'renderer-render-field-label *form-renderer* *form-theme* field form args))
 
 (defun render-field-errors (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field-errors *form-renderer* field form args))
+  (apply #'renderer-render-field-errors *form-renderer* *form-theme* field form args))
 
 (defun render-field-widget (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field-widget *form-renderer* field form args))
+  (apply #'renderer-render-field-widget *form-renderer* *form-theme* field form args))
 
-(defgeneric renderer-render-form (renderer form &rest args))
-(defgeneric renderer-render-field (renderer field form &rest args))
-(defgeneric renderer-render-field-label (renderer field form &rest args))
-(defgeneric renderer-render-field-errors (renderer field form &rest args))
-(defgeneric renderer-render-field-widget (renderer field form &rest argss))
+(defgeneric renderer-render-form (renderer theme form &rest args))
+(defgeneric renderer-render-field (renderer theme field form &rest args))
+(defgeneric renderer-render-field-label (renderer theme field form &rest args))
+(defgeneric renderer-render-field-errors (renderer theme field form &rest args))
+(defgeneric renderer-render-field-widget (renderer theme field form &rest argss))
 
 (defun handle-request (&optional (form *form*))
   (when (form-csrf-protection-p form)

@@ -14,6 +14,13 @@
   :components ((:module :src
 			:components
 			((:file "package")
+			 (:module :themes
+				  :components
+				  ((:file "theme")
+				   (:file "default")
+				   (:file "bootstrap")
+				   (:file "specials"))
+				  :serial t)
 			 (:file "cl-forms")
 			 (:module :fields
 				  :components
@@ -23,5 +30,6 @@
 				   (:file "url")
 				   (:file "integer")
 				   (:file "choice")
-				   (:file "submit")))))))
+				   (:file "submit"))))
+			:serial t)))
 	       
