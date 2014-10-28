@@ -21,7 +21,11 @@
     (let ((form
            (getf djula::*template-arguments* form-name)))
       (format stream #?'<form action="${(forms::form-action form)}"
-              method="${(forms::form-method form)}">'))))
+              method="${(forms::form-method form)}">')
+      (when (forms::form-csrf-protection-p form)
+	(let ((token (forms::set-form-session-csrf-token form)))
+	  (format stream #?'<input name="${(forms::form-csrf-field-name form)}"
+			type="hidden" value="${token}"'))))))
 
 (djula::def-tag-compiler :form-end (&optional form-name)
   "Finish form rendering"
