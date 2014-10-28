@@ -131,6 +131,20 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
      (theme forms::default-form-theme)
+     (field forms::password-form-field) form &rest args)
+  (<input (<type= "password")
+	  (<name= (forms::form-field-name field form))
+	  (when (forms::field-empty-value field)
+	    (<placeholder= (forms::field-empty-value field)))
+	  (renderer-render-field-attributes renderer theme field form)
+	  (when (forms::field-value field)
+	    (<value=
+	     (funcall (forms::field-formatter field)
+		      (forms::field-value field))))))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :qimt))
+     (theme forms::default-form-theme)
      (field forms::boolean-form-field) form &rest args)
   (<input (<type= "checkbox")
 	  (<name= (forms::form-field-name field form))

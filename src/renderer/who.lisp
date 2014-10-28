@@ -145,6 +145,22 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (theme forms::default-form-theme)
+     (field forms::password-form-field)
+     form &rest args)
+  (format *html* "<input type=\"password\"")
+  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (forms::field-empty-value field)
+    (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
+  (renderer-render-field-attributes renderer theme field form)
+  (when (forms::field-value field)
+    (format *html* " value=\"~A\""
+            (funcall (forms::field-formatter field)
+                     (forms::field-value field))))
+    (format *html* "></input>"))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"

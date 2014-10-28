@@ -27,6 +27,7 @@
 				  ((:file "string")
 				   (:file "boolean")
 				   (:file "email")
+				   (:file "password")
 				   (:file "url")
 				   (:file "integer")
 				   (:file "choice")
