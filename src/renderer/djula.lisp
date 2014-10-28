@@ -21,7 +21,10 @@
     (let ((form
            (getf djula::*template-arguments* form-name)))
       (format stream #?'<form action="${(forms::form-action form)}"
-              method="${(forms::form-method form)}">')
+              method="${(forms::form-method form)}"
+	      ${(if (getf args :class)
+		    (format nil " class=\"~A\"" (getf args :class))
+		    "")}>')
       (when (forms::form-csrf-protection-p form)
 	(let ((token (forms::set-form-session-csrf-token form)))
 	  (format stream #?'<input name="${(forms::form-csrf-field-name form)}"
@@ -51,7 +54,7 @@
                 (forms.who::*html* stream))
             (apply #'forms::render-field field form args)))))))
 
-(djula:def-tag-compiler :form-field-label (form-name field-name)
+(djula:def-tag-compiler :form-field-label (form-name field-name &rest args)
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
@@ -59,9 +62,9 @@
         (let ((field (forms::get-field form field-symbol)))
           (let ((forms::*form-renderer* :who)
                 (forms.who::*html* stream))
-            (forms::render-field-label field form)))))))
+            (apply #'forms::render-field-label field form args)))))))
 
-(djula:def-tag-compiler :form-field-errors (form-name field-name)
+(djula:def-tag-compiler :form-field-errors (form-name field-name &rest args)
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
@@ -69,7 +72,7 @@
         (let ((field (forms::get-field form field-symbol)))
           (let ((forms::*form-renderer* :who)
                 (forms.who::*html* stream))
-            (forms::render-field-errors field form)))))))
+            (apply #'forms::render-field-errors field form args)))))))
 
 (djula:def-tag-compiler :form-field-widget (form-name field-name &rest args)
   (lambda (stream)

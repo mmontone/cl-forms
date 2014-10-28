@@ -19,6 +19,7 @@
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
            :method (symbol-name (forms::form-method form))
+	   :class (getf args :class)
 	   (when (forms::form-csrf-protection-p form)
 	     (let ((token (forms::set-form-session-csrf-token form)))
 	       (htm
@@ -41,7 +42,7 @@
 					       form &rest args)
   (when (forms::form-errors form)
     (with-html-output (*html*)
-      (:ul :class "errors"
+      (:ul :class (or (getf args :class "errors"))
 	   (loop for error in (forms::form-errors form)
 	      do
 		(htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error)))))))))
@@ -51,23 +52,18 @@
 					 field form &rest args)
   (with-html-output (*html*)
     (:div
-     (forms::renderer-render-field-label renderer theme field form)
-     (forms::renderer-render-field-errors renderer theme field form)
-     (forms::renderer-render-field-widget renderer theme field form))))
+     (apply #'forms::renderer-render-field-label renderer theme field form args)
+     (apply #'forms::renderer-render-field-errors renderer theme field form args)
+     (apply #'forms::renderer-render-field-widget renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-label ((renderer (eql :who))
 					       (theme forms::default-form-theme)
 					       field form &rest args)
   (with-html-output (*html*)
     (:label
+     :class (getf args :class)
      (str (or (forms::field-label field)
               (forms::field-name field))))))
-
-(defmethod forms::renderer-render-field-label ((renderer (eql :who))
-					       theme
-					       (field forms::submit-form-field)
-					       form &rest args)
-  )
 
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who))
 						(theme forms::default-form-theme)
@@ -78,7 +74,7 @@
                             :key #'string))))
     (when errors
       (with-html-output (*html*)
-        (:div :class "errors"
+        (:div :class (or (getf args :class) "errors")
               (fmt "~{~A~^, ~}" errors))))))
 
 (defmethod forms::renderer-render-field-widget
@@ -88,6 +84,8 @@
      form &rest args)
   (format *html* "<input type=\"text\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
   (renderer-render-field-attributes renderer theme field form)
@@ -103,6 +101,8 @@
      (field forms::email-form-field) form &rest args)
   (format *html* "<input type=\"email\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
   (renderer-render-field-attributes renderer theme field form)
@@ -118,6 +118,8 @@
      (field forms::url-form-field) form &rest args)
   (format *html* "<input type=\"url\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
   (renderer-render-field-attributes renderer theme field form)
@@ -133,6 +135,8 @@
      (field forms::integer-form-field) form &rest args)
   (format *html* "<input type=\"number\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
   (renderer-render-field-attributes renderer theme field form)
@@ -149,6 +153,8 @@
      form &rest args)
   (format *html* "<input type=\"password\"")
   (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
     (format *html* " placeholder=\"~A\"" (forms::field-empty-value field)))
   (renderer-render-field-attributes renderer theme field form)
@@ -164,6 +170,7 @@
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"
+	    :class (getf args :class)
             :name (forms::form-field-name field form)
             :checked (when (forms::field-value field)
                        "checked"))))
@@ -174,6 +181,7 @@
      (field forms::submit-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "submit"
+	    :class (getf args :class)
             :value (or (forms::field-label field) "Submit"))))
 
 (defmethod forms::renderer-render-field-widget
