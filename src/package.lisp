@@ -10,4 +10,6 @@
 	   :get-form
 	   :render-form
 	   :with-form-fields
-	   :with-form-field-values))
+	   :with-form-field-values
+	   :handle-request
+	   :validate-form))
