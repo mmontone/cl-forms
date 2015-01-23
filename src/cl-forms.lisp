@@ -53,7 +53,10 @@
 	 (cons field-name (apply #'make-form-field field-type :name (string field-name) field-args)))))
 
 (defun get-form (name &rest args)
-  (apply (get name :form) args))
+  (let ((form-builder (get name :form)))
+    (when (not form-builder)
+      (error "Form not found: ~A" name))
+    (apply form-builder args)))
 
 (defmacro with-form-fields (fields form &body body)
   `(let ,(loop for field in fields
