@@ -8,7 +8,7 @@
 
 (defun tests-demo ()
   (let ((test-results (forms.test:run-tests)))
-    (who:with-html-output (*html*)
+    (who:with-html-output (forms.who::*html*)
       (:div :class "panel-group" :id "accordion" :role "tablist" 
 	    :aria-multiselectable"true"
 	    (loop for test-result in test-results

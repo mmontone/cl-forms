@@ -42,7 +42,7 @@
 (defun render-demo-page (&key (demo (error "Provide the demo"))
                               (source (error "Provide the source"))
                               (active-menu :fields))
-  (who:with-html-output-to-string (*html*)
+  (who:with-html-output-to-string (forms.who::*html*)
     (:html
      (:head
       (:title "cl-forms demo")
@@ -89,7 +89,7 @@
                               (funcall demo))
                         (:div :role "tabpanel" :class "tab-pane" :id "source"
                               (:div :class "prettyprint"
-				    (file-string source))))))
+				    (who:str (file-string source)))))))
                                         ;(:script :src "https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js")
       (:script :src "jquery.js")
       (:script :src "bootstrap.js")))))
