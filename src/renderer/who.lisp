@@ -4,12 +4,11 @@
 
 (in-package :forms.who)
 
-(defvar *html*)
+(defvar *html* nil)
 
 (defmethod forms::call-with-form-renderer ((renderer (eql :who)) function)
   (let ((forms::*form-renderer* renderer))
-    (with-html-output-to-string (*html*)
-      (funcall function))))
+    (funcall function)))
 
 (defmethod forms::renderer-render-form ((renderer (eql :who))
 					(theme forms::default-form-theme)
