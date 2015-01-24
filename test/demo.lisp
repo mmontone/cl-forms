@@ -81,13 +81,14 @@
                             (:a :href "/tests" (who:str "Tests")))))
             (:div :role "tabpanel" :class "col-md-9"
                   (:ul :class "nav nav-tabs" :role "tablist"
-                       :data-toggle "tab"
-                       (:li :role "tab" :class "active"
+		       (:li :role "tab" :class "active"
                             :aria-controls "demo"
-                            (:a :href "#demo" (who:str "Demo")))
+                            (:a :href "#demo" :data-toggle "tab"
+				(who:str "Demo")))
                        (:li :role "tab"
                             :aria-controls "source"
-                            (:a :href "#source" (who:str "Source"))))
+                            (:a :href "#source" :data-toggle "tab"
+				(who:str "Source"))))
                   (:div :class "tab-content"
                         (:div :role "tabpanel" :class "tab-pane active" :id "demo"
                               (funcall demo))
