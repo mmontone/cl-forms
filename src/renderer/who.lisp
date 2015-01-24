@@ -275,3 +275,13 @@
     (format *html* " data-parsley-minlength=\"~A\"" (clavier::validator-min constraint)))
   (when (clavier::validator-max constraint)
     (format *html* " data-parsley-maxlength=\"~A\"" (clavier::validator-max constraint))))
+
+(defmethod renderer-render-field-constraint ((renderer (eql :who))
+					     (constraint clavier:greater-than-validator)
+					     field form)
+  (format *html* " data-parsley-min=\"~A\"" (clavier::validator-number constraint)))
+
+(defmethod renderer-render-field-constraint ((renderer (eql :who))
+					     (constraint clavier:less-than-validator)
+					     field form)
+  (format *html* " data-parsley-max=\"~A\"" (clavier::validator-number constraint)))
