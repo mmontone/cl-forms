@@ -59,6 +59,10 @@
                             :class (and (equalp active-menu :fields)
                                         "active")
                             (:a :href "/fields" (who:str "Fields")))
+		       (:li :role "presentation"
+                            :class (and (equalp active-menu :models)
+                                        "active")
+                            (:a :href "/models" (who:str "Models")))
                        (:li :role "presentation"
                             :class (and (equalp active-menu :validation)
                                         "active")
