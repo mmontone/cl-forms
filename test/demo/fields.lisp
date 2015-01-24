@@ -1,16 +1,31 @@
 (in-package :forms.test)
 
-(hunchentoot:define-easy-handler (fields-demo-handler :uri "/fields") ()
-  (render-demo-page :demo #'fields-demo
-		    :source (asdf:system-relative-pathname :cl-forms.demo 
-							   "test/demo/fields.lisp")
-		    :active-menu :fields))
-
 (forms:defform fields-form (:action "/fields-post")
   ((name :string :value "")
    (ready :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
    (submit :submit :label "Create")))
+
+(defun fields-demo ()
+  (who:with-html-output (forms.who::*html*)
+    (:div :class :heading
+	  (:h3 (who:str "Simple form")))
+    (:div :class :row
+	  (let ((form (forms::get-form 'fields-form)))
+	    (forms:with-form-renderer :who
+	      (forms:render-form form))))
+    (:div :class :heading
+	  (:h3 (who:str "Choices")))
+    (:div :class :row
+	  (let ((form (forms::get-form 'choices-form)))
+	    (forms:with-form-renderer :who
+	      (forms:render-form form))))))  
+
+(hunchentoot:define-easy-handler (fields-demo-handler :uri "/fields") ()
+  (render-demo-page :demo #'fields-demo
+		    :source (asdf:system-relative-pathname :cl-forms.demo 
+							   "test/demo/fields.lisp")
+		    :active-menu :fields))
 
 (hunchentoot:define-easy-handler (fields-form-post 
 				  :uri "/fields-post" 
@@ -29,9 +44,41 @@
 							     "test/demo/fields.lisp")
 		      :active-menu :fields)))
 
-(defun fields-demo ()
-  (let ((form (forms::get-form 'fields-form)))
-    (forms:with-form-renderer :who
-      (forms:render-form form))))
+;; Choices widget test
 
+(forms:defform choices-form (:action "/choices-post")
+  ((sex :choice
+	:choices (list "Male" "Female")
+	:value "Male")
+   (sex2 :choice
+	 :choices (list "Male" "Female")
+	 :value "Female"
+	 :expanded t)
+   (choices :choice
+	    :choices (list "Foo" "Bar")
+	    :value (list "Foo")
+	    :multiple t)
+   (choices2 :choice
+	     :choices (list "Foo" "Bar")
+	     :value (list "Bar")
+	     :multiple t
+	     :expanded  t)
+   (submit :submit :label "Ok")))
 
+(hunchentoot:define-easy-handler (choices-form-post :uri "/choices-post" 
+						    :default-request-type :post) ()
+  (flet ((choices-post ()
+	   (let ((form (forms:get-form 'choices-form)))
+	     (forms::handle-request form)
+	     (forms::validate-form form)
+	     (forms::with-form-field-values (sex sex2 choices choices2) form
+	       (who:with-html-output (forms.who::*html*)
+		 (:ul 
+		   (:li (who:fmt "Sex: ~A" sex))
+		   (:li (who:fmt "Sex2: ~A" sex2))
+		   (:li (who:fmt "Choices: ~A" choices))
+		   (:li (who:fmt "Choices2: ~A" choices2))))))))
+    (render-demo-page :demo #'choices-post
+		      :source (asdf:system-relative-pathname :cl-forms.demo 
+							     "test/demo/fields.lisp")
+		      :active-menu :fields)))
