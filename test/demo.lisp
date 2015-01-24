@@ -43,6 +43,13 @@
 (define-static-resource "/prettify.css"
     "test/static/prettify/prettify.css")
 
+(define-static-resource "/parsley.css"
+    "test/static/bower_components/parsleyjs/src/parsley.css")
+
+(define-static-resource "/parsley.js"
+    "test/static/bower_components/parsleyjs/dist/parsley.js")
+
+
 (defun start-demo ()
   (hunchentoot:start *demo-acceptor*))
 
@@ -58,64 +65,70 @@
       (:title "cl-forms demo")
       (:link :rel "stylesheet" :href "/bootstrap.css")
       (:link :rel "stylesheet" :href "/prettify.css")
+      (:link :rel "stylesheet" :href "/parsley.css")
       (:script :src "/jquery.js")
       (:script :src "/bootstrap.js")
       (:script :src "/prettify.js")
-      (:script :src "/lang-lisp.js"))
+      (:script :src "/lang-lisp.js")
+      (:script :src "/parsley.js"))
      (:body :onload "prettyPrint()"
-      (:header :role"banner" :id "top" :class "navbar navbar-static-top"
-               (:div :class "container"
-                     (:div :class "navbar-header"
-                           (:a :class "navbar-brand" 
-			       :href "/" (who:str "CL-FORMS demo")))))
-      (:div :class "container"
-            (:div :class "col-md-3"
-                  (:ul :class "nav nav-pills nav-stacked"
-                       (:li :role "presentation"
-                            :class (and (equalp active-menu :fields)
-                                        "active")
-                            (:a :href "/fields" (who:str "Fields")))
-                       (:li :role "presentation"
-                            :class (and (equalp active-menu :models)
-                                        "active")
-                            (:a :href "/models" (who:str "Models")))
-                       (:li :role "presentation"
-                            :class (and (equalp active-menu :validation)
-                                        "active")
-                            (:a :href "/validation" (who:str "Validation")))
-                       (:li :role "presentation"
-                            :class (and (equalp active-menu :themes)
-                                        "active")
-                            (:a :href "/themes" (who:str "Themes")))
-                       (:li :role "presentation"
-                            :class (and (equalp active-menu :renderers)
-                                        "active")
-                            (:a :href "/renderers" (who:str "Renderers")))
-                       (:li :role "presentation"
-                            :class (and (equalp active-menu :tests)
-                                        "active")
-                            (:a :href "/tests" (who:str "Tests")))))
-            (:div :role "tabpanel" :class "col-md-9"
-                  (:ul :class "nav nav-tabs" :role "tablist"
-                       (:li :role "tab" :class "active"
-                            :aria-controls "demo"
-                            (:a :href "#demo" :data-toggle "tab"
-                                (who:str "Demo")))
-                       (:li :role "tab"
-                            :aria-controls "source"
-                            (:a :href "#source" :data-toggle "tab"
-				(who:str "Source"))))
-                  (:div :class "tab-content"
-                        (:div :role "tabpanel" :class "tab-pane active" 
-			      :id "demo"
-                              (funcall demo))
-                        (:div :role "tabpanel" :class "tab-pane" 
-			      :id "source"
-                              (:pre :class "prettyprint"
-                                    (who:str
-                                     (file-string source)
-                                     ))))))
-      ))))
+            (:header :role"banner" :id "top" :class "navbar navbar-static-top"
+                     (:div :class "container"
+                           (:div :class "navbar-header"
+                                 (:a :class "navbar-brand"
+                                     :href "/" (who:str "CL-FORMS demo")))))
+            (:div :class "container"
+                  (:div :class "col-md-3"
+                        (:ul :class "nav nav-pills nav-stacked"
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :fields)
+                                              "active")
+                                  (:a :href "/fields" (who:str "Fields")))
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :models)
+                                              "active")
+                                  (:a :href "/models" (who:str "Models")))
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :validation)
+                                              "active")
+                                  (:a :href "/validation" (who:str "Validation")))
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :client-validation)
+                                              "active")
+                                  (:a :href "/client-validation" (who:str "Client validation")))
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :themes)
+                                              "active")
+                                  (:a :href "/themes" (who:str "Themes")))
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :renderers)
+                                              "active")
+                                  (:a :href "/renderers" (who:str "Renderers")))
+                             (:li :role "presentation"
+                                  :class (and (equalp active-menu :tests)
+                                              "active")
+                                  (:a :href "/tests" (who:str "Tests")))))
+                  (:div :role "tabpanel" :class "col-md-9"
+                        (:ul :class "nav nav-tabs" :role "tablist"
+                             (:li :role "tab" :class "active"
+                                  :aria-controls "demo"
+                                  (:a :href "#demo" :data-toggle "tab"
+                                      (who:str "Demo")))
+                             (:li :role "tab"
+                                  :aria-controls "source"
+                                  (:a :href "#source" :data-toggle "tab"
+                                      (who:str "Source"))))
+                        (:div :class "tab-content"
+                              (:div :role "tabpanel" :class "tab-pane active"
+                                    :id "demo"
+                                    (funcall demo))
+                              (:div :role "tabpanel" :class "tab-pane"
+                                    :id "source"
+                                    (:pre :class "prettyprint"
+                                          (who:str
+                                           (file-string source)
+                                           ))))))
+            ))))
 
 (hunchentoot:define-easy-handler (demo-main :uri "/") ()
   (render-demo-page :demo #'fields-demo

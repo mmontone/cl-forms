@@ -1,7 +1,7 @@
 (in-package :forms.test)
 
-(forms:defform validated-form (:action "/validation-post"
-				       :client-validation nil)
+(forms:defform client-validated-form (:action "/client-validation-post"
+					      :client-validation t)
   ((name :string :value "" :constraints (list (clavier:is-a-string)
 					      (clavier:not-blank)
 					      (clavier:len :max 5)))
@@ -13,16 +13,20 @@
    (email :email)
    (submit :submit :label "Create")))
 
-(defun validation-demo ()
-  (let ((form (forms::get-form 'validated-form)))
-    (forms:with-form-renderer :who
-      (forms:render-form form))))
+(hunchentoot:define-easy-handler (client-validation-handler 
+				  :uri "/client-validation") ()
+  (flet ((client-validation ()
+	   (let ((form (forms::get-form 'client-validated-form)))
+	     (forms:with-form-renderer :who
+	       (forms:render-form form)))))
+    (render-demo-page :demo #'client-validation
+		      :source (asdf:system-relative-pathname :cl-forms.demo 
+							     "test/demo/client-validation.lisp")
+		      :active-menu :client-validation)))
 
-(hunchentoot:define-easy-handler (validated-form-post :uri "/validation-post" 
-						      :default-request-type :post) ()
-
-  (flet ((validation-post ()
-	   (let ((form (forms:get-form 'validated-form)))
+(hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
+  (flet ((client-validation-post ()
+	   (let ((form (forms:get-form 'client-validated-form)))
 	     (forms::handle-request form)
 	     (if (forms::validate-form form)
 		 ;; The form is valid
@@ -37,13 +41,7 @@
 		 ;; The form is not valid
 		 (forms:with-form-renderer :who
 		   (forms:render-form form))))))
-    (render-demo-page :demo #'validation-post
+    (render-demo-page :demo #'client-validation-post
 		      :source (asdf:system-relative-pathname :cl-forms.demo 
-							     "test/demo/validation.lisp")
-		      :active-menu :validation)))
-
-(hunchentoot:define-easy-handler (validation-demo-handler :uri "/validation") ()
-  (render-demo-page :demo #'validation-demo
-		    :source (asdf:system-relative-pathname :cl-forms.demo 
-							   "test/demo/validation.lisp")
-		    :active-menu :validation))
+							     "test/demo/client-validation.lisp")
+		      :active-menu :client-validation)))
