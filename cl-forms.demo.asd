@@ -16,6 +16,7 @@
 				  :pathname "demo"
 				  :components
 				  ((:file "fields")
+				   (:file "models")
 				   (:file "tests"))
 				  :serial t))
 			:serial t)))
