@@ -1,0 +1,8 @@
+{
+    "name": "cl-forms",
+    "dependencies": {
+	"jquery" : "latest",
+	"bootstrap" : "latest",
+	"parsleyjs" : "latest"
+    }
+}
