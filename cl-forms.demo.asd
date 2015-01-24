@@ -17,6 +17,7 @@
 				  :components
 				  ((:file "fields")
 				   (:file "models")
+				   (:file "validation")
 				   (:file "tests"))
 				  :serial t))
 			:serial t)))
