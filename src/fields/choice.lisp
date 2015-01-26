@@ -111,7 +111,7 @@
 		      value))
 	      (field-value field))))
 
-(defmethod field-read-from-request ((field choice-form-field) form)
+(defmethod field-read-from-request ((field choice-form-field) form parameters)
   (cond
     ((and (field-expanded field)
 	  (field-multiple field))
@@ -121,7 +121,7 @@
 				  (remove-if-not (lambda (param)
 					   (equalp (first param)
 						   (string (form-field-name field form))))
-					 (hunchentoot:post-parameters*))))
+					 parameters)))
 	   (choices-alist (field-choices-alist field)))
        (setf (field-value field)
 	     (mapcar (lambda (key)
@@ -132,7 +132,7 @@
      ;; Radio buttons rendered
      (setf (field-value field)
 	   (cdr (assoc (funcall (field-key-reader field)
-				(hunchentoot:post-parameter (form-field-name field form)))
+				(cdr (assoc (form-field-name field form) parameters :test #'string=)))
 		       (field-choices-alist field)))))
     ((and (not (field-expanded field))
 	  (field-multiple field))
@@ -142,7 +142,7 @@
 				  (remove-if-not (lambda (param)
 					   (equalp (first param)
 						   (string (form-field-name field form))))
-					 (hunchentoot:post-parameters*))))
+					 parameters)))
 	   (choices-alist (field-choices-alist field)))
        (setf (field-value field)
 	     (mapcar (lambda (key)
@@ -153,5 +153,5 @@
      ;; Single select box
      (setf (field-value field)
 	   (cdr (assoc (funcall (field-key-reader field)
-				(hunchentoot:post-parameter (form-field-name field form)))
+				(cdr (assoc (form-field-name field form) parameters :test #'string=)))
 		       (field-choices-alist field)))))))

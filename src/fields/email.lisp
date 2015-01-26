@@ -14,9 +14,9 @@
 	      (if error (cons error errors)
 		  errors)))))
 
-(defmethod field-read-from-request ((field email-form-field) form)
+(defmethod field-read-from-request ((field email-form-field) form parameters)
   (setf (field-value field)
-	(hunchentoot:post-parameter (form-field-name field form))))
+	(cdr (assoc (form-field-name field form) parameters :test #'string=))))
 
 (defmethod make-form-field ((field-type (eql :email)) &rest args)
   (apply #'make-instance 'email-form-field args))

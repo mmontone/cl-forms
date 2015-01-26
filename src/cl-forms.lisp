@@ -297,8 +297,9 @@
 			     (hunchentoot:post-parameter (form-csrf-field-name form)))))
 	(error "Invalid CSRF token"))))
   (loop for field in (form-fields form)
-       do (field-read-from-request (cdr field) form)))
+       do (field-read-from-request (cdr field) form
+				   (hunchentoot:post-parameters*))))
 
-(defgeneric field-read-from-request (field form))
+(defgeneric field-read-from-request (field form parameters))
 
 (defgeneric make-form-field (field-type &rest args))

@@ -4,9 +4,9 @@
   ()
   (:documentation "A password input field"))
 
-(defmethod field-read-from-request ((field password-form-field) form)
+(defmethod field-read-from-request ((field password-form-field) form parameters)
   (setf (field-value field)
-	(hunchentoot:post-parameter (form-field-name field form))))
+	(cdr (assoc (form-field-name field form) parameters :test #'string=))))
 
 (defmethod make-form-field ((field-type (eql :password)) &rest args)
   (apply #'make-instance 'password-form-field args))

@@ -14,9 +14,11 @@
 	      (if error (cons error errors)
 		  errors)))))
 
-(defmethod field-read-from-request ((field boolean-form-field) form)
+(defmethod field-read-from-request ((field boolean-form-field) form parameters)
   (setf (field-value field)
-	(equalp (hunchentoot:post-parameter (form-field-name field form)) "on")))
+	(equalp 
+	 (cdr (assoc (form-field-name field form) parameters :test #'string=)) 
+	 "on")))
 
 (defmethod make-form-field ((field-type (eql :boolean)) &rest args)
   (apply #'make-instance 'boolean-form-field args))
