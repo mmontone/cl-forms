@@ -5,10 +5,14 @@
   (:documentation "A string input field"))
 
 (defmethod validate-form-field ((form-field email-form-field))
-  (and
-   (funcall (clavier:valid-email "~A is not a valid email" (field-name form-field))
-	    (field-value form-field))
-   (call-next-method)))
+  (multiple-value-bind (valid-p error)
+      (funcall (clavier:valid-email "~A is not a valid email" (field-name form-field))
+	       (field-value form-field))
+    (multiple-value-bind (valid-constraints-p errors)
+	(call-next-method)
+      (values (and valid-p valid-constraints-p)
+	      (if error (cons error errors)
+		  errors)))))
 
 (defmethod field-read-from-request ((field email-form-field) form)
   (setf (field-value field)
