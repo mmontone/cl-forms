@@ -8,4 +8,6 @@
   :components ((:module :test
 			:components
 			((:file "package")
-			 (:file "test")))))
+			 (:file "test"))))
+  :perform (asdf:test-op (o c)
+			 (uiop:symbol-call :forms.test :run-tests)))
