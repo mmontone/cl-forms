@@ -50,7 +50,7 @@
     "test/static/bower_components/parsleyjs/dist/parsley.js")
 
 
-(defun start-demo ()
+(defun run-demo ()
   (hunchentoot:start *demo-acceptor*))
 
 (defun stop-demo ()
