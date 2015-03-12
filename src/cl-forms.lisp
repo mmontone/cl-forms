@@ -267,6 +267,12 @@
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 
+(defun render-form-start (&optional (form *form*) &rest args)
+  (apply #'renderer-render-form *form-renderer* *form-theme* form args))
+
+(defun render-form-end (&optional (form *form*))
+  (apply #'renderer-render-form-end *form-renderer* *form-theme* form))
+
 (defun render-form-errors (&optional (form *form*) &rest args)
   (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args))
 
@@ -283,6 +289,8 @@
   (apply #'renderer-render-field-widget *form-renderer* *form-theme* field form args))
 
 (defgeneric renderer-render-form (renderer theme form &rest args))
+(defgeneric renderer-render-form-start (renderer theme form &rest args))
+(defgeneric renderer-render-form-end (renderer theme form))
 (defgeneric renderer-render-field (renderer theme field form &rest args))
 (defgeneric renderer-render-field-label (renderer theme field form &rest args))
 (defgeneric renderer-render-field-errors (renderer theme field form &rest args))

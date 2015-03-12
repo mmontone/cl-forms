@@ -11,44 +11,65 @@
     (funcall function)))
 
 (defmethod forms::renderer-render-form ((renderer (eql :who))
-					(theme forms::default-form-theme)
-					form &rest args)
+                                        (theme forms::default-form-theme)
+                                        form &rest args)
   (with-html-output (*html*)
     (apply #'forms::renderer-render-form-errors renderer theme form args)
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
            :method (symbol-name (forms::form-method form))
-	   :class (getf args :class)
-	   (when (forms::form-csrf-protection-p form)
-	     (let ((token (forms::set-form-session-csrf-token form)))
-	       (htm
-		(:input :name (forms::form-csrf-field-name form)
-			:type "hidden" :value token))))	     
+           :class (getf args :class)
+           (when (forms::form-csrf-protection-p form)
+             (let ((token (forms::set-form-session-csrf-token form)))
+               (htm
+                (:input :name (forms::form-csrf-field-name form)
+                        :type "hidden" :value token))))
            (loop for field in (forms::form-fields form)
               do
                 (forms::renderer-render-field renderer theme (cdr field) form)))))
 
 (defmethod forms::renderer-render-form :after ((renderer (eql :who))
-					       (theme forms::default-form-theme)
-					       form &rest args)
+                                               (theme forms::default-form-theme)
+                                               form &rest args)
   (when (forms::client-validation form)
     (with-html-output (*html*)
       (:script :type "text/javascript"
                (fmt "$('#~A').parsley();" (forms::form-id form))))))
 
+(defmethod forms::renderer-render-form-start ((renderer (eql :who))
+                                              (theme forms::default-form-theme)
+                                              form &rest args)
+  "Start form rendering"
+  (format *html* "<form action=\"~A\" method=\"~A\" ~@{~A~}>"
+          (forms::form-action form)
+          (forms::form-method form)
+          (when (getf args :class)
+            (format nil " class=\"~A\"" (getf args :class))))
+  (when (forms::form-csrf-protection-p form)
+    (let ((token (forms::set-form-session-csrf-token form)))
+      (format *html* "<input name=\"~A\" type=\"hidden\" value=\"~A\""
+              (forms::form-csrf-field-name form)
+              token))))
+
+(defmethod forms::renderer-render-form-end ((renderer (eql :who))
+                                            (theme forms::default-form-theme)
+                                            form)
+  "Finish form rendering"
+  (format *html* "</form>"))
+
 (defmethod forms::renderer-render-form-errors ((renderer (eql :who))
-					       (theme forms::default-form-theme)
-					       form &rest args)
+                                               (theme forms::default-form-theme)
+                                               form &rest args)
   (when (forms::form-errors form)
     (with-html-output (*html*)
       (:ul :class (or (getf args :class "errors"))
-	   (loop for error in (forms::form-errors form)
-	      do
-		(htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error)))))))))
+           (loop for error in (forms::form-errors form)
+              do
+                (htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error)))))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
-					 (theme forms::default-form-theme)
-					 field form &rest args)
+                                         (theme forms::default-form-theme)
+                                         field form &rest args)
   (with-html-output (*html*)
     (:div
      (apply #'forms::renderer-render-field-label renderer theme field form args)
@@ -56,8 +77,8 @@
      (apply #'forms::renderer-render-field-widget renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-label ((renderer (eql :who))
-					       (theme forms::default-form-theme)
-					       field form &rest args)
+                                               (theme forms::default-form-theme)
+                                               field form &rest args)
   (with-html-output (*html*)
     (:label
      :class (getf args :class)
@@ -65,8 +86,8 @@
               (forms::field-name field))))))
 
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who))
-						(theme forms::default-form-theme)
-						field form &rest args)
+                                                (theme forms::default-form-theme)
+                                                field form &rest args)
   (let ((errors (cdr (assoc (forms::field-name field)
                             (forms::form-errors form)
                             :test #'equalp
@@ -92,7 +113,7 @@
     (format *html* " value=\"~A\""
             (funcall (forms::field-formatter field)
                      (forms::field-value field))))
-    (format *html* "></input>"))
+  (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -161,7 +182,7 @@
     (format *html* " value=\"~A\""
             (funcall (forms::field-formatter field)
                      (forms::field-value field))))
-    (format *html* "></input>"))
+  (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -169,7 +190,7 @@
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"
-	    :class (getf args :class)
+            :class (getf args :class)
             :name (forms::form-field-name field form)
             :checked (when (forms::field-value field)
                        "checked"))))
@@ -180,7 +201,7 @@
      (field forms::submit-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "submit"
-	    :class (getf args :class)
+            :class (getf args :class)
             :value (or (forms::field-label field) "Submit"))))
 
 (defmethod forms::renderer-render-field-widget
@@ -252,7 +273,7 @@
 
 ;; Attributes and constraints
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
-					     theme
+                                             theme
                                              field form)
   (when (forms::client-validation form)
     (when (forms::field-required-p field)
@@ -261,9 +282,9 @@
        do (renderer-render-field-constraint renderer constraint field form))))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
-					     theme
-					     (field forms::integer-form-field)
-					     form)
+                                             theme
+                                             (field forms::integer-form-field)
+                                             form)
   (format *html* " data-parsley-type=\"integer\"")
   (call-next-method))
 
@@ -277,13 +298,13 @@
     (format *html* " data-parsley-maxlength=\"~A\"" (clavier::validator-max constraint))))
 
 (defmethod renderer-render-field-constraint ((renderer (eql :who))
-					     (constraint clavier:greater-than-validator)
-					     field form)
-  (format *html* " data-parsley-min=\"~A\"" 
-	  (1+ (clavier::validator-number constraint))))
+                                             (constraint clavier:greater-than-validator)
+                                             field form)
+  (format *html* " data-parsley-min=\"~A\""
+          (1+ (clavier::validator-number constraint))))
 
 (defmethod renderer-render-field-constraint ((renderer (eql :who))
-					     (constraint clavier:less-than-validator)
-					     field form)
-  (format *html* " data-parsley-max=\"~A\"" 
-	  (1- (clavier::validator-number constraint))))
+                                             (constraint clavier:less-than-validator)
+                                             field form)
+  (format *html* " data-parsley-max=\"~A\""
+          (1- (clavier::validator-number constraint))))
