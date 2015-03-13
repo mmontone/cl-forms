@@ -70,7 +70,9 @@
       (:ul :class (or (getf args :class "errors"))
            (loop for error in (forms::form-errors form)
               do
-                (htm (:li (fmt "~A: ~{~A~^, ~}" (first error) (cdr error)))))))))
+                (htm (:li (fmt "~A: ~{~A~^, ~}" (forms::field-label 
+						 (first error))
+			       (cdr error)))))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
                                          (theme forms::default-form-theme)

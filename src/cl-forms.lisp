@@ -260,7 +260,7 @@
 	     (multiple-value-bind (valid-p errors)
 		    (validate-form-field (cdr field))
 	       (when (not valid-p)
-		 (list (cons (car field) errors))))))
+		 (list (cons (cdr field) errors))))))
   (values (null (form-errors form))
 	  (form-errors form)))
 
