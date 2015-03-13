@@ -268,7 +268,7 @@
   (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 
 (defun render-form-start (&optional (form *form*) &rest args)
-  (apply #'renderer-render-form *form-renderer* *form-theme* form args))
+  (apply #'renderer-render-form-start *form-renderer* *form-theme* form args))
 
 (defun render-form-end (&optional (form *form*))
   (renderer-render-form-end *form-renderer* *form-theme* form))

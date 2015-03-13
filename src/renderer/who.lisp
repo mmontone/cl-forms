@@ -47,7 +47,7 @@
             (format nil " class=\"~A\"" (getf args :class))))
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
-      (format *html* "<input name=\"~A\" type=\"hidden\" value=\"~A\""
+      (format *html* "<input name=\"~A\" type=\"hidden\" value=\"~A\"/>"
               (forms::form-csrf-field-name form)
               token))))
 
