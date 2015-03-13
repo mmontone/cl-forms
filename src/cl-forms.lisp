@@ -271,22 +271,34 @@
   (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 
 (defun render-form-end (&optional (form *form*))
-  (apply #'renderer-render-form-end *form-renderer* *form-theme* form))
+  (renderer-render-form-end *form-renderer* *form-theme* form))
 
 (defun render-form-errors (&optional (form *form*) &rest args)
   (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args))
 
 (defun render-field (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field *form-renderer* *form-theme* field form args))
+  (let ((field (if (symbolp field)
+		   (get-field form field)
+		   field)))
+    (apply #'renderer-render-field *form-renderer* *form-theme* field form args)))
 
 (defun render-field-label (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field-label *form-renderer* *form-theme* field form args))
+  (let ((field (if (symbolp field)
+		   (get-field form field)
+		   field)))
+    (apply #'renderer-render-field-label *form-renderer* *form-theme* field form args)))
 
 (defun render-field-errors (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field-errors *form-renderer* *form-theme* field form args))
+  (let ((field (if (symbolp field)
+		   (get-field form field)
+		   field)))
+    (apply #'renderer-render-field-errors *form-renderer* *form-theme* field form args)))
 
 (defun render-field-widget (field &optional (form *form*) &rest args)
-  (apply #'renderer-render-field-widget *form-renderer* *form-theme* field form args))
+  (let ((field (if (symbolp field)
+		   (get-field form field)
+		   field)))
+    (apply #'renderer-render-field-widget *form-renderer* *form-theme* field form args)))
 
 (defgeneric renderer-render-form (renderer theme form &rest args))
 (defgeneric renderer-render-form-start (renderer theme form &rest args))
