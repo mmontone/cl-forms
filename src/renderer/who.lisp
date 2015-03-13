@@ -67,7 +67,7 @@
                                                form &rest args)
   (when (forms::form-errors form)
     (with-html-output (*html*)
-      (:ul :class (or (getf args :class "errors"))
+      (:ul :class (or (getf args :class "errors parsley-errors-list filled"))
            (loop for error in (forms::form-errors form)
               do
                 (htm (:li (fmt "~A: ~{~A~^, ~}" (forms::field-label 
