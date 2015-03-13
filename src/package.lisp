@@ -18,5 +18,6 @@
 	   :render-form-errors
 	   :with-form-fields
 	   :with-form-field-values
+	   :field-value
 	   :handle-request
 	   :validate-form))
