@@ -40,7 +40,8 @@
                                               (theme forms::default-form-theme)
                                               form &rest args)
   "Start form rendering"
-  (format *html* "<form action=\"~A\" method=\"~A\" ~@{~A~}>"
+  (format *html* "<form id=\"~A\" action=\"~A\" method=\"~A\" ~@[~A~]>"
+	  (forms::form-id form)
           (forms::form-action form)
           (forms::form-method form)
           (when (getf args :class)
@@ -55,7 +56,11 @@
                                             (theme forms::default-form-theme)
                                             form)
   "Finish form rendering"
-  (format *html* "</form>"))
+  (format *html* "</form>")
+  (when (forms::client-validation form)
+    (with-html-output (*html*)
+      (:script :type "text/javascript"
+               (fmt "$('#~A').parsley();" (forms::form-id form))))))
 
 (defmethod forms::renderer-render-form-errors ((renderer (eql :who))
                                                (theme forms::default-form-theme)
