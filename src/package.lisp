@@ -15,6 +15,7 @@
 	   :render-field-label
 	   :render-field-errors
 	   :render-field-widget
+	   :render-form-errors
 	   :with-form-fields
 	   :with-form-field-values
 	   :handle-request
