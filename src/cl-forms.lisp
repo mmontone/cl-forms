@@ -13,6 +13,16 @@
 (defmacro with-form-renderer (renderer &body body)
   `(call-with-form-renderer ,renderer (lambda () ,@body)))
 
+(defun call-with-form-theme (form-theme function)
+  (let ((theme (if (symbolp form-theme)
+                   (make-instance form-theme)
+                   form-theme)))
+    (let ((*form-theme* theme))
+      (funcall function))))
+
+(defmacro with-form-theme (form-theme &body body)
+  `(call-with-form-theme ,form-theme (lambda () ,@body)))
+
 (defun call-with-form (form function)
   (let ((*form* form))
     (funcall function)))

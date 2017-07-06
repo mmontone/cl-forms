@@ -1,7 +1,5 @@
 (in-package :forms.test)
 
-(defparameter *html* nil)
-
 (defun file-string (path)
   (with-open-file (stream path)
     (let ((data (make-string (file-length stream))))
