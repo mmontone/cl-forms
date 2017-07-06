@@ -56,13 +56,14 @@
                 :type "hidden"
                 :value token)))))
 
-(defmethod forms::renderer-render-field :around
-    ((renderer (eql :who))
-     (theme bootstrap-form-theme)
-     field form &rest args)
+(defmethod forms::renderer-render-field ((renderer (eql :who))
+                                         (theme bootstrap-form-theme)
+                                         field form &rest args)
   (with-html-output (*html*)
     (:form-group
-     (call-next-method))))
+     (apply #'forms::renderer-render-field-label renderer theme field form args)
+     (apply #'forms::renderer-render-field-errors renderer theme field form args)
+     (apply #'forms::renderer-render-field-widget renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -217,6 +218,7 @@
        (with-html-output (*html*)
          (:select
           :name (forms::form-field-name field form)
+          :class "form-control"
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm

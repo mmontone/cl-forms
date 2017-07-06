@@ -10,7 +10,9 @@
   (let ((form (forms::get-form 'bs-fields-form)))
     (forms:with-form-theme 'forms.who::bootstrap-form-theme
       (forms:with-form-renderer :who
-        (forms:render-form form)))))
+        (forms:render-form form)
+        (forms:render-form form :inline t)
+        (forms:render-form form :horizontal t)))))
 
 (hunchentoot:define-easy-handler (bootstrap-form :uri "/themes") ()
   (render-demo-page :demo #'bootstrap-form-demo
