@@ -41,7 +41,7 @@
                                               form &rest args)
   "Start form rendering"
   (format *html* "<form id=\"~A\" action=\"~A\" method=\"~A\" ~@[~A~]>"
-	  (forms::form-id form)
+          (forms::form-id form)
           (forms::form-action form)
           (forms::form-method form)
           (when (getf args :class)
@@ -70,9 +70,10 @@
       (:ul :class (or (getf args :class "errors parsley-errors-list filled"))
            (loop for error in (forms::form-errors form)
               do
-                (htm (:li (fmt "~A: ~{~A~^, ~}" (forms::field-label 
-						 (first error))
-			       (cdr error)))))))))
+                (htm (:li (fmt "~@[~A: ~]~{~A~^, ~}"
+                               (forms::field-label
+                                (first error))
+                               (cdr error)))))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
                                          (theme forms::default-form-theme)
