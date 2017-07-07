@@ -86,11 +86,12 @@
 (defmethod forms::renderer-render-field-label ((renderer (eql :who))
                                                (theme forms::default-form-theme)
                                                field form &rest args)
-  (with-html-output (*html*)
-    (:label
-     :class (getf args :class)
-     (str (or (forms::field-label field)
-              (forms::field-name field))))))
+  (unless (typep field 'forms::submit-form-field)
+    (with-html-output (*html*)
+      (:label
+       :class (getf args :class)
+       (str (or (forms::field-label field)
+                (forms::field-name field)))))))
 
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who))
                                                 (theme forms::default-form-theme)
@@ -98,7 +99,7 @@
   (let ((errors (cdr (assoc (forms::field-name field)
                             (forms::form-errors form)
                             :test #'equalp
-                            :key #'string))))
+                            :key #'princ-to-string))))
     (when errors
       (with-html-output (*html*)
         (:div :class (or (getf args :class) "errors")
