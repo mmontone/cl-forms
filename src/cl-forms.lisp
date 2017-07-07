@@ -314,11 +314,6 @@
 (defgeneric renderer-render-form-end (renderer theme form))
 (defgeneric renderer-render-field (renderer theme field form &rest args))
 (defgeneric renderer-render-field-label (renderer theme field form &rest args))
-
-(defmethod renderer-render-field-label (renderer theme (field submit-form-field) form &rest args)
-  ;; Don't render the label of submit buttons
-  )
-
 (defgeneric renderer-render-field-errors (renderer theme field form &rest args))
 (defgeneric renderer-render-field-widget (renderer theme field form &rest argss))
 

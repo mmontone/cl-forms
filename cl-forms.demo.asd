@@ -5,6 +5,7 @@
   :license "MIT"
   :depends-on (#:cl-forms
                #:cl-forms.who
+               #:cl-forms.who.bootstrap
                #:cl-forms.test
                #:hunchentoot
                #:cl-who)
