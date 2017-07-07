@@ -1,13 +1,13 @@
 (asdf:defsystem #:cl-forms.test
   :serial t
-  :description "Describe cl-forms here"
+  :description "CL-FORMS tests"
   :author "Mariano Montone"
   :license "MIT"
   :depends-on (#:cl-forms
-	       #:fiveam)
+               #:fiveam)
   :components ((:module :test
-			:components
-			((:file "package")
-			 (:file "test"))))
+                        :components
+                        ((:file "package")
+                         (:file "test"))))
   :perform (asdf:test-op (o c)
-			 (uiop:symbol-call :forms.test :run-tests)))
+                         (uiop:symbol-call :forms.test :run-tests)))

@@ -1,6 +1,6 @@
 (asdf:defsystem #:cl-forms
   :serial t
-  :description "Describe cl-forms here"
+  :description "A web forms handling library"
   :author "Mariano Montone"
   :license "MIT"
   :depends-on (#:alexandria

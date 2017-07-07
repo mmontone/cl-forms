@@ -1,6 +1,6 @@
 (asdf:defsystem #:cl-forms.demo
   :serial t
-  :description "Describe cl-forms here"
+  :description "CL-FORM demo application"
   :author "Mariano Montone"
   :license "MIT"
   :depends-on (#:cl-forms

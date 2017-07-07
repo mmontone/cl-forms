@@ -1,12 +1,12 @@
 (asdf:defsystem #:cl-forms.djula
   :serial t
-  :description "Describe cl-forms here"
+  :description "CL-FORMS Djula backend"
   :author "Mariano Montone"
   :license "MIT"
   :depends-on (#:cl-forms
-	       #:cl-forms.who
-	       #:djula)
+               #:cl-forms.who
+               #:djula)
   :components ((:module :renderer
-			:pathname "src/renderer/"
-			:components
-			((:file "djula")))))
+                        :pathname "src/renderer/"
+                        :components
+                        ((:file "djula")))))
