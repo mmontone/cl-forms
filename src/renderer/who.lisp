@@ -70,9 +70,9 @@
       (:ul :class (or (getf args :class "errors parsley-errors-list filled"))
            (loop for error in (forms::form-errors form)
               do
-                (htm (:li (fmt "~@[~A: ~]~{~A~^, ~}"
-                               (forms::field-label
-                                (first error))
+                (htm (:li (fmt "~A: ~{~A~^, ~}"
+                               (or (forms::field-label (first error))
+                                   (forms::field-name (first error)))
                                (cdr error)))))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
