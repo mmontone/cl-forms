@@ -69,6 +69,7 @@
       (:script :src "/prettify.js")
       (:script :src "/lang-lisp.js")
       (:script :src "/parsley.js"))
+     (:style "ul.errors li {color:red;}")
      (:body :onload "prettyPrint()"
             (:header :role"banner" :id "top" :class "navbar navbar-static-top"
                      (:div :class "container"
