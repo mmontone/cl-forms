@@ -20,6 +20,7 @@
                                    (:file "models")
                                    (:file "validation")
                                    (:file "client-validation")
+                                   (:file "layout")
                                    (:file "themes")
                                    (:file "tests"))
                                   :serial t))

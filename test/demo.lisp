@@ -96,6 +96,10 @@
                                               "active")
                                   (:a :href "/client-validation" (who:str "Client validation")))
                              (:li :role "presentation"
+                                  :class (and (equalp active-menu :layout)
+                                              "active")
+                                  (:a :href "/layout" (who:str "Layout")))
+                             (:li :role "presentation"
                                   :class (and (equalp active-menu :themes)
                                               "active")
                                   (:a :href "/themes" (who:str "Themes")))
