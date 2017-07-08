@@ -250,6 +250,11 @@
     (values (not errors)
             errors)))
 
+(defmethod field-valid-p ((form-field form-field) &optional (form *form*))
+  "Determines if a field is valid. This method assumes the form has already
+been validated via validate-form."
+  (not (find form-field (mapcar #'first (form-errors form)))))
+
 (defmethod form-session-csrf-entry ((form form))
   (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
 

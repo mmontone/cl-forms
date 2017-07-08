@@ -18,5 +18,6 @@
            :with-form-fields
            :with-form-field-values
            :field-value
+           :field-valid-p
            :handle-request
            :validate-form))

@@ -79,10 +79,11 @@
                                          (theme forms::default-form-theme)
                                          field form &rest args)
   (with-html-output (*html*)
-    (:div
-     (apply #'forms::renderer-render-field-label renderer theme field form args)
-     (apply #'forms::renderer-render-field-errors renderer theme field form args)
-     (apply #'forms::renderer-render-field-widget renderer theme field form args))))
+    (:div :class (when (not (forms:field-valid-p field form))
+                   "has-error")
+          (apply #'forms::renderer-render-field-label renderer theme field form args)
+          (apply #'forms::renderer-render-field-errors renderer theme field form args)
+          (apply #'forms::renderer-render-field-widget renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-label ((renderer (eql :who))
                                                (theme forms::default-form-theme)

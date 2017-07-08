@@ -8,8 +8,8 @@
 
 (defun format-css-classes (classes)
   (format nil "~{~a~^ ~}" (mapcar (lambda (class)
-                                     (string-downcase (string class)))
-                                   (remove-if #'null classes))))
+                                    (string-downcase (string class)))
+                                  (remove-if #'null classes))))
 
 (defmethod forms::renderer-render-form ((renderer (eql :who))
                                         (theme bootstrap-form-theme)
@@ -60,10 +60,11 @@
                                          (theme bootstrap-form-theme)
                                          field form &rest args)
   (with-html-output (*html*)
-    (:form-group
-     (apply #'forms::renderer-render-field-label renderer theme field form args)
-     (apply #'forms::renderer-render-field-errors renderer theme field form args)
-     (apply #'forms::renderer-render-field-widget renderer theme field form args))))
+    (:form-group :class (when (not (forms:field-valid-p field form))
+                          "has-error")
+                 (apply #'forms::renderer-render-field-label renderer theme field form args)
+                 (apply #'forms::renderer-render-field-errors renderer theme field form args)
+                 (apply #'forms::renderer-render-field-widget renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))

@@ -3,7 +3,7 @@
 (forms:defform layout-form (:action "/layout-post")
   ((firstname :string :value "")
    (lastname :string :value "")
-   (public :boolean :value t)
+   (active :boolean :value t)
    (address :string :value "")
    (choices :choice
             :choices (list "Foo" "Bar")
@@ -44,6 +44,7 @@
                                 (row 
                                  (:h3 (who:str "General"))
                                  (col (f firstname)) (col (f lastname)))
+                                (f active)
                                 (row
                                  (:h3 (who:str "Address"))
                                  (f address))
@@ -67,17 +68,19 @@
   (flet ((fields-post ()
            (let ((form (forms:get-form 'fields-form)))
              (forms::handle-request form)
-             (forms::with-form-field-values (firstname lastname active address
+             (if (forms::validate-form form)
+                 (forms::with-form-field-values (firstname lastname active address
                                                  sex choices choices2) form
-               (who:with-html-output (forms.who::*html*)
-                 (:ul
-                  (:li (who:fmt "Firstname: ~A" firstname))
+                   (who:with-html-output (forms.who::*html*)
+                     (:ul
+                      (:li (who:fmt "Firstname: ~A" firstname))
                   (:li (who:fmt "Lastname: ~A" lastname))
                   (:li (who:fmt "Active: ~A" active))
                   (:li (who:fmt "Sex: ~A" sex))
                   (:li (who:fmt "Address: ~A" address))
                   (:li (who:fmt "Choices: ~A" choices))
-                  (:li (who:fmt "Choices2: ~A" choices2))))))))
+                  (:li (who:fmt "Choices2: ~A" choices2)))))
+                 "Form is not valid"))))
     (render-demo-page :demo #'fields-post
                       :source (asdf:system-relative-pathname :cl-forms.demo
                                                              "test/demo/fields.lisp")
