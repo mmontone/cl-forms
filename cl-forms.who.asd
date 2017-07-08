@@ -4,8 +4,7 @@
   :author "Mariano Montone"
   :license "MIT"
   :depends-on (#:cl-forms
-               #:cl-who
-               #:cl-css)
+               #:cl-who)
   :components ((:module :renderer
                         :pathname "src/renderer/"
                         :components

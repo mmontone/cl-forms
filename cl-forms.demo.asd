@@ -8,7 +8,8 @@
                #:cl-forms.who.bootstrap
                #:cl-forms.test
                #:hunchentoot
-               #:cl-who)
+               #:cl-who
+               #:cl-css)
   :components ((:module :test
                         :components
                         ((:file "package")
