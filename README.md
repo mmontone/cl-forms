@@ -27,12 +27,12 @@ Use `defform` to define a form. Example:
    (submit :submit :label "Create")))
 ```
 
-On your web handler, grab the form via `get-form`, select a renderer and render the form on your web page:
+On your web handler, grab the form via `get-form`, select a renderer with `with-form-renderer`and then render the form with `render-form`:
 
 ```lisp
 (let ((form (forms::get-form 'fields-form)))
    (forms:with-form-renderer :who
-   (forms:render-form form))
+      (forms:render-form form))
 ```
 
 To handle the form, grab it via `get-form` and then call `handle-request` (you should probably also call `validate-form` after). 
@@ -45,8 +45,8 @@ Then bind form fields via either `with-form-field-values`, that binds the form f
        (who:with-html-output (forms.who::*html*)
           (:ul
             (:li (who:fmt "Name: ~A" name))
-            (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
-            (:li (who:fmt "Sex: ~A" (forms::field-value sex)))))))
+            (:li (who:fmt "Ready: ~A" ready))
+            (:li (who:fmt "Sex: ~A" sex))))))
 ```
 
 Plase have a look at the demo sources for more examples of how to use the library
@@ -59,7 +59,6 @@ Download web assets. From /test/static directory run:
 ```
 bower install
 ```
-
 and then:
 
 ```lisp
