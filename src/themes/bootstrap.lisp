@@ -63,8 +63,8 @@
     (:form-group :class (when (not (forms:field-valid-p field form))
                           "has-error")
                  (apply #'forms::renderer-render-field-label renderer theme field form args)
-                 (apply #'forms::renderer-render-field-errors renderer theme field form args)
-                 (apply #'forms::renderer-render-field-widget renderer theme field form args))))
+                 (apply #'forms::renderer-render-field-widget renderer theme field form args)
+                 (apply #'forms::renderer-render-field-errors renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))

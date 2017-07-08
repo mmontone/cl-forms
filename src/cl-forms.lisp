@@ -118,6 +118,10 @@
    (errors :initform nil
            :accessor form-errors
            :documentation "Form errors after validation")
+   (display-errors :initarg :display-errors
+                   :initform (list :list :inline)
+                   :accessor display-errors
+                   :documentation "A list containing the places where to display errors. Valid options are :list and :inline")
    (client-validation :initarg :client-validation
                       :initform t
                       :accessor client-validation
@@ -253,7 +257,7 @@
 (defmethod field-valid-p ((form-field form-field) &optional (form *form*))
   "Determines if a field is valid. This method assumes the form has already
 been validated via validate-form."
-  (not (find form-field (mapcar #'first (form-errors form)))))
+  (not (find form-field (form-errors form) :key 'car)))
 
 (defmethod form-session-csrf-entry ((form form))
   (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
@@ -287,7 +291,8 @@ been validated via validate-form."
   (renderer-render-form-end *form-renderer* *form-theme* form))
 
 (defun render-form-errors (&optional (form *form*) &rest args)
-  (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args))
+  (when (member :top (display-errors form))
+    (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args)))
 
 (defun render-field (field &optional (form *form*) &rest args)
   (let ((field (if (symbolp field)
@@ -317,10 +322,21 @@ been validated via validate-form."
 (defgeneric renderer-render-form (renderer theme form &rest args))
 (defgeneric renderer-render-form-start (renderer theme form &rest args))
 (defgeneric renderer-render-form-end (renderer theme form))
+(defgeneric renderer-render-form-errors (renderer theme form &rest args))
 (defgeneric renderer-render-field (renderer theme field form &rest args))
 (defgeneric renderer-render-field-label (renderer theme field form &rest args))
 (defgeneric renderer-render-field-errors (renderer theme field form &rest args))
 (defgeneric renderer-render-field-widget (renderer theme field form &rest argss))
+
+(defmethod renderer-render-field-errors :around (renderer theme field form &rest args)
+  ;; Render field errors inline only when :inline is specified on form
+  (when (member :inline (forms::display-errors form))
+    (call-next-method)))
+
+(defmethod renderer-render-form-errors :around  (renderer theme form &rest args)
+  ;; Render form errors only when :list is specified on form
+  (when (member :list (forms::display-errors form))
+    (call-next-method)))
 
 (defun handle-request (&optional (form *form*))
   (when (form-csrf-protection-p form)

@@ -82,8 +82,8 @@
     (:div :class (when (not (forms:field-valid-p field form))
                    "has-error")
           (apply #'forms::renderer-render-field-label renderer theme field form args)
-          (apply #'forms::renderer-render-field-errors renderer theme field form args)
-          (apply #'forms::renderer-render-field-widget renderer theme field form args))))
+          (apply #'forms::renderer-render-field-widget renderer theme field form args)
+          (apply #'forms::renderer-render-field-errors renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-label ((renderer (eql :who))
                                                (theme forms::default-form-theme)
@@ -98,10 +98,9 @@
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who))
                                                 (theme forms::default-form-theme)
                                                 field form &rest args)
-  (let ((errors (cdr (assoc (forms::field-name field)
-                            (forms::form-errors form)
-                            :test #'equalp
-                            :key #'princ-to-string))))
+  (let ((errors (cdr (find field
+                           (forms::form-errors form)
+                           :key 'car))))
     (when errors
       (with-html-output (*html*)
         (:div :class (or (getf args :class) "errors")
