@@ -161,6 +161,10 @@
                 :initform nil
                 :accessor field-empty-value
                 :documentation "Value to use when the field value is nil")
+   (parser :initarg :parser
+           :initform nil
+           :accessor field-parser
+           :documentation "Custom field value parser")
    (formatter :initarg :formatter
               :initform #'princ-to-string
               :accessor field-formatter
@@ -353,5 +357,12 @@ been validated via validate-form."
                                  (hunchentoot:post-parameters*))))
 
 (defgeneric field-read-from-request (field form parameters))
+
+(defmethod field-read-from-request :after (field form parameters)
+  "Use the parser function after reading the value from the request"
+  (when (field-parser field)
+    (setf (field-value field)
+          (funcall (field-parser field)
+                   (field-value field)))))
 
 (defgeneric make-form-field (field-type &rest args))
