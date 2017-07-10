@@ -351,7 +351,7 @@
        (forms::dflet ((forms::field-request-name (field form)
                                                  (fmt:fmt nil
                                                           (forms::call-next-function)                                                              "[" i "]")))
-         (forms::renderer-render-field renderer theme item form))
+         (forms::renderer-render-field-widget renderer theme item form))
      finally
      ;; Render a new entry
        (forms::dflet ((forms::field-request-name (field form)
