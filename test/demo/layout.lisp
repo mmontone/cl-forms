@@ -21,7 +21,7 @@
     (:div :class :container
           (:div :class :row
                 (:div :class :heading
-                      (:h3 (who:str "Custom layed-out form")))
+                      (:h1 (who:str "Custom layed-out form")))
                 (:p (who:str "This is a form with a custom layout:"))
                 (let ((form (forms::get-form 'layout-form)))
                   (macrolet ((f (name)

@@ -8,6 +8,7 @@
 
 (defun fields-demo ()
   (who:with-html-output (forms.who::*html*)
+    (:h1 (who:str "Fields example"))
     (:div :class :container
           (:div :class :row
                 (:div :class :heading
