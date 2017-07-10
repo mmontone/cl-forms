@@ -358,4 +358,4 @@
                                                  (fmt:fmt nil
                                                           (forms::call-next-function)                                                              "[" (1+ i) "]")))
          (let ((entry (funcall (forms::list-field-type field))))
-           (forms::renderer-render-field renderer theme entry form)))))
+           (forms::renderer-render-field-widget renderer theme entry form)))))
