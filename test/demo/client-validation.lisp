@@ -13,16 +13,21 @@
    (email :email)
    (submit :submit :label "Create")))
 
+(defun client-validation (&optional form)
+  (let ((form (or form (forms::get-form 'client-validated-form))))
+    (forms:with-form-renderer :who
+      (who:with-html-output (forms.who::*html*)
+        (:h1 (who:str "Client side validation"))
+        (:p (who:str "This is an example of how client side validation works. Client side validation uses parsleyjs library for validating client side."))
+        (:p (who:str "The interesting thing about the implementation is that validations are specified in the form definition, and are \"compiled\" to rules in javascript. Also, this example uses the exactly the same constraints than the server side validation demo."))      
+        (forms:render-form form)))))
+
 (hunchentoot:define-easy-handler (client-validation-handler
                                   :uri "/client-validation") ()
-  (flet ((client-validation ()
-           (let ((form (forms::get-form 'client-validated-form)))
-             (forms:with-form-renderer :who
-               (forms:render-form form)))))
-    (render-demo-page :demo #'client-validation
-                      :source (asdf:system-relative-pathname :cl-forms.demo
-                                                             "test/demo/client-validation.lisp")
-                      :active-menu :client-validation)))
+  (render-demo-page :demo #'client-validation
+                    :source (asdf:system-relative-pathname :cl-forms.demo
+                                                           "test/demo/client-validation.lisp")
+                    :active-menu :client-validation))
 
 (hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
   (flet ((client-validation-post ()
@@ -39,8 +44,7 @@
                       (:li (who:fmt "Age: ~A" age))
                       (:li (who:fmt "Email: ~A" email)))))
                  ;; The form is not valid
-                 (forms:with-form-renderer :who
-                   (forms:render-form form))))))
+                 (client-validation form)))))
     (render-demo-page :demo #'client-validation-post
                       :source (asdf:system-relative-pathname :cl-forms.demo
                                                              "test/demo/client-validation.lisp")

@@ -13,10 +13,13 @@
    (email :email)
    (submit :submit :label "Create")))
 
-(defun validation-demo ()
-  (let ((form (forms::get-form 'validated-form)))
-    (forms:with-form-renderer :who
-      (forms:render-form form))))
+(defun validation-demo (&optional form)
+  (forms:with-form-renderer :who
+    (who:with-html-output (forms.who::*html*)
+      (:h1 (who:str "Server side validation"))
+      (:p (who:str "This is a demo of server side validation. Submit the form and play with the values to see how it works. Also look at field constraints in source code tab."))
+      (let ((form (or form (forms::get-form 'validated-form))))
+        (forms:render-form form)))))
 
 (hunchentoot:define-easy-handler (validated-form-post :uri "/validation-post"
                                                       :default-request-type :post) ()
@@ -35,8 +38,7 @@
                       (:li (who:fmt "Age: ~A" age))
                       (:li (who:fmt "Email: ~A" email)))))
                  ;; The form is not valid
-                 (forms:with-form-renderer :who
-                   (forms:render-form form))))))
+                 (validation-demo form)))))
     (render-demo-page :demo #'validation-post
                       :source (asdf:system-relative-pathname :cl-forms.demo
                                                              "test/demo/validation.lisp")
