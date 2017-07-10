@@ -6,6 +6,11 @@
          :accessor list-field-type
          :type function
          :documentation "The list elements type.")
+   (empty-item-predicate :initarg :empty-item-predicate
+                         :initform nil
+                         :accessor empty-item-predicate
+                         :type (or null function)
+                         :documentation "A predicate that tells when a list item is considered empty, and so it is removed from the list")
    (add-button :initarg :add-button
                :initform t
                :accessor add-button-p
@@ -51,8 +56,13 @@
                                                     parameters)
                            item-field)))
                      request-list-indexes)))
-        ;; The value of a list field is a list of fields (the type of its list elements)
-        (setf (field-value field) items)))))
+        ;; Remove items with remove-predicate. For example,
+        (let ((items (if (empty-item-predicate field)
+                         (remove-if (empty-item-predicate field)
+                                    items)
+                         items)))
+          ;; The value of a list field is a list of fields (the type of its list elements)
+          (setf (field-value field) items))))))
 
 (defun list-field-values (list-field)
   "Returns the actual values of a list field"

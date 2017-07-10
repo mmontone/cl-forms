@@ -10,10 +10,14 @@
    ;; Subforms
    (main-member :subform :subform 'member-form)
    (secondary-member :subform :subform 'member-form)
+      ;; Simple list
+   (todo :list :type '(:string :required-p nil)
+         :empty-item-predicate (lambda (field)
+                                 (let ((val (forms:field-value field)))
+                                   (or (null val)
+                                       (string= val "")))))
   ;; Subform list
-   ;(members :list :type '(:subform :subform member-form))
-   ;; Simple list
-   (todo :list :type '(:string :required-p nil))
+   (members :list :type '(:subform :subform member-form))
    (save :submit :label "Save")))
 
 (defun form-composition-demo (&optional form)
@@ -30,7 +34,7 @@
         (forms::render-field 'todo form)
         (forms::render-field 'save form)
         (:h2 (who:str "List of subforms"))
-        ;(forms::render-field 'members form)
+        (forms::render-field 'members form)
         (forms::render-field 'save form)
         (forms::render-form-end form)))))
 
