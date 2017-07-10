@@ -17,7 +17,12 @@
                                    (or (null val)
                                        (string= val "")))))
   ;; Subform list
-   (members :list :type '(:subform :subform member-form))
+   (members :list :type '(:subform :subform member-form)
+            :empty-item-predicate (lambda (field)
+                                    (let* ((subform (forms:field-value field))
+                                           (val (forms:get-field-value subform 'name)))
+                                      (or (null val)
+                                          (string= val "")))))
    (save :submit :label "Save")))
 
 (defun form-composition-demo (&optional form)

@@ -356,6 +356,7 @@
      ;; Render a new entry
        (forms::dflet ((forms::field-request-name (field form)
                                                  (fmt:fmt nil
-                                                          (forms::call-next-function)                                                              "[" (1+ i) "]")))
+                                                          (forms::call-next-function)
+                                                          "[" (1+ i) "]")))
          (let ((entry (funcall (forms::list-field-type field))))
            (forms::renderer-render-field-widget renderer theme entry form)))))

@@ -7,6 +7,8 @@
            :defform
            :defform-builder
            :get-form
+           :get-field
+           :get-field-value
            :render-form
            :render-form-start
            :render-form-end

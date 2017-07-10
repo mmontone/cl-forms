@@ -82,6 +82,9 @@
    (when error-p
      (error "Field ~A not found in ~A" field-name form))))
 
+(defun get-field-value (form field-name &optional (error-p t))
+  (field-value (get-field form field-name)))
+
 (defclass form ()
   ((id :initarg :id
        :accessor form-id

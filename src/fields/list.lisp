@@ -34,22 +34,27 @@
     (apply #'make-instance 'list-form-field :type list-field-type args)))
 
 (defmethod field-read-from-request ((field list-form-field) form parameters)
+  ;; First, create a regex to filter the list-field parameters. It's those with the format <field>[<index>]
   (let ((regex
          (ppcre:create-scanner `(:sequence ,(field-request-name field form)
+                                           (:greedy-repetition 0 nil (:alternation :word-char-class "-"))
                                            "["
                                            (:register (:greedy-repetition 1 nil :digit-class))
                                            "]"))))
+    ;; Then, extract the indexes posted
     (let ((request-list-indexes
-           (loop for param in parameters
-              when (ppcre:scan regex (car param))
-              collect (ppcre:register-groups-bind (index)
-                          (regex (car param))
-                        (parse-integer index)))))
+           (remove-duplicates
+            (loop for param in parameters
+               when (ppcre:scan regex (car param))
+               collect (ppcre:register-groups-bind (index)
+                           (regex (car param))
+                         (parse-integer index))))))
+      ;; With the indexes posted, read the list items from the request parameters
       (let ((items
              (mapcar (lambda (i) 
                        (dflet ((field-request-name (field form)
-                                                   (fmt:fmt nil                    
-                                                            (call-next-function)                                                              "[" i "]")))
+                                                   (fmt:fmt nil                                                                                (call-next-function)
+                                                            "[" i "]")))
                          (let ((item-field (funcall (list-field-type field))))
                            (field-read-from-request item-field
                                                     form
