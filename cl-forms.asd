@@ -13,11 +13,12 @@
   :components ((:module :src
                         :components
                         ((:file "package")
+                         (:file "dynamic-function")
                          (:module :themes
                                   :components
                                   ((:file "theme")
                                    (:file "default")
-                                   ;(:file "bootstrap")
+                                        ;(:file "bootstrap")
                                    (:file "specials"))
                                   :serial t)
                          (:file "cl-forms")
@@ -30,6 +31,8 @@
                                    (:file "url")
                                    (:file "integer")
                                    (:file "choice")
-                                   (:file "submit"))))
+                                   (:file "submit")
+                                   (:file "subform")
+                                   (:file "list"))))
                         :serial t))
   :in-order-to ((asdf:test-op (asdf:test-op :cl-forms.test))))

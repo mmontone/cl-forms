@@ -20,7 +20,7 @@
 
 (defmethod field-read-from-request ((field string-form-field) form parameters)
   (setf (field-value field)
-	(cdr (assoc (form-field-name field form) parameters :test #'string=))))
+	(cdr (assoc (field-request-name field form) parameters :test #'string=))))
 
 (defmethod make-form-field ((field-type (eql :string)) &rest args)
   (apply #'make-instance 'string-form-field args))

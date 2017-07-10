@@ -217,8 +217,13 @@
   (setf (form-fields form)
         (append (form-fields form) field)))
 
-(defun form-field-name (form-field &optional (form *form*))
-  (format nil "~A-~A" (form-name form) (field-name form-field)))
+(defdfun field-request-name (form-field form)
+  "The name of the field to appear in the HTML. Used both for rendering the field to HTML and reading it from the HTTP request.
+This is defined as a dynamically scoped function because it is needed that its behaviour changes depending on which part of the form is being read/generated. The parts being subforms, or list field items."
+  ;;Default field name generation
+  (fmt:fmt nil
+           (form-name form)
+           "-" (field-name form-field)))
 
 (defmethod field-value ((field form-field))
   (if (field-accessor field)
@@ -232,6 +237,14 @@
                value
                (form-model (field-form field)))
       (setf (slot-value field 'value) value)))
+
+(defclass field-validator (clavier::validator)
+  ((field :initarg :field
+          :initform (error "Provide the field")
+          :accessor validator-field
+          :documentation "The validator field"))
+  (:metaclass closer-mop:funcallable-standard-class)
+  (:documentation "Generic field validator. Needs a field to be initialized"))
 
 (defgeneric validate-form-field (form-field))
 

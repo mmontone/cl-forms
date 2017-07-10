@@ -111,6 +111,10 @@
                                               "active")
                                   (:a :href "/renderers" (who:str "Renderers")))
                              (:li :role "presentation"
+                                  :class (and (equalp active-menu :composition)
+                                              "active")
+                                  (:a :href "/composition" (who:str "Composition")))
+                             (:li :role "presentation"
                                   :class (and (equalp active-menu :tests)
                                               "active")
                                   (:a :href "/tests" (who:str "Tests")))))

@@ -23,6 +23,7 @@
                                    (:file "client-validation")
                                    (:file "layout")
                                    (:file "themes")
+                                   (:file "composition")
                                    (:file "tests"))
                                   :serial t))
                         :serial t)))

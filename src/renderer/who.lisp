@@ -112,7 +112,7 @@
      (field forms::string-form-field)
      form &rest args)
   (format *html* "<input type=\"text\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -129,7 +129,7 @@
      (theme forms::default-form-theme)
      (field forms::email-form-field) form &rest args)
   (format *html* "<input type=\"email\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -146,7 +146,7 @@
      (theme forms::default-form-theme)
      (field forms::url-form-field) form &rest args)
   (format *html* "<input type=\"url\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -163,7 +163,7 @@
      (theme forms::default-form-theme)
      (field forms::integer-form-field) form &rest args)
   (format *html* "<input type=\"number\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -181,7 +181,7 @@
      (field forms::password-form-field)
      form &rest args)
   (format *html* "<input type=\"password\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -200,7 +200,7 @@
   (with-html-output (*html*)
     (:input :type "checkbox"
             :class (getf args :class)
-            :name (forms::form-field-name field form)
+            :name (forms::field-request-name field form)
             :checked (when (forms::field-value field)
                        "checked"))))
 
@@ -226,7 +226,7 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
             do
               (htm
-               (:input :type "checkbox" :name (forms::form-field-name field form)
+               (:input :type "checkbox" :name (forms::field-request-name field form)
                        :value key
                        :checked (when (member key selected-keys)
                                   "checked")
@@ -240,7 +240,7 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
             do
               (htm
-               (:input :type "radio" :name (forms::form-field-name field form)
+               (:input :type "radio" :name (forms::field-request-name field form)
                        :value (princ-to-string key)
                        :checked (when (equalp (first selected-value)
                                               key)
@@ -253,7 +253,7 @@
      (let ((selected-keys (mapcar #'first (forms::field-keys-and-values field))))
        (with-html-output (*html*)
          (:select
-          :name (forms::form-field-name field form)
+          :name (forms::field-request-name field form)
           :multiple "multiple"
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
@@ -269,7 +269,7 @@
      (let ((selected-value (forms::field-key-and-value field)))
        (with-html-output (*html*)
          (:select
-          :name (forms::form-field-name field form)
+          :name (forms::field-request-name field form)
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm
@@ -317,3 +317,45 @@
                                              field form)
   (format *html* " data-parsley-max=\"~A\""
           (1- (clavier::validator-number constraint))))
+
+;; Subform field
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
+     (field forms::subform-form-field)
+     form &rest args)
+  (declare (ignore args))
+  (forms::dflet ((forms::field-request-name (fld subform)
+                                            (fmt:fmt nil
+                                                     (:a (forms::form-name form)) "-"                                                  (:a (forms::field-name field)) "-"
+                                                     (:a (forms::call-next-function)))))
+    ;; Render the fields of the subform (but not the HTML form element - form elements inside other form elements is not supported in HTML)
+    (let ((subform (or (forms:field-value field)
+                       (forms::field-subform field))))
+      (loop for field in (forms::form-fields subform)
+         do
+           (forms::renderer-render-field renderer theme (cdr field)
+                                         subform)))))
+
+;; List field
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
+     (field forms::list-form-field)
+     form &rest args)
+  (declare (ignore args))
+  (loop for item in (forms::field-value field)
+     for i from 0
+     do
+       (forms::dflet ((forms::field-request-name (field form)
+                                                 (fmt:fmt nil
+                                                          (forms::call-next-function)                                                              "[" i "]")))
+         (forms::renderer-render-field renderer theme item form))
+     finally
+     ;; Render a new entry
+       (forms::dflet ((forms::field-request-name (field form)
+                                                 (fmt:fmt nil
+                                                          (forms::call-next-function)                                                              "[" (1+ i) "]")))
+         (let ((entry (funcall (forms::list-field-type field))))
+           (forms::renderer-render-field renderer theme entry form)))))

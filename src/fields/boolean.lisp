@@ -17,7 +17,7 @@
 (defmethod field-read-from-request ((field boolean-form-field) form parameters)
   (setf (field-value field)
 	(equalp 
-	 (cdr (assoc (form-field-name field form) parameters :test #'string=)) 
+	 (cdr (assoc (field-request-name field form) parameters :test #'string=)) 
 	 "on")))
 
 (defmethod make-form-field ((field-type (eql :boolean)) &rest args)

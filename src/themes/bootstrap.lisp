@@ -72,7 +72,7 @@
      (field forms::string-form-field)
      form &rest args)
   (format *html* "<input type=\"text\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-empty-value field)
@@ -89,7 +89,7 @@
      (theme bootstrap-form-theme)
      (field forms::email-form-field) form &rest args)
   (format *html* "<input type=\"email\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-empty-value field)
@@ -106,7 +106,7 @@
      (theme bootstrap-form-theme)
      (field forms::url-form-field) form &rest args)
   (format *html* "<input type=\"url\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-empty-value field)
@@ -123,7 +123,7 @@
      (theme bootstrap-form-theme)
      (field forms::integer-form-field) form &rest args)
   (format *html* "<input type=\"number\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-empty-value field)
@@ -141,7 +141,7 @@
      (field forms::password-form-field)
      form &rest args)
   (format *html* "<input type=\"password\"")
-  (format *html* " name=\"~A\"" (forms::form-field-name field form))
+  (format *html* " name=\"~A\"" (forms::field-request-name field form))
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-empty-value field)
@@ -175,7 +175,7 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
             do
               (htm
-               (:input :type "checkbox" :name (forms::form-field-name field form)
+               (:input :type "checkbox" :name (forms::field-request-name field form)
                        :value key
                        :checked (when (member key selected-keys)
                                   "checked")
@@ -189,7 +189,7 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
             do
               (htm
-               (:input :type "radio" :name (forms::form-field-name field form)
+               (:input :type "radio" :name (forms::field-request-name field form)
                        :value (princ-to-string key)
                        :checked (when (equalp (first selected-value)
                                               key)
@@ -202,7 +202,7 @@
      (let ((selected-keys (mapcar #'first (forms::field-keys-and-values field))))
        (with-html-output (*html*)
          (:select
-          :name (forms::form-field-name field form)
+          :name (forms::field-request-name field form)
           :multiple "multiple"
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
@@ -218,7 +218,7 @@
      (let ((selected-value (forms::field-key-and-value field)))
        (with-html-output (*html*)
          (:select
-          :name (forms::form-field-name field form)
+          :name (forms::field-request-name field form)
           :class "form-control"
           (loop for (key . choice) in (forms::field-choices-alist field)
              do

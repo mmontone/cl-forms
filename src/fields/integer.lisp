@@ -17,7 +17,7 @@
 (defmethod field-read-from-request ((field integer-form-field) form parameters)
   (setf (field-value field)
 	(let ((value 
-	       (cdr (assoc (form-field-name field form) parameters :test #'string=))))
+	       (cdr (assoc (field-request-name field form) parameters :test #'string=))))
 	  (and value
 	       (parse-integer value :junk-allowed t)))))
 
