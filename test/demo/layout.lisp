@@ -41,14 +41,14 @@
                         (who:with-html-output (forms.who::*html*)
                           (:div :class :container
                                 (forms:render-form-start)
-                                (row 
+                                (row
                                  (:h3 (who:str "General"))
                                  (col (f firstname)) (col (f lastname)))
                                 (f active)
                                 (row
                                  (:h3 (who:str "Address"))
                                  (f address))
-                                (row                          
+                                (row
                                  (:h3 (who:str "Other"))
                                  (f choices)
                                  (f choices2))
@@ -66,22 +66,21 @@
                                   :uri "/layout-post"
                                   :default-request-type :post) ()
   (flet ((fields-post ()
-           (let ((form (forms:get-form 'fields-form)))
+           (let ((form (forms:get-form 'layout-form)))
              (forms::handle-request form)
              (if (forms::validate-form form)
                  (forms::with-form-field-values (firstname lastname active address
-                                                 sex choices choices2) form
+                                                           choices choices2) form
                    (who:with-html-output (forms.who::*html*)
                      (:ul
                       (:li (who:fmt "Firstname: ~A" firstname))
-                  (:li (who:fmt "Lastname: ~A" lastname))
-                  (:li (who:fmt "Active: ~A" active))
-                  (:li (who:fmt "Sex: ~A" sex))
-                  (:li (who:fmt "Address: ~A" address))
-                  (:li (who:fmt "Choices: ~A" choices))
-                  (:li (who:fmt "Choices2: ~A" choices2)))))
+                      (:li (who:fmt "Lastname: ~A" lastname))
+                      (:li (who:fmt "Active: ~A" active))
+                      (:li (who:fmt "Address: ~A" address))
+                      (:li (who:fmt "Choices: ~A" choices))
+                      (:li (who:fmt "Choices2: ~A" choices2)))))
                  "Form is not valid"))))
     (render-demo-page :demo #'fields-post
                       :source (asdf:system-relative-pathname :cl-forms.demo
-                                                             "test/demo/fields.lisp")
+                                                             "test/demo/layout.lisp")
                       :active-menu :layout)))
