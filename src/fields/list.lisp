@@ -37,7 +37,7 @@
   ;; First, create a regex to filter the list-field parameters. It's those with the format <field>[<index>]
   (let ((regex
          (ppcre:create-scanner `(:sequence ,(field-request-name field form)
-                                           (:greedy-repetition 0 nil (:alternation :word-char-class "-"))
+                                           (:non-greedy-repetition 0 nil :everything)
                                            "["
                                            (:register (:greedy-repetition 1 nil :digit-class))
                                            "]"))))

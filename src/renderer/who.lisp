@@ -328,7 +328,7 @@
   (declare (ignore args))
   (forms::dflet ((forms::field-request-name (fld subform)
                                             (fmt:fmt nil
-                                                     (:a (forms::form-name form)) "-"                                                  (:a (forms::field-name field)) "-"
+                                                     (:a (forms::form-name form)) "."                                                  (:a (forms::field-name field)) "."
                                                      (:a (forms::call-next-function)))))
     ;; Render the fields of the subform (but not the HTML form element - form elements inside other form elements is not supported in HTML)
     (let ((subform (or (forms:field-value field)

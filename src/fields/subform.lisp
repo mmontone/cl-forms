@@ -25,7 +25,7 @@
   (let ((field-subform (field-subform field)))
     (forms::dflet ((forms::field-request-name (fld subform)
                                               (fmt:fmt nil
-                                                       (:a (forms::form-name form)) "-"                                                  (:a (forms::field-name field)) "-"
+                                                       (:a (forms::form-name form)) "."                                                  (:a (forms::field-name field)) "."
                                                        (:a (forms::call-next-function)))))
       (handle-request field-subform)
       (setf (field-value field) field-subform))))

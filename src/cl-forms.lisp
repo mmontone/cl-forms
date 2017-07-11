@@ -226,7 +226,7 @@ This is defined as a dynamically scoped function because it is needed that its b
   ;;Default field name generation
   (fmt:fmt nil
            (form-name form)
-           "-" (field-name form-field)))
+           "." (field-name form-field)))
 
 (defmethod field-value ((field form-field))
   (if (field-accessor field)
