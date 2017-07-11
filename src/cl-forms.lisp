@@ -3,6 +3,7 @@
 (defvar *form-renderer* nil)
 (defvar *default-form-renderer* :who)
 (defvar *form* nil "The current form")
+(defvar *base64-encode* nil "If T, encode form parameters in base64")
 
 (defmethod call-with-form-renderer (renderer function)
   (let ((*form-renderer* renderer))
@@ -142,6 +143,15 @@
      do
        (setf (field-form (cdr field)) form)))
 
+(defun post-parameters (&optional (request hunchentoot:*request*))
+  (let ((post-parameters (hunchentoot:post-parameters request)))
+    (if *base64-encode*
+        (mapcar (lambda (param)
+                  (cons (base64:base64-string-to-string (car param) :uri t)
+                        (cdr param)))
+                post-parameters)
+        post-parameters)))
+
 (defmethod make-csrf-token ((form form))
   (ironclad:byte-array-to-hex-string
    (ironclad:ascii-string-to-byte-array
@@ -232,6 +242,12 @@
 (defun field-request-name (form-field form)
   (fmt:fmt nil
            (:join "" (alexandria:flatten (reverse *field-path*)))))
+
+(defun render-field-request-name (form-field form)
+  (let ((request-name (field-request-name form-field form)))
+    (if *base64-encode*
+        (base64:string-to-base64-string request-name :uri t)
+        request-name)))
 
 (defmethod field-value ((field form-field))
   (if (field-accessor field)
@@ -377,9 +393,10 @@ been validated via validate-form."
         ;; The form is not valid. Throw an error, but reset its CSRF token for next time
         (set-form-session-csrf-token form)
         (error "Invalid CSRF token"))))
-  (loop for field in (form-fields form)
-     do (field-read-from-request (cdr field) form
-                                 (hunchentoot:post-parameters*))))
+  (let ((post-parameters (post-parameters)))
+    (loop for field in (form-fields form)
+       do (field-read-from-request (cdr field) form
+                                   post-parameters))))
 
 (defgeneric field-read-from-request (field form parameters))
 

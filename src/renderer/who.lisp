@@ -112,7 +112,7 @@
      (field forms::string-form-field)
      form &rest args)
   (format *html* "<input type=\"text\"")
-  (format *html* " name=\"~A\"" (forms::field-request-name field form))
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -129,7 +129,7 @@
      (theme forms::default-form-theme)
      (field forms::email-form-field) form &rest args)
   (format *html* "<input type=\"email\"")
-  (format *html* " name=\"~A\"" (forms::field-request-name field form))
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -146,7 +146,7 @@
      (theme forms::default-form-theme)
      (field forms::url-form-field) form &rest args)
   (format *html* "<input type=\"url\"")
-  (format *html* " name=\"~A\"" (forms::field-request-name field form))
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -163,7 +163,7 @@
      (theme forms::default-form-theme)
      (field forms::integer-form-field) form &rest args)
   (format *html* "<input type=\"number\"")
-  (format *html* " name=\"~A\"" (forms::field-request-name field form))
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -181,7 +181,7 @@
      (field forms::password-form-field)
      form &rest args)
   (format *html* "<input type=\"password\"")
-  (format *html* " name=\"~A\"" (forms::field-request-name field form))
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-empty-value field)
@@ -200,7 +200,7 @@
   (with-html-output (*html*)
     (:input :type "checkbox"
             :class (getf args :class)
-            :name (forms::field-request-name field form)
+            :name (forms::render-field-request-name field form)
             :checked (when (forms::field-value field)
                        "checked"))))
 
@@ -226,7 +226,7 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
             do
               (htm
-               (:input :type "checkbox" :name (forms::field-request-name field form)
+               (:input :type "checkbox" :name (forms::render-field-request-name field form)
                        :value key
                        :checked (when (member key selected-keys)
                                   "checked")
@@ -240,7 +240,7 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
             do
               (htm
-               (:input :type "radio" :name (forms::field-request-name field form)
+               (:input :type "radio" :name (forms::render-field-request-name field form)
                        :value (princ-to-string key)
                        :checked (when (equalp (first selected-value)
                                               key)
@@ -253,7 +253,7 @@
      (let ((selected-keys (mapcar #'first (forms::field-keys-and-values field))))
        (with-html-output (*html*)
          (:select
-          :name (forms::field-request-name field form)
+          :name (forms::render-field-request-name field form)
           :multiple "multiple"
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
@@ -269,7 +269,7 @@
      (let ((selected-value (forms::field-key-and-value field)))
        (with-html-output (*html*)
          (:select
-          :name (forms::field-request-name field form)
+          :name (forms::render-field-request-name field form)
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm

@@ -77,7 +77,7 @@
      (theme forms::default-form-theme)
      (field forms::string-form-field) form &rest args)
   (<input (<type= "text")
-	  (<name= (forms::field-request-name field form))
+	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-empty-value field)
 	    (<placeholder= (forms::field-empty-value field)))
 	  (renderer-render-field-attributes renderer theme field form)
@@ -91,7 +91,7 @@
      (theme forms::default-form-theme)
      (field forms::email-form-field) form &rest args)
   (<input (<type= "email")
-	  (<name= (forms::field-request-name field form))
+	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-empty-value field)
 	    (<placeholder= (forms::field-empty-value field)))
 	  (renderer-render-field-attributes renderer theme field form)
@@ -105,7 +105,7 @@
      (theme forms::default-form-theme)
      (field forms::url-form-field) form &rest args)
   (<input (<type= "url")
-	  (<name= (forms::field-request-name field form))
+	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-empty-value field)
 		 (<placeholder= (forms::field-empty-value field)))
 	  (renderer-render-field-attributes renderer theme field form)
@@ -119,7 +119,7 @@
      (theme forms::default-form-theme)
      (field forms::integer-form-field) form &rest args)
   (<input (<type= "number")
-	  (<name= (forms::field-request-name field form))
+	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-empty-value field)
 	    (<placeholder= (forms::field-empty-value field)))
 	  (renderer-render-field-attributes renderer theme field form)
@@ -133,7 +133,7 @@
      (theme forms::default-form-theme)
      (field forms::password-form-field) form &rest args)
   (<input (<type= "password")
-	  (<name= (forms::field-request-name field form))
+	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-empty-value field)
 	    (<placeholder= (forms::field-empty-value field)))
 	  (renderer-render-field-attributes renderer theme field form)
@@ -147,7 +147,7 @@
      (theme forms::default-form-theme)
      (field forms::boolean-form-field) form &rest args)
   (<input (<type= "checkbox")
-	  (<name= (forms::field-request-name field form))
+	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-value field)
 	    (<checked= "checked"))))
 
@@ -170,7 +170,7 @@
        (loop for (key . choice) in (forms::field-choices-alist field)
 	  do
 	    (<input (<type= "checkbox")
-		    (<name= (forms::field-request-name field form))
+		    (<name= (forms::render-field-request-name field form))
 		    (<value= key)
 		    (when (member key selected-keys)
 		      (<checked= "checked"))
@@ -183,7 +183,7 @@
        (loop for (key . choice) in (forms::field-choices-alist field)
 	  do
 	    (<input (<type= "radio")
-		    (<name= (forms::field-request-name field form))
+		    (<name= (forms::render-field-request-name field form))
 		    (<value= (princ-to-string key))
 		    (when (equalp (first selected-value)
 				  key)
@@ -195,7 +195,7 @@
      ;; A multiple select box
      (let ((selected-keys (mapcar #'first (forms::field-keys-and-values field))))
        (<select
-	 (<name= (forms::field-request-name field form))
+	 (<name= (forms::render-field-request-name field form))
 	 (<multiple= "multiple")
 	 (loop for (key . choice) in (forms::field-choices-alist field)
 	    do
@@ -209,7 +209,7 @@
      ;; A single select box
      (let ((selected-value (forms::field-key-and-value field)))
        (<select
-	 (<name= (forms::field-request-name field form))
+	 (<name= (forms::render-field-request-name field form))
 	 (loop for (key . choice) in (forms::field-choices-alist field)
 	    do
 	      (<option (<value= (princ-to-string key))

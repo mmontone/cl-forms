@@ -24,4 +24,5 @@
            :field-formatter
            :field-parser
            :handle-request
-           :validate-form))
+           :validate-form
+           :*base64-encode*))
