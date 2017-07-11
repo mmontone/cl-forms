@@ -326,10 +326,7 @@
      (field forms::subform-form-field)
      form &rest args)
   (declare (ignore args))
-  (forms::dflet ((forms::field-request-name (fld subform)
-                                            (fmt:fmt nil
-                                                     (:a (forms::form-name form)) "."                                                  (:a (forms::field-name field)) "."
-                                                     (:a (forms::call-next-function)))))
+  (let ((forms::*field-path* (cons "." forms::*field-path*)))
     ;; Render the fields of the subform (but not the HTML form element - form elements inside other form elements is not supported in HTML)
     (let ((subform (or (forms:field-value field)
                        (forms::field-subform field))))
@@ -348,15 +345,10 @@
   (loop for item in (forms::field-value field)
      for i from 0
      do
-       (forms::dflet ((forms::field-request-name (field form)
-                                                 (fmt:fmt nil
-                                                          (forms::call-next-function)                                                              "[" i "]")))
+       (let ((forms::*field-path* (cons (list "[" i "].") forms::*field-path*)))
          (forms::renderer-render-field-widget renderer theme item form))
      finally
      ;; Render a new entry
-       (forms::dflet ((forms::field-request-name (field form)
-                                                 (fmt:fmt nil
-                                                          (forms::call-next-function)
-                                                          "[" (1+ i) "]")))
+       (let ((forms::*field-path* (cons (list "[" (1+ i) "].") forms::*field-path*)))
          (let ((entry (funcall (forms::list-field-type field))))
            (forms::renderer-render-field-widget renderer theme entry form)))))

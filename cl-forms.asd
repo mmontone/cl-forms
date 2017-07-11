@@ -13,7 +13,6 @@
   :components ((:module :src
                         :components
                         ((:file "package")
-                         (:file "dynamic-function")
                          (:module :themes
                                   :components
                                   ((:file "theme")

@@ -37,7 +37,7 @@
   ;; First, create a regex to filter the list-field parameters. It's those with the format <field>[<index>]
   (let ((regex
          (ppcre:create-scanner `(:sequence ,(field-request-name field form)
-                                           (:non-greedy-repetition 0 nil :everything)
+                                           ;(:non-greedy-repetition 0 nil :everything)
                                            "["
                                            (:register (:greedy-repetition 1 nil :digit-class))
                                            "]"))))
@@ -51,10 +51,8 @@
                          (parse-integer index))))))
       ;; With the indexes posted, read the list items from the request parameters
       (let ((items
-             (mapcar (lambda (i) 
-                       (dflet ((field-request-name (field form)
-                                                   (fmt:fmt nil                                                                                (call-next-function)
-                                                            "[" i "]")))
+             (mapcar (lambda (i)
+                       (let ((*field-path* (cons (list "[" i "].") *field-path*)))
                          (let ((item-field (funcall (list-field-type field))))
                            (field-read-from-request item-field
                                                     form

@@ -220,13 +220,18 @@
   (setf (form-fields form)
         (append (form-fields form) field)))
 
-(defdfun field-request-name (form-field form)
-  "The name of the field to appear in the HTML. Used both for rendering the field to HTML and reading it from the HTTP request.
-This is defined as a dynamically scoped function because it is needed that its behaviour changes depending on which part of the form is being read/generated. The parts being subforms, or list field items."
-  ;;Default field name generation
+(defvar *field-path* nil)
+
+(defgeneric field-add-to-path (form-field form &optional path)
+  (:method (form-field form &optional (path *field-path*))
+    (if (null path)
+        (cons (list (form-name form) "." (field-name form-field))
+              path)
+        (cons (field-name form-field) path))))
+
+(defun field-request-name (form-field form)
   (fmt:fmt nil
-           (form-name form)
-           "." (field-name form-field)))
+           (:join "" (alexandria:flatten (reverse *field-path*)))))
 
 (defmethod field-value ((field form-field))
   (if (field-accessor field)
@@ -358,6 +363,10 @@ been validated via validate-form."
   (when (member :list (forms::display-errors form))
     (call-next-method)))
 
+(defmethod renderer-render-field-widget :around (renderer theme field form &rest args)
+  (let ((*field-path* (field-add-to-path field form *field-path*)))
+    (call-next-method)))
+
 (defun handle-request (&optional (form *form*))
   (when (form-csrf-protection-p form)
     ;; Check the csrf token
@@ -373,6 +382,10 @@ been validated via validate-form."
                                  (hunchentoot:post-parameters*))))
 
 (defgeneric field-read-from-request (field form parameters))
+
+(defmethod field-read-from-request :around (field form parameters)
+  (let ((*field-path* (field-add-to-path field form *field-path*)))
+    (call-next-method)))
 
 (defmethod field-read-from-request :after (field form parameters)
   "Use the parser function after reading the value from the request"
