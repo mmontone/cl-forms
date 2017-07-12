@@ -287,8 +287,12 @@
   (when (forms::client-validation form)
     (when (forms::field-required-p field)
       (format *html* " data-parsley-required=\"true\""))
+    (when (forms::field-validation-triggers field)
+      (fmt:fmt *html* " data-parsley-trigger=\""
+               (:join "," (forms::field-validation-triggers field) (:a _ :downcase))
+                      "\"")))
     (loop for constraint in (forms::field-constraints field)
-       do (renderer-render-field-constraint renderer constraint field form))))
+       do (renderer-render-field-constraint renderer constraint field form)))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              theme
