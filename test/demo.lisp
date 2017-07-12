@@ -32,14 +32,11 @@
 (define-static-resource "/jquery.js"
     "test/static/bower_components/jquery/dist/jquery.min.js")
 
-(define-static-resource "/prettify.js"
-    "test/static/prettify/prettify.js")
+(define-static-resource "/highlight-lisp.js"
+    "test/static/highlight-lisp/highlight-lisp.js")
 
-(define-static-resource "/lang-lisp.js"
-    "test/static/prettify/lang-lisp.js")
-
-(define-static-resource "/prettify.css"
-    "test/static/prettify/prettify.css")
+(define-static-resource "/highlight-lisp-github.css"
+    "test/static/highlight-lisp/themes/github.css")
 
 (define-static-resource "/parsley.css"
     "test/static/bower_components/parsleyjs/src/parsley.css")
@@ -62,83 +59,84 @@
      (:head
       (:title "cl-forms demo")
       (:link :rel "stylesheet" :href "/bootstrap.css")
-      (:link :rel "stylesheet" :href "/prettify.css")
+      (:link :rel "stylesheet" :href "/highlight-lisp-github.css")
       (:link :rel "stylesheet" :href "/parsley.css")
       (:script :src "/jquery.js")
       (:script :src "/bootstrap.js")
-      (:script :src "/prettify.js")
-      (:script :src "/lang-lisp.js")
+      (:script :src "/highlight-lisp.js")
       (:script :src "/parsley.js"))
      (:style
       (who:str
        (cl-css:css '(("ul.errors li" :color "red")
                      (".has-error input" :background-color "pink")))))       
-     (:body :onload "prettyPrint()"
-            (:header :role"banner" :id "top" :class "navbar navbar-static-top"
-                     (:div :class "container"
-                           (:div :class "navbar-header"
-                                 (:a :class "navbar-brand"
-                                     :href "/" (who:str "CL-FORMS demo")))))
-            (:div :class "container"
-                  (:div :class "col-md-3"
-                        (:ul :class "nav nav-pills nav-stacked"
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :fields)
-                                              "active")
-                                  (:a :href "/fields" (who:str "Fields")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :models)
-                                              "active")
-                                  (:a :href "/models" (who:str "Models")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :validation)
-                                              "active")
-                                  (:a :href "/validation" (who:str "Validation")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :client-validation)
-                                              "active")
-                                  (:a :href "/client-validation" (who:str "Client validation")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :layout)
-                                              "active")
-                                  (:a :href "/layout" (who:str "Layout")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :themes)
-                                              "active")
-                                  (:a :href "/themes" (who:str "Themes")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :renderers)
-                                              "active")
-                                  (:a :href "/renderers" (who:str "Renderers")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :composition)
-                                              "active")
-                                  (:a :href "/composition" (who:str "Composition")))
-                             (:li :role "presentation"
-                                  :class (and (equalp active-menu :tests)
-                                              "active")
-                                  (:a :href "/tests" (who:str "Tests")))))
-                  (:div :role "tabpanel" :class "col-md-9"
-                        (:ul :class "nav nav-tabs" :role "tablist"
-                             (:li :role "tab" :class "active"
-                                  :aria-controls "demo"
-                                  (:a :href "#demo" :data-toggle "tab"
-                                      (who:str "Demo")))
-                             (:li :role "tab"
-                                  :aria-controls "source"
-                                  (:a :href "#source" :data-toggle "tab"
-                                      (who:str "Source"))))
-                        (:div :class "tab-content"
-                              (:div :role "tabpanel" :class "tab-pane active"
-                                    :id "demo"
-                                    (funcall demo))
-                              (:div :role "tabpanel" :class "tab-pane"
-                                    :id "source"
-                                    (:pre :class "prettyprint"
-                                          (who:str
-                                           (file-string source)
+     (:body
+      (:header :role"banner" :id "top" :class "navbar navbar-static-top"
+               (:div :class "container"
+                     (:div :class "navbar-header"
+                           (:a :class "navbar-brand"
+                               :href "/" (who:str "CL-FORMS demo")))))
+      (:div :class "container"
+            (:div :class "col-md-3"
+                  (:ul :class "nav nav-pills nav-stacked"
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :fields)
+                                        "active")
+                            (:a :href "/fields" (who:str "Fields")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :models)
+                                        "active")
+                            (:a :href "/models" (who:str "Models")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :validation)
+                                        "active")
+                            (:a :href "/validation" (who:str "Validation")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :client-validation)
+                                        "active")
+                            (:a :href "/client-validation" (who:str "Client validation")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :layout)
+                                        "active")
+                            (:a :href "/layout" (who:str "Layout")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :themes)
+                                        "active")
+                            (:a :href "/themes" (who:str "Themes")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :renderers)
+                                        "active")
+                            (:a :href "/renderers" (who:str "Renderers")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :composition)
+                                        "active")
+                            (:a :href "/composition" (who:str "Composition")))
+                       (:li :role "presentation"
+                            :class (and (equalp active-menu :tests)
+                                        "active")
+                            (:a :href "/tests" (who:str "Tests")))))
+            (:div :role "tabpanel" :class "col-md-9"
+                  (:ul :class "nav nav-tabs" :role "tablist"
+                       (:li :role "tab" :class "active"
+                            :aria-controls "demo"
+                            (:a :href "#demo" :data-toggle "tab"
+                                (who:str "Demo")))
+                       (:li :role "tab"
+                            :aria-controls "source"
+                            (:a :href "#source" :data-toggle "tab"
+                                (who:str "Source"))))
+                  (:div :class "tab-content"
+                        (:div :role "tabpanel" :class "tab-pane active"
+                              :id "demo"
+                              (funcall demo))
+                        (:div :role "tabpanel" :class "tab-pane"
+                              :id "source"
+                              (:pre (:code :class "lisp"
+                                           (who:str
+                                            (file-string source))
                                            ))))))
-            ))))
+      (:script :type "text/javascript"
+               (who:str "HighlightLisp.highlight_auto();"))
+      ))))
 
 (hunchentoot:define-easy-handler (demo-main :uri "/") ()
   (render-demo-page :demo #'fields-demo
