@@ -31,13 +31,22 @@
   (if (equalp sex :male) "Male" "Female"))
 
 (defun models-demo ()
-  (let ((person (make-instance 'person
+  (who:with-html-output (forms.who::*html*)
+    (:h1 (who:str "Form models"))
+    (:p "Forms can be attached to model objects. Model objects are CLOS instances from where form values are read and written to.")
+    (:p "To work with models, forms are defined via defform-builder instead of defform. A form-builder is a function that takes the model objects and attaches it to the form. The form needs to define the accessors to access the model for each form field.")
+    (:p "This is an example of a form attached to a person object. Please have a look at the source code to see how it is done.")
+    (render-model-form)))
+
+(defun render-model-form (&optional form)
+  (let ((form (or form
+                  (let ((person (make-instance 'person
                                :name "Foo"
                                :single t
                                :sex :male)))
-    (let ((form (forms::get-form 'model-form person)))
-      (forms:with-form-renderer :who
-        (forms:render-form form)))))
+                    (forms::get-form 'model-form person)))))
+    (forms:with-form-renderer :who
+      (forms:render-form form))))
 
 (hunchentoot:define-easy-handler (model-form :uri "/models") ()
   (render-demo-page :demo #'models-demo
