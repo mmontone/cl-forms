@@ -60,12 +60,15 @@
   (let ((value (cdr (assoc (field-request-name field form) parameters :test #'string=))))
     (setf (field-value field)
           (or
-           (local-time:parse-timestring
-            value
-            :date-separator #\-
-            :allow-missing-time-part t
-            :fail-on-error nil)
-           value))))
+           (and value
+                (local-time:parse-timestring
+                 value
+                 :date-separator #\-
+                 :allow-missing-time-part t
+                 :fail-on-error nil))
+           (if (string= value "")
+               nil
+               value)))))
 
 (defmethod format-field-value ((field date-form-field) value &optional (stream *standard-output*))
   (if (typep value 'local-time:timestamp)

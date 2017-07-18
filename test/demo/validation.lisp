@@ -11,7 +11,7 @@
                                     (clavier:greater-than -1)
                                     (clavier:less-than 200)))
    (email :email)
-   (birth-date :date)
+   (birth-date :date :required-p nil)
    (submit :submit :label "Create")))
 
 (defun validation-demo (&optional form)
