@@ -167,13 +167,17 @@
           :accessor field-label
           :documentation "The field label")
    (value :initarg :value
+          :writer (setf field-value)
           :initform nil
-          :accessor field-value
           :documentation "Field value")
-   (empty-value :initarg :empty-value
+   (default-value :initarg :default-value
                 :initform nil
-                :accessor field-empty-value
+                :accessor field-default-value
                 :documentation "Value to use when the field value is nil")
+   (placeholder :initarg :placeholder
+                :accessor field-placeholder
+                :initform nil
+                :documentation "Field placeholder (text that appears when the field is empty)")
    (parser :initarg :parser
            :initform nil
            :accessor field-parser
@@ -225,6 +229,10 @@
     (format stream "~A value: ~A"
             (field-name field)
             (field-value field))))
+
+(defmethod field-value ((field form-field))
+  (or (slot-value field 'value)
+      (default-value field)))
 
 (defun add-field (form field)
   (setf (form-fields form)
