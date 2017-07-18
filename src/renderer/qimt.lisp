@@ -83,8 +83,7 @@
 	  (renderer-render-field-attributes renderer theme field form)
 	  (when (forms::field-value field)
 	    (<value=
-	     (funcall (forms::field-formatter field)
-		      (forms::field-value field))))))
+	     (forms:format-field-value-to-string field)))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
@@ -97,8 +96,7 @@
 	  (renderer-render-field-attributes renderer theme field form)
 	  (when (forms::field-value field)
 	    (<value=
-	     (funcall (forms::field-formatter field)
-		      (forms::field-value field))))))
+	     (forms:format-field-value-to-string field)))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
@@ -111,8 +109,7 @@
 	  (renderer-render-field-attributes renderer theme field form)
 	  (when (forms::field-value field)
 	    (<value=
-	     (funcall (forms::field-formatter field)
-		      (forms::field-value field))))))
+	     (forms:format-field-value-to-string field)))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
@@ -125,8 +122,7 @@
 	  (renderer-render-field-attributes renderer theme field form)
 	  (when (forms::field-value field)
 	    (<value=
-	     (funcall (forms::field-formatter field)
-		      (forms::field-value field))))))
+	     (forms:format-field-value-to-string)))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
@@ -139,8 +135,7 @@
 	  (renderer-render-field-attributes renderer theme field form)
 	  (when (forms::field-value field)
 	    (<value=
-	     (funcall (forms::field-formatter field)
-		      (forms::field-value field))))))
+	     (forms:format-field-value-to-string field)))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
@@ -174,8 +169,9 @@
 		    (<value= key)
 		    (when (member key selected-keys)
 		      (<checked= "checked"))
-		    (xd (funcall (forms::field-formatter field)
-				 choice))))))
+		    (xd (forms:format-field-value-to-string field
+                                                    choice)
+                )))))
     ((and (forms::field-expanded field)
 	  (not (forms::field-multiple field)))
      ;; Render radio buttons
@@ -188,7 +184,7 @@
 		    (when (equalp (first selected-value)
 				  key)
 		      (<checked= "checked"))
-		    (xd (funcall (forms::field-formatter field)
+		    (xd (forms:format-field-value-to-string field
 				 choice))))))
     ((and (not (forms::field-expanded field))
 	  (forms::field-multiple field))
@@ -202,7 +198,7 @@
 	      (<option (<value= (princ-to-string key))
 		       (when (member key selected-keys)
 			 (<selected= "selected"))
-		       (xd (funcall (forms::field-formatter field)
+		       (xd (forms:format-field-value-to-string field
 				    choice)))))))
     ((and (not (forms::field-expanded field))
 	  (not (forms::field-multiple field)))
@@ -216,7 +212,7 @@
 		       (when (equalp (first selected-value)
 				     key)
 			 (<selected= "selected"))
-		       (xd (funcall (forms::field-formatter field)
+		       (xd (forms:format-field-value-to-string field
 				    choice)))))))))
 
 ;; Attributes and constraints

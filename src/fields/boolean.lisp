@@ -20,5 +20,12 @@
 	 (cdr (assoc (field-request-name field form) parameters :test #'string=)) 
 	 "on")))
 
+(defmethod format-field-value ((field boolean-form-field) value &optional (stream *standard-output*))
+  (if value
+      (write-string "on" stream)
+      (write-string "off" stream)))
+
 (defmethod make-form-field ((field-type (eql :boolean)) &rest args)
   (apply #'make-instance 'boolean-form-field args))
+
+

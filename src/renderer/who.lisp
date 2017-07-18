@@ -120,8 +120,7 @@
   (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (funcall (forms::field-formatter field)
-                     (forms::field-value field))))
+            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -137,8 +136,7 @@
   (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (funcall (forms::field-formatter field)
-                     (forms::field-value field))))
+            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -158,8 +156,7 @@
   (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (funcall (forms::field-formatter field)
-                     (forms::field-value field))))
+            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -175,8 +172,7 @@
   (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (funcall (forms::field-formatter field)
-                     (forms::field-value field))))
+            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -192,8 +188,7 @@
   (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (funcall (forms::field-formatter field)
-                     (forms::field-value field))))
+            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -210,8 +205,7 @@
   (renderer-render-field-attributes renderer theme field form)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (funcall (forms::field-formatter field)
-                     (forms::field-value field))))
+            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -251,7 +245,7 @@
                        :value key
                        :checked (when (member key selected-keys)
                                   "checked")
-                       (str (funcall (forms::field-formatter field)
+                       (str (forms:format-field-value-to-string field
                                      choice))))))))
     ((and (forms::field-expanded field)
           (not (forms::field-multiple field)))
@@ -266,7 +260,7 @@
                        :checked (when (equalp (first selected-value)
                                               key)
                                   "checked")
-                       (str (funcall (forms::field-formatter field)
+                       (str (forms:format-field-value-to-string field
                                      choice))))))))
     ((and (not (forms::field-expanded field))
           (forms::field-multiple field))
@@ -282,7 +276,7 @@
                 (:option :value (princ-to-string key)
                          :selected (when (member key selected-keys)
                                      "selected")
-                         (str (funcall (forms::field-formatter field)
+                         (str (forms:format-field-value-to-string field
                                        choice)))))))))
     ((and (not (forms::field-expanded field))
           (not (forms::field-multiple field)))
@@ -298,7 +292,7 @@
                          :selected (when (equalp (first selected-value)
                                                  key)
                                      "selected")
-                         (str (funcall (forms::field-formatter field)
+                         (str (forms:format-field-value-to-string field
                                        choice)))))))))))
 
 ;; Attributes and constraints

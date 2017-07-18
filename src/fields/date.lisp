@@ -67,5 +67,10 @@
             :fail-on-error nil)
            value))))
 
+(defmethod format-field-value ((field date-form-field) value &optional (stream *standard-output*))
+  (if (typep value 'local-time:timestamp)
+      (local-time:format-timestring stream value :format (date-format field))
+      (call-next-method)))
+
 (defmethod make-form-field ((field-type (eql :date)) &rest args)
   (apply #'make-instance 'date-form-field args))

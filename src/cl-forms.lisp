@@ -183,7 +183,7 @@
            :accessor field-parser
            :documentation "Custom field value parser")
    (formatter :initarg :formatter
-              :initform #'princ-to-string
+              :initform nil
               :accessor field-formatter
               :documentation "The field formatter")
    (constraints :initarg :constraints
@@ -307,6 +307,21 @@
   "Determines if a field is valid. This method assumes the form has already
 been validated via validate-form."
   (not (find form-field (form-errors form) :key 'car)))
+
+(defgeneric format-field-value (form-field field-value &optional stream))
+
+(defmethod format-field-value :around ((form-field form-field) field-value &optional (stream *standard-output*))
+  (if (field-formatter form-field)
+      (funcall (field-formatter form-field)
+               field-value stream)
+      (call-next-method)))
+
+(defmethod format-field-value ((form-field form-field) field-value &optional (stream *standard-output*))
+  (format stream "~A" field-value))
+
+(defun format-field-value-to-string (form-field &optional (field-value (field-value form-field)))
+  (with-output-to-string (s)
+    (format-field-value form-field field-value s)))
 
 (defmethod form-session-csrf-entry ((form form))
   (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
