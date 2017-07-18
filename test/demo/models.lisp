@@ -27,8 +27,10 @@
                                  :formatter format-sex)
                             (submit :submit :label "Update")))))
 
-(defun format-sex (sex)
-  (if (equalp sex :male) "Male" "Female"))
+(defun format-sex (sex stream)
+  (write-string
+   (if (equalp sex :male) "Male" "Female")
+   stream))
 
 (defun models-demo ()
   (who:with-html-output (forms.who::*html*)
