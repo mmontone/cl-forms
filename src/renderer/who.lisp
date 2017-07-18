@@ -18,6 +18,7 @@
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
            :method (symbol-name (forms::form-method form))
+           :enctype (forms::form-enctype form)
            :class (getf args :class)
            (when (forms::form-csrf-protection-p form)
              (let ((token (forms::set-form-session-csrf-token form)))
@@ -40,12 +41,15 @@
                                               (theme forms::default-form-theme)
                                               form &rest args)
   "Start form rendering"
-  (format *html* "<form id=\"~A\" action=\"~A\" method=\"~A\" ~@[~A~]>"
-          (forms::form-id form)
-          (forms::form-action form)
-          (forms::form-method form)
-          (when (getf args :class)
-            (format nil " class=\"~A\"" (getf args :class))))
+  (fmt:with-fmt (*html*)
+    "<form id=\"" (forms::form-id form) "\""
+    " action=\"" (forms::form-action form) "\""
+    " method=\"" (forms::form-method form) "\""
+    (:when (forms::form-enctype form)
+      " enctype=\"" (forms::form-enctype form) "\"")
+    (:when (getf args :class)
+           " class=\"" (getf args :class) "\"" )
+    ">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
       (format *html* "<input name=\"~A\" type=\"hidden\" value=\"~A\"/>"
@@ -218,6 +222,16 @@
             :name (forms::render-field-request-name field form)
             :checked (when (forms::field-value field)
                        "checked"))))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
+     (field forms::file-form-field) form &rest args)
+  (with-html-output (*html*)
+    (:input :type "file"
+            :class (getf args :class)
+            :name (forms::render-field-request-name field form)
+            :value (forms::format-field-value-to-string field))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))

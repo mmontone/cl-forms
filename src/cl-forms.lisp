@@ -103,6 +103,10 @@
            :initform :post
            :accessor form-method
            :documentation "The form method")
+   (enctype :initarg :enctype
+            :initform nil
+            :accessor form-enctype
+            :documentation "Form encoding type. i.e. Use multipart/form-data for file uploads")
    (fields :initarg :fields
            :initform nil
            :accessor form-fields

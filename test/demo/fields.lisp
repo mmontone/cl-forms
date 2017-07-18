@@ -1,9 +1,11 @@
 (in-package :forms.test)
 
-(forms:defform fields-form (:action "/fields-post")
+(forms:defform fields-form (:action "/fields-post"
+                                    :enctype "multipart/form-data")
   ((name :string :value "")
    (ready :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
+   (avatar :file :upload-handler 'handle-file-upload)
    (submit :submit :label "Create")))
 
 (defun fields-demo ()
@@ -35,12 +37,15 @@
   (flet ((fields-post ()
            (let ((form (forms:get-form 'fields-form)))
              (forms::handle-request form)
-             (forms::with-form-fields (name ready sex) form
+             (forms::with-form-fields (name ready sex avatar) form
                (who:with-html-output (forms.who::*html*)
                  (:ul
                   (:li (who:fmt "Name: ~A" (forms::field-value name)))
                   (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
-                  (:li (who:fmt "Sex: ~A" (forms::field-value sex)))))))))
+                  (:li (who:fmt "Sex: ~A" (forms::field-value sex)))
+                  (:li (who:fmt "Avatar: ~A" (forms::file-name avatar))
+                       (:img :width 200 :height 200
+                             :src (format nil "/files?f=~A" (forms::file-name avatar))))))))))
     (render-demo-page :demo #'fields-post
                       :source (asdf:system-relative-pathname :cl-forms.demo
                                                              "test/demo/fields.lisp")
@@ -84,3 +89,28 @@
                       :source (asdf:system-relative-pathname :cl-forms.demo
                                                              "test/demo/fields.lisp")
                       :active-menu :fields)))
+
+;; File handling
+
+(defvar *files* nil)
+(defvar *files-path* (pathname "/tmp/cl-forms/"))
+
+(defun handle-file-upload (file-field)
+  ;; Store the file
+  (let ((new-path (merge-pathnames 
+                       (forms::file-name file-field)
+                       *files-path*)))
+    (rename-file (forms::file-path file-field)
+                 (ensure-directories-exist new-path))
+    ;; Save for handler
+    (push (cons (forms::file-name file-field)
+                (list new-path (forms::file-content-type file-field)))
+          *files*)))
+
+(defun handle-uploaded-file ()
+  (let ((finfo (cdr (assoc (hunchentoot:parameter "f") *files* :test #'equalp))))
+    (hunchentoot:handle-static-file (first finfo) (second finfo))))
+
+(push 
+ (hunchentoot:create-prefix-dispatcher "/files" 'handle-uploaded-file)
+ hunchentoot:*dispatch-table*)

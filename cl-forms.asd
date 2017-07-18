@@ -31,6 +31,7 @@
                                    (:file "integer")
                                    (:file "choice")
                                    (:file "date")
+                                   (:file "file")
                                    (:file "submit")
                                    (:file "subform")
                                    (:file "list"))))
