@@ -30,6 +30,7 @@
                                    (:file "url")
                                    (:file "integer")
                                    (:file "choice")
+                                   (:file "date")
                                    (:file "submit")
                                    (:file "subform")
                                    (:file "list"))))
