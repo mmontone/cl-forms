@@ -44,8 +44,10 @@
                   (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
                   (:li (who:fmt "Sex: ~A" (forms::field-value sex)))
                   (:li (who:fmt "Avatar: ~A" (forms::file-name avatar))
-                       (:img :width 200 :height 200
-                             :src (format nil "/files?f=~A" (forms::file-name avatar))))))))))
+                       (when (forms::file-name avatar)
+                         (who:htm
+                          (:img :width 200 :height 200
+                                :src (format nil "/files?f=~A" (forms::file-name avatar))))))))))))
     (render-demo-page :demo #'fields-post
                       :source (asdf:system-relative-pathname :cl-forms.demo
                                                              "test/demo/fields.lisp")

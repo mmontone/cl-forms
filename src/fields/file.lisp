@@ -23,7 +23,7 @@
 (defmethod field-read-from-request ((field file-form-field) form parameters)
   (let ((fvalue
          (cdr (assoc (field-request-name field form) parameters :test #'string=))))
-    (if (listp fvalue)
+    (if (and fvalue (listp fvalue))
         (destructuring-bind (path file-name content-type) fvalue
           (setf (file-path field) path)
           (setf (file-name field) file-name)
