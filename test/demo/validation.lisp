@@ -30,14 +30,15 @@
              (forms::handle-request form)
              (if (forms::validate-form form)
                  ;; The form is valid
-                 (forms::with-form-field-values (name single sex age email) form
+                 (forms::with-form-field-values (name single sex age email birth-date) form
                    (who:with-html-output (forms.who::*html*)
                      (:ul
                       (:li (who:fmt "Name: ~A" name))
                       (:li (who:fmt "Single: ~A" single))
                       (:li (who:fmt "Sex: ~A" sex))
                       (:li (who:fmt "Age: ~A" age))
-                      (:li (who:fmt "Email: ~A" email)))))
+                      (:li (who:fmt "Email: ~A" email))
+                      (:li (who:fmt "Birth date: ~A" birth-date)))))
                  ;; The form is not valid
                  (validation-demo form)))))
     (render-demo-page :demo #'validation-post
