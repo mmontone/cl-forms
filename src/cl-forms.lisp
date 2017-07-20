@@ -349,6 +349,9 @@ been validated via validate-form."
   (values (null (form-errors form))
           (form-errors form)))
 
+(defun form-valid-p (form)
+  (null (form-errors form)))
+
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 

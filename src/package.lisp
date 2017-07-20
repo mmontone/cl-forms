@@ -25,6 +25,7 @@
            :field-parser
            :handle-request
            :validate-form
+           :form-valid-p
            :format-field-value
            :format-field-value-to-string
            :*base64-encode*))
