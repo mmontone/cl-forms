@@ -46,7 +46,8 @@
   (let ((validator (clavier:fn (lambda (date)
                                  (typep date 'local-time:timestamp))
                                (format nil "~A is not a valid date"
-                                       (field-name form-field)))))
+                                       (or (field-label form-field)
+                                           (field-name form-field))))))
     (multiple-value-bind (valid-p error)
         (funcall validator
                  (field-value form-field))
