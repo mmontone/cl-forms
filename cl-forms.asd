@@ -32,6 +32,7 @@
                                    (:file "choice")
                                    (:file "date")
                                    (:file "file")
+                                   (:file "hidden")
                                    (:file "submit")
                                    (:file "subform")
                                    (:file "list"))))

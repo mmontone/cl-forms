@@ -144,8 +144,8 @@
 
 (defmethod initialize-instance :after ((form form) &rest initargs)
   (loop for field in (form-fields form)
-     do
-       (setf (field-form (cdr field)) form)))
+        do
+           (setf (field-form (cdr field)) form)))
 
 (defun post-parameters (&optional (request hunchentoot:*request*))
   (let ((post-parameters (hunchentoot:post-parameters request)))
@@ -241,6 +241,9 @@
 (defun add-field (form field)
   (setf (form-fields form)
         (append (form-fields form) field)))
+
+(defmethod field-render-label-p ((field form-field))
+  t)
 
 (defvar *field-path* nil)
 

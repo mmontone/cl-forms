@@ -10,3 +10,6 @@
 
 (defmethod make-form-field ((field-type (eql :submit)) &rest args)
   (apply #'make-instance 'submit-form-field args))
+
+(defmethod field-render-label-p ((field submit-form-field))
+  nil)

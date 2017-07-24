@@ -92,7 +92,7 @@
 (defmethod forms::renderer-render-field-label ((renderer (eql :who))
                                                (theme forms::default-form-theme)
                                                field form &rest args)
-  (unless (typep field 'forms::submit-form-field)
+  (when (forms::field-render-label-p field)
     (with-html-output (*html*)
       (:label
        :class (getf args :class)
@@ -232,6 +232,15 @@
             :class (getf args :class)
             :name (forms::render-field-request-name field form)
             :value (forms::format-field-value-to-string field))))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
+     (field forms::hidden-form-field) form &rest args)
+  (with-html-output (*html*)
+    (:input :type "hidden"
+            :name (forms::render-field-request-name field form)
+            :value (forms:field-value field))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
