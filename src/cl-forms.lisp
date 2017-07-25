@@ -445,3 +445,35 @@ been validated via validate-form."
                    (field-value field)))))
 
 (defgeneric make-form-field (field-type &rest args))
+
+;; Form templates
+
+(defun collect-replace-fields (form)
+  (let (fields)
+    (let ((new-form (%collect-replace-fields
+                     form
+                     (lambda (field) (push field fields)))))
+      (values new-form fields))))
+
+(defun %collect-replace-fields (form collect-field)
+  (if (atom form)
+      form
+      (if (eql (first form) 'forms:form-field)
+          (progn
+            (funcall collect-field (cdr form))
+            `(forms:render-field ',(second form)))
+          (loop for part in form
+                collect
+                (%collect-replace-fields part collect-field)))))
+
+(defmacro form-template (form-var args &body body)
+  (multiple-value-bind (new-body fields) (collect-replace-fields body)
+    (alexandria:with-unique-names (form-name)
+      `(progn
+         (defform ,form-name ,args
+           ,fields)
+         (let ((,form-var (or ,form-var (get-form ',form-name))))
+           (with-form ,form-var
+             (render-form-start)
+             ,@new-body
+             (render-form-end)))))))

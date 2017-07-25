@@ -1,7 +1,8 @@
 (defpackage #:cl-forms
   (:nicknames :forms)
   (:use #:cl)
-  (:export :with-form
+  (:export :form-field
+           :with-form
            :with-form-renderer
            :with-form-theme
            :defform
@@ -26,6 +27,7 @@
            :handle-request
            :validate-form
            :form-valid-p
+           :form-template
            :format-field-value
            :format-field-value-to-string
            :*base64-encode*))
