@@ -99,6 +99,10 @@
                                         "active")
                             (:a :href "/layout" (who:str "Layout")))
                        (:li :role "presentation"
+                            :class (and (equalp active-menu :template)
+                                        "active")
+                            (:a :href "/template" (who:str "Template")))
+                       (:li :role "presentation"
                             :class (and (equalp active-menu :themes)
                                         "active")
                             (:a :href "/themes" (who:str "Themes")))

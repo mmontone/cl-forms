@@ -27,7 +27,7 @@
            :handle-request
            :validate-form
            :form-valid-p
-           :form-template
+           :with-form-template
            :format-field-value
            :format-field-value-to-string
            :*base64-encode*))

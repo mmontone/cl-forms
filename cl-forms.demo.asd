@@ -22,6 +22,7 @@
                                    (:file "validation")
                                    (:file "client-validation")
                                    (:file "layout")
+                                   (:file "form-templates")
                                    (:file "themes")
                                    (:file "composition")
                                    (:file "tests"))

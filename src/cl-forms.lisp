@@ -466,14 +466,14 @@ been validated via validate-form."
                 collect
                 (%collect-replace-fields part collect-field)))))
 
-(defmacro form-template (form-var args &body body)
+(defmacro with-form-template ((&optional form-var) form-name args &body body)
   (multiple-value-bind (new-body fields) (collect-replace-fields body)
-    (alexandria:with-unique-names (form-name)
-      `(progn
-         (defform ,form-name ,args
-           ,fields)
-         (let ((,form-var (or ,form-var (get-form ',form-name))))
-           (with-form ,form-var
-             (render-form-start)
-             ,@new-body
-             (render-form-end)))))))
+    (let ((form-bind (or form-var (gensym "FORM"))))
+    `(progn
+       (defform ,form-name ,args
+         ,fields)
+       (let ((,form-bind (or ,form-var (get-form ',form-name))))
+         (with-form ,form-bind
+           (render-form-start)
+           ,@new-body
+           (render-form-end)))))))
