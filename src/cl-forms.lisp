@@ -5,6 +5,14 @@
 (defvar *form* nil "The current form")
 (defvar *base64-encode* nil "If T, encode form parameters in base64")
 
+(defun check-duplicate-fields (fields)
+  (when (not (equal
+              (length (remove-duplicates fields
+                                         :key (alexandria:compose 'string 'car)
+                                         :test 'string=))
+              (length fields)))
+    (error "Form contains duplicate fields")))
+
 (defmethod call-with-form-renderer (renderer function)
   (let ((*form-renderer* renderer))
     (funcall function)))
@@ -30,6 +38,7 @@
   `(call-with-form ,form (lambda () ,@body)))
 
 (defmacro defform (form-name args fields)
+  (check-duplicate-fields fields)
   `(setf (get ',form-name :form)
          (lambda ()
            (make-instance 'form
