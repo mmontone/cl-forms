@@ -374,7 +374,7 @@ been validated via validate-form."
   (renderer-render-form-end *form-renderer* *form-theme* form))
 
 (defun render-form-errors (&optional (form *form*) &rest args)
-  (when (member :top (display-errors form))
+  (when (member :list (display-errors form))
     (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args)))
 
 (defun render-field (field &optional (form *form*) &rest args)
