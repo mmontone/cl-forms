@@ -48,7 +48,7 @@
                         (and (getf args :inline)
                              "form-inline")
                         (and (getf args :horizontal)
-                             "form-horizontal"))) "\"")
+                             "form-horizontal"))) "\">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
       (who:with-html-output (html *html*)
