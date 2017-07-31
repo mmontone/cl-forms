@@ -11,6 +11,14 @@
                                     (string-downcase (string class)))
                                   (remove-if #'null classes))))
 
+(defmethod forms::renderer-render-form-errors ((renderer (eql :who))
+                                               (theme bootstrap-form-theme)
+                                               form &rest args)
+  (when (forms::form-errors form)
+    (with-html-output (*html*)
+      (:div :class "alert alert-danger"
+            (call-next-method)))))
+
 (defmethod forms::renderer-render-form ((renderer (eql :who))
                                         (theme bootstrap-form-theme)
                                         form &rest args)
@@ -48,7 +56,7 @@
                         (and (getf args :inline)
                              "form-inline")
                         (and (getf args :horizontal)
-                             "form-horizontal"))) "\"")
+                             "form-horizontal"))) "\">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
       (who:with-html-output (html *html*)
