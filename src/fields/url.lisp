@@ -6,9 +6,8 @@
 
 (defmethod validate-form-field ((form-field url-form-field))
   (and
-   (funcall (clavier:valid-url "~A is not a valid url"
-                               (or (field-label form-field)
-                                   (field-name form-field)))
+   (funcall (clavier:valid-url (or (field-invalid-message form-field)
+                                   "The url is not valid"))
             (field-value form-field))
    (call-next-method)))
 

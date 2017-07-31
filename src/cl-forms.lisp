@@ -4,6 +4,7 @@
 (defvar *default-form-renderer* :who)
 (defvar *form* nil "The current form")
 (defvar *base64-encode* nil "If T, encode form parameters in base64")
+(defvar *field-required-message* nil)
 
 (defun check-duplicate-fields (fields)
   (when (not (equal
@@ -142,7 +143,8 @@
    (client-validation :initarg :client-validation
                       :initform t
                       :accessor client-validation
-                      :documentation "When T, form client validation is enabled"))
+                      :documentation "When T, form client validation is enabled")
+   )
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
@@ -153,8 +155,8 @@
 
 (defmethod initialize-instance :after ((form form) &rest initargs)
   (loop for field in (form-fields form)
-        do
-           (setf (field-form (cdr field)) form)))
+     do
+       (setf (field-form (cdr field)) form)))
 
 (defun post-parameters (&optional (request hunchentoot:*request*))
   (let ((post-parameters (hunchentoot:post-parameters request)))
@@ -184,9 +186,9 @@
           :initform nil
           :documentation "Field value")
    (default-value :initarg :default-value
-                :initform nil
-                :accessor field-default-value
-                :documentation "Value to use when the field value is nil")
+     :initform nil
+     :accessor field-default-value
+     :documentation "Value to use when the field value is nil")
    (placeholder :initarg :placeholder
                 :accessor field-placeholder
                 :initform nil
@@ -207,6 +209,16 @@
              :initform t
              :accessor field-required-p
              :documentation "Whether the field is required")
+   (required-message :initarg :required-message
+                     :initform *field-required-message*
+                     :accessor field-required-message
+                     :type (or null string)
+                     :documentation "Message to display when field is required")
+   (invalid-message :initarg :invalid-message
+                    :initform nil
+                    :accessor field-invalid-message
+                    :type (or null string function)
+                    :documentation "Message to display when field is invalid")
    (read-only :initarg :read-only-p
               :initform nil
               :accessor field-read-only-p
@@ -219,10 +231,6 @@
              :initform nil
              :accessor field-accessor
              :documentation "The field accessor to the underlying model")
-   (invalid-message :initarg :invalid-message
-                    :initform nil
-                    :accessor field-invalid-message
-                    :documentation "The message to display if the field is invalid")
    (trim :initarg :trim-p
          :initform t
          :accessor field-trim-p
@@ -245,7 +253,7 @@
 
 (defmethod field-value ((field form-field))
   (or (slot-value field 'value)
-      (default-value field)))
+      (field-default-value field)))
 
 (defun add-field (form field)
   (setf (form-fields form)
@@ -301,7 +309,10 @@
     ((and (field-required-p form-field)
           (null (field-value form-field)))
      (values nil
-             (list (format nil "~A is required" (field-name form-field)))))
+             (list (format nil (or (field-required-message form-field)
+                                   "~A is required")
+                           (or (field-label form-field)
+                               (field-name form-field))))))
     ((and (not (field-required-p form-field))
           (null (field-value form-field)))
      (values t nil))
@@ -472,17 +483,17 @@ been validated via validate-form."
             (funcall collect-field (cdr form))
             `(forms:render-field ',(second form)))
           (loop for part in form
-                collect
-                (%collect-replace-fields part collect-field)))))
+             collect
+               (%collect-replace-fields part collect-field)))))
 
 (defmacro with-form-template ((&optional form-var) form-name args &body body)
   (multiple-value-bind (new-body fields) (collect-replace-fields body)
     (let ((form-bind (or form-var (gensym "FORM"))))
-    `(progn
-       (defform ,form-name ,args
-         ,fields)
-       (let ((,form-bind (or ,form-var (get-form ',form-name))))
-         (with-form ,form-bind
-           (render-form-start)
-           ,@new-body
-           (render-form-end)))))))
+      `(progn
+         (defform ,form-name ,args
+           ,fields)
+         (let ((,form-bind (or ,form-var (get-form ',form-name))))
+           (with-form ,form-bind
+             (render-form-start)
+             ,@new-body
+             (render-form-end)))))))

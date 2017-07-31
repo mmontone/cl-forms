@@ -28,7 +28,7 @@
   (:default-initargs
    :message (lambda (validator object)
               (declare (ignorable validator object))
-              (format nil "The date is invalid: ~A" object)))
+              "The date is invalid"))
   (:documentation "A date validator. TODO: should perhaps be part of clavier validators"))
 
 (defmethod clavier::%validate ((validator date-validator) object &rest args)
@@ -45,9 +45,8 @@
 (defmethod validate-form-field ((form-field date-form-field))
   (let ((validator (clavier:fn (lambda (date)
                                  (typep date 'local-time:timestamp))
-                               (format nil "~A is not a valid date"
-                                       (or (field-label form-field)
-                                           (field-name form-field))))))
+                               (or (field-invalid-message form-field)
+                                   "The date is invalid"))))
     (multiple-value-bind (valid-p error)
         (funcall validator
                  (field-value form-field))

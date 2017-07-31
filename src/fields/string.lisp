@@ -10,9 +10,8 @@
 
 (defmethod validate-form-field ((form-field string-form-field))
   (multiple-value-bind (valid-p error)
-      (funcall (clavier:is-a-string "~A should be a string"
-                                    (or (field-label form-field)
-                                        (field-name form-field)))
+      (funcall (clavier:is-a-string (or (field-invalid-message form-field)
+                                        "Should be a string"))
                (field-value form-field))
     (multiple-value-bind (valid-constraints-p errors)
         (call-next-method)

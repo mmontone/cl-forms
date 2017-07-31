@@ -6,9 +6,8 @@
 
 (defmethod validate-form-field ((form-field email-form-field))
   (multiple-value-bind (valid-p error)
-      (funcall (clavier:valid-email "~A is not a valid email"
-                                    (or (field-label form-field)
-                                        (field-name form-field)))
+      (funcall (clavier:valid-email (or (field-invalid-message form-field)
+                                        "The email is not valid"))
                (field-value form-field))
     (multiple-value-bind (valid-constraints-p errors)
         (call-next-method)

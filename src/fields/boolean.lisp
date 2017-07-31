@@ -6,7 +6,8 @@
 
 (defmethod validate-form-field ((form-field boolean-form-field))
   (multiple-value-bind (valid-p error)
-      (funcall (clavier:is-a-boolean "~A should be a boolean"
+      (funcall (clavier:is-a-boolean (or (field-invalid-message form-field)
+                                         "~A should be a boolean")
                                      (or (field-label form-field)
                                          (field-name form-field)))
                (field-value form-field))

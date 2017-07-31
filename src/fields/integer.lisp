@@ -6,9 +6,8 @@
 
 (defmethod validate-form-field ((form-field integer-form-field))
   (multiple-value-bind (valid-p error)
-      (funcall (clavier:is-an-integer "~A is not an integer"
-				      (or (field-label form-field)
-					  (field-name form-field)))
+      (funcall (clavier:is-an-integer (or (field-invalid-message form-field)
+                                          "Should be a number"))
                (field-value form-field))
     (multiple-value-bind (valid-constraints-p errors)
         (call-next-method)
