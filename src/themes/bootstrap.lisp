@@ -74,6 +74,12 @@
                  (apply #'forms::renderer-render-field-widget renderer theme field form args)
                  (apply #'forms::renderer-render-field-errors renderer theme field form args))))
 
+(defmethod forms::renderer-render-field ((renderer (eql :who))
+                                         (theme bootstrap-form-theme)
+                                         (field forms::submit-form-field) form &rest args)
+  (format *html* "<br/>")
+  (apply #'forms::renderer-render-field-widget renderer theme field form args))
+
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (theme bootstrap-form-theme)
