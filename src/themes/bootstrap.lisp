@@ -237,4 +237,10 @@
                                                  key)
                                      "selected")
                          (str (forms:format-field-value-to-string field
-                                       choice)))))))))))
+                                                                  choice)))))))))))
+
+(defmethod renderer-render-field-attributes ((renderer (eql :who))
+                                             (theme bootstrap-form-theme)
+                                             field form)
+  (format *html* " class=\"form-control\"")
+  (call-next-method))
