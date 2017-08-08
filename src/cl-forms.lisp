@@ -40,15 +40,18 @@
 
 (defmacro defform (form-name args fields)
   (check-duplicate-fields fields)
-  `(setf (get ',form-name :form)
-         (lambda ()
-           (make-instance 'form
-                          :name ',form-name
-                          :fields (list ,@(loop for field in fields
-                                             collect
-                                               (destructuring-bind (field-name field-type &rest field-args) field
-                                                 `(cons ',field-name (make-form-field ,field-type :name ,(string field-name) ,@field-args)))))
-                          ,@args))))
+  (alexandria:with-gensyms (fargs)
+    `(setf (get ',form-name :form)
+           (lambda (&rest ,fargs)
+             (apply #'make-instance
+                    'form
+                    :name ',form-name
+                    :fields (list ,@(loop for field in fields
+                                          collect
+                                          (destructuring-bind (field-name field-type &rest field-args) field
+                                            `(cons ',field-name (make-form-field ,field-type :name ,(string field-name) ,@field-args)))))
+                    (append ,fargs
+                            (list ,@args)))))))
 
 (defmacro defform-builder (form-name args &body body)
   (alexandria:with-unique-names (form)
@@ -67,9 +70,9 @@
 
 (defun make-form-fields (fields)
   (loop for field in fields
-     collect
-       (destructuring-bind (field-name field-type &rest field-args) field
-         (cons field-name (apply #'make-form-field field-type :name (string field-name) field-args)))))
+        collect
+        (destructuring-bind (field-name field-type &rest field-args) field
+          (cons field-name (apply #'make-form-field field-type :name (string field-name) field-args)))))
 
 (defun get-form (name &rest args)
   (let ((form-builder (get name :form)))
@@ -79,12 +82,12 @@
 
 (defmacro with-form-fields (fields form &body body)
   `(let ,(loop for field in fields
-            collect `(,field (get-field ,form ',field)))
+               collect `(,field (get-field ,form ',field)))
      ,@body))
 
 (defmacro with-form-field-values (fields form &body body)
   `(let ,(loop for field in fields
-            collect `(,field (field-value (get-field ,form ',field))))
+               collect `(,field (field-value (get-field ,form ',field))))
      ,@body))
 
 (defun get-field (form field-name &optional (error-p t))
@@ -155,8 +158,8 @@
 
 (defmethod initialize-instance :after ((form form) &rest initargs)
   (loop for field in (form-fields form)
-     do
-       (setf (field-form (cdr field)) form)))
+        do
+           (setf (field-form (cdr field)) form)))
 
 (defun post-parameters (&optional (request hunchentoot:*request*))
   (let ((post-parameters (hunchentoot:post-parameters request)))
@@ -186,9 +189,9 @@
           :initform nil
           :documentation "Field value")
    (default-value :initarg :default-value
-     :initform nil
-     :accessor field-default-value
-     :documentation "Value to use when the field value is nil")
+                  :initform nil
+                  :accessor field-default-value
+                  :documentation "Value to use when the field value is nil")
    (placeholder :initarg :placeholder
                 :accessor field-placeholder
                 :initform nil
@@ -321,12 +324,12 @@
 (defmethod validate-form-field ((form-field form-field))
   (let ((errors nil))
     (loop for constraint in (field-constraints form-field)
-       do
-         (multiple-value-bind (valid-p error-msg)
-             (funcall constraint
-                      (field-value form-field))
-           (when (not valid-p)
-             (push error-msg errors))))
+          do
+             (multiple-value-bind (valid-p error-msg)
+                 (funcall constraint
+                          (field-value form-field))
+               (when (not valid-p)
+                 (push error-msg errors))))
     (values (not errors)
             errors)))
 
@@ -364,11 +367,11 @@ been validated via validate-form."
 (defun validate-form (&optional (form *form*))
   (setf (form-errors form)
         (loop for field in (form-fields form)
-           appending
-             (multiple-value-bind (valid-p errors)
-                 (validate-form-field (cdr field))
-               (when (not valid-p)
-                 (list (cons (cdr field) errors))))))
+              appending
+              (multiple-value-bind (valid-p errors)
+                  (validate-form-field (cdr field))
+                (when (not valid-p)
+                  (list (cons (cdr field) errors))))))
   (values (null (form-errors form))
           (form-errors form)))
 
@@ -448,8 +451,8 @@ been validated via validate-form."
         (error "Invalid CSRF token"))))
   (let ((post-parameters (post-parameters)))
     (loop for field in (form-fields form)
-       do (field-read-from-request (cdr field) form
-                                   post-parameters))))
+          do (field-read-from-request (cdr field) form
+                                      post-parameters))))
 
 (defgeneric field-read-from-request (field form parameters))
 
@@ -483,8 +486,8 @@ been validated via validate-form."
             (funcall collect-field (cdr form))
             `(forms:render-field ',(second form)))
           (loop for part in form
-             collect
-               (%collect-replace-fields part collect-field)))))
+                collect
+                (%collect-replace-fields part collect-field)))))
 
 (defmacro with-form-template ((&optional form-var) form-name args &body body)
   (multiple-value-bind (new-body fields) (collect-replace-fields body)

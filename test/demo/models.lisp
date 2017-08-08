@@ -18,13 +18,13 @@
                  :action "/models-post"
                  :fields (forms::make-form-fields
                           `((name :string :label "Name"
-                                  :accessor person-name)
+                                          :accessor person-name)
                             (single :boolean :label "Single"
-                                    :accessor person-single)
+                                             :accessor person-single)
                             (sex :choice :label "Sex"
-                                 :choices (:male :female)
-                                 :accessor person-sex
-                                 :formatter format-sex)
+                                         :choices (:male :female)
+                                         :accessor person-sex
+                                         :formatter format-sex)
                             (submit :submit :label "Update")))))
 
 (defun format-sex (sex stream)
@@ -43,9 +43,9 @@
 (defun render-model-form (&optional form)
   (let ((form (or form
                   (let ((person (make-instance 'person
-                               :name "Foo"
-                               :single t
-                               :sex :male)))
+                                               :name "Foo"
+                                               :single t
+                                               :sex :male)))
                     (forms::get-form 'model-form person)))))
     (forms:with-form-renderer :who
       (forms:render-form form))))
