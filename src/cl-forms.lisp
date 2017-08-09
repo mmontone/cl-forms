@@ -285,13 +285,13 @@
         request-name)))
 
 (defmethod field-value ((field form-field))
-  (if (field-accessor field)
+  (if (and (field-accessor field) (form-model (field-form field)))
       (funcall (fdefinition (field-accessor field))
                (form-model (field-form field)))
       (slot-value field 'value)))
 
 (defmethod (setf field-value) (value (field form-field))
-  (if (field-accessor field)
+  (if (and (field-accessor field) (form-model (field-form field)))
       (funcall (fdefinition `(setf ,(field-accessor field)))
                value
                (form-model (field-form field)))
