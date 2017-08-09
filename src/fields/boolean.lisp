@@ -4,6 +4,9 @@
   ()
   (:documentation "A boolean input"))
 
+(defmethod field-required-p ((form-field boolean-form-field))
+  nil)
+
 (defmethod validate-form-field ((form-field boolean-form-field))
   (multiple-value-bind (valid-p error)
       (funcall (clavier:is-a-boolean (or (field-invalid-message form-field)
