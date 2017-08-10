@@ -27,6 +27,8 @@
            :handle-request
            :validate-form
            :form-valid-p
+           :form-errors
+           :add-form-error
            :with-form-template
            :format-field-value
            :format-field-value-to-string

@@ -381,6 +381,16 @@ been validated via validate-form."
 (defun form-valid-p (form)
   (null (form-errors form)))
 
+(defun add-form-error (field error-msg &optional (form *form*))
+  "Add an error on FIELD"
+  (let ((field (if (symbolp field)
+                   (forms::get-field form field)
+                   field)))
+    (if (assoc field (form-errors form))
+        (push error-msg (cdr (assoc field (form-errors form))))
+        (push (cons field (list error-msg))
+              (form-errors form)))))
+
 (defun render-form (&optional (form *form*) &rest args)
   (apply #'renderer-render-form *form-renderer* *form-theme* form args))
 
