@@ -146,8 +146,7 @@
    (client-validation :initarg :client-validation
                       :initform t
                       :accessor client-validation
-                      :documentation "When T, form client validation is enabled")
-   )
+                      :documentation "When T, form client validation is enabled"))
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
@@ -196,6 +195,10 @@
                 :accessor field-placeholder
                 :initform nil
                 :documentation "Field placeholder (text that appears when the field is empty)")
+   (help-text :initarg :help-text
+              :initform nil
+              :accessor field-help-text
+              :documentation "Field help text")
    (parser :initarg :parser
            :initform nil
            :accessor field-parser

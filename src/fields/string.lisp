@@ -25,3 +25,6 @@
 
 (defmethod make-form-field ((field-type (eql :string)) &rest args)
   (apply #'make-instance 'string-form-field args))
+
+(defmethod make-form-field ((field-type (eql :text)) &rest args)
+  (apply #'make-instance 'text-form-field args))

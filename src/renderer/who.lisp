@@ -20,6 +20,8 @@
            :method (symbol-name (forms::form-method form))
            :enctype (forms::form-enctype form)
            :class (getf args :class)
+           :data-parsley-validate (when (forms::client-validation form)
+                                    "true")
            (when (forms::form-csrf-protection-p form)
              (let ((token (forms::set-form-session-csrf-token form)))
                (htm
@@ -48,7 +50,9 @@
     (:when (forms::form-enctype form)
       " enctype=\"" (forms::form-enctype form) "\"")
     (:when (getf args :class)
-           " class=\"" (getf args :class) "\"" )
+      " class=\"" (getf args :class) "\"" )
+    (:when (forms::client-validation form)
+      " data-parsley-validate")
     ">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
@@ -61,7 +65,7 @@
                                             form)
   "Finish form rendering"
   (format *html* "</form>")
-  (when (forms::client-validation form)
+  #+nil(when (forms::client-validation form)
     (with-html-output (*html*)
       (:script :type "text/javascript"
                (fmt "$('#~A').parsley();" (forms::form-id form))))))
@@ -126,6 +130,21 @@
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
+     (field forms::text-form-field)
+     form &rest args)
+  (format *html* "<textarea")
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
+  (renderer-render-field-attributes renderer theme field form)
+  (format *html* ">")
+  (when (forms::field-value field)
+    (write-string (forms:format-field-value-to-string field) *html*))
+  (format *html* "</textarea>"))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))

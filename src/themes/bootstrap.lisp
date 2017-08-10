@@ -34,6 +34,8 @@
                          "form-inline")
                     (and (getf args :horizontal)
                          "form-horizontal")))
+           :data-parsley-validate (when (forms::client-validation form)
+                                    "true")
            (when (forms::form-csrf-protection-p form)
              (let ((token (forms::set-form-session-csrf-token form)))
                (htm
@@ -56,7 +58,10 @@
                         (and (getf args :inline)
                              "form-inline")
                         (and (getf args :horizontal)
-                             "form-horizontal"))) "\">")
+                             "form-horizontal")))
+               (:when (forms::client-validation form)
+                 " data-parsley-validate")
+           "\">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
       (who:with-html-output (html *html*)
@@ -72,7 +77,16 @@
                           "has-error")
                  (apply #'forms::renderer-render-field-label renderer theme field form args)
                  (apply #'forms::renderer-render-field-widget renderer theme field form args)
-                 (apply #'forms::renderer-render-field-errors renderer theme field form args))))
+                 (apply #'forms::renderer-render-field-errors renderer theme field form args)
+                 (apply #'forms::renderer-render-field-help renderer theme field form args))))
+
+(defmethod forms::renderer-render-field-help ((renderer (eql :who))
+                                              (theme bootstrap-form-theme)
+                                              field form &rest args)
+  (when (forms::field-help-text field)
+    (with-html-output (*html*)
+      (:p :class "help-block"
+          (who:str (forms::field-help-text field))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
                                          (theme bootstrap-form-theme)
@@ -100,6 +114,22 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (theme bootstrap-form-theme)
+     (field forms::text-form-field)
+     form &rest args)
+  (format *html* "<textarea")
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
+                                                           "form-control"))))
+  (renderer-render-field-attributes renderer theme field form)
+  (format *html* ">")
+  (when (forms::field-value field)
+    (write-string (forms:format-field-value-to-string field) *html*))
+  (format *html* "</textarea>"))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme bootstrap-form-theme)
      (field forms::email-form-field) form &rest args)
   (format *html* "<input type=\"email\"")
   (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
@@ -112,6 +142,46 @@
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
+
+
+(defmethod forms::renderer-render-field
+  ((renderer (eql :who))
+   (theme bootstrap-form-theme)
+   (field forms::boolean-form-field) form &rest args)
+  (with-html-output (*html*)
+    (:div :class "checkbox"
+          (:label
+           (apply #'forms::renderer-render-field-widget renderer theme field form args)
+           (who:str (or (forms::field-label field)
+                        (forms::field-name field)))))
+    ))
+   
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme bootstrap-form-theme)
+     (field forms::boolean-form-field) form &rest args)
+  (with-html-output (*html*)
+    (:input :type "checkbox"
+            :class (format-css-classes (list (getf args :class)
+                                                           "form-control"))
+            :name (forms::render-field-request-name field form)
+            :checked (when (forms::field-value field)
+                       "checked"))))
+
+;; (defmethod forms::renderer-render-field-widget
+;;     ((renderer (eql :who))
+;;      (theme bootstrap-form-theme)
+;;      (field forms::boolean-form-field) form &rest args)
+;;   (let ((classes (format-css-classes (list (getf args :class)
+;;                                            "form-control"))))
+;;     (fmt:with-fmt (*html*)
+;;       "<input type=\"checkbox\""
+;;       (:when classes
+;;         " name=\"" (forms::render-field-request-name field form) "\""
+;;         " class=\"" classes "\""
+;;         (:when (forms::field-value field)
+;;           " checked")
+;;         ">"))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
