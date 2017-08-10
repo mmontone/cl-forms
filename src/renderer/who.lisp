@@ -125,7 +125,7 @@
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -140,7 +140,7 @@
   (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (format *html* ">")
   (when (forms::field-value field)
     (write-string (forms:format-field-value-to-string field) *html*))
@@ -156,7 +156,7 @@
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -176,7 +176,7 @@
     (format *html* " min=\"~A\"" (forms::date-min field)))
   (when (forms::date-max field)
     (format *html* " max=\"~A\"" (forms::date-max field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -192,7 +192,7 @@
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -208,7 +208,7 @@
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -225,7 +225,7 @@
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -340,21 +340,28 @@
 ;; Attributes and constraints
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              theme
-                                             field form)
+                                             field form &rest args)
+  ;; Field validation attributes
   (when (forms::client-validation form)
     (when (forms::field-required-p field)
       (format *html* " data-parsley-required=\"true\""))
     (when (forms::field-validation-triggers field)
       (fmt:fmt *html* " data-parsley-trigger=\""
                (:join "," (forms::field-validation-triggers field) (:a _ :downcase))
-                      "\"")))
-    (loop for constraint in (forms::field-constraints field)
+               "\"")))
+  ;; HTML attributes
+  (loop for key in (getf args :attrs) by #'cddr
+        for val in (cdr (getf args :attrs)) by #'cddr
+        do
+           (format *html* " ~A=\"~A\"" key val))
+  ;; Constraints
+  (loop for constraint in (forms::field-constraints field)
        do (renderer-render-field-constraint renderer constraint field form)))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              theme
                                              (field forms::integer-form-field)
-                                             form)
+                                             form &rest args)
   (format *html* " data-parsley-type=\"integer\"")
   (call-next-method))
 

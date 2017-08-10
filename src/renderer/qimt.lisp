@@ -80,7 +80,7 @@
 	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-placeholder field)
 	    (<placeholder= (forms::field-placeholder field)))
-	  (renderer-render-field-attributes renderer theme field form)
+	  (apply #'renderer-render-field-attributes renderer theme field form args)
 	  (when (forms::field-value field)
 	    (<value=
 	     (forms:format-field-value-to-string field)))))
@@ -93,7 +93,7 @@
 	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-placeholder field)
 	    (<placeholder= (forms::field-placeholder field)))
-	  (renderer-render-field-attributes renderer theme field form)
+	  (apply #'renderer-render-field-attributes renderer theme field form args)
 	  (when (forms::field-value field)
 	    (<value=
 	     (forms:format-field-value-to-string field)))))
@@ -106,7 +106,7 @@
 	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-placeholder field)
 		 (<placeholder= (forms::field-placeholder field)))
-	  (renderer-render-field-attributes renderer theme field form)
+	  (apply #'renderer-render-field-attributes renderer theme field form args)
 	  (when (forms::field-value field)
 	    (<value=
 	     (forms:format-field-value-to-string field)))))
@@ -119,7 +119,7 @@
 	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-placeholder field)
 	    (<placeholder= (forms::field-placeholder field)))
-	  (renderer-render-field-attributes renderer theme field form)
+	  (apply #'renderer-render-field-attributes renderer theme field form args)
 	  (when (forms::field-value field)
 	    (<value=
 	     (forms:format-field-value-to-string)))))
@@ -132,7 +132,7 @@
 	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-placeholder field)
 	    (<placeholder= (forms::field-placeholder field)))
-	  (renderer-render-field-attributes renderer theme field form)
+	  (apply #'renderer-render-field-attributes renderer theme field form args)
 	  (when (forms::field-value field)
 	    (<value=
 	     (forms:format-field-value-to-string field)))))
@@ -223,7 +223,7 @@
 
 (defmethod renderer-render-field-attributes ((renderer (eql :qimt))
 					     theme
-                                             field form)
+                                             field form &rest args)
   (when (forms::client-validation form)
     (when (forms::field-required-p field)
       (<data-parsley-required= "true"))
@@ -233,7 +233,7 @@
 (defmethod renderer-render-field-attributes ((renderer (eql :qimt))
 					     theme
 					     (field forms::integer-form-field)
-					     form)
+					     form &rest args)
   (<data-parsley-type= "integer")
   (call-next-method))
 

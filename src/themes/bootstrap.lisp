@@ -105,7 +105,7 @@
                                                            "form-control")))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -121,7 +121,7 @@
   (when (getf args :class)
     (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control"))))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (format *html* ">")
   (when (forms::field-value field)
     (write-string (forms:format-field-value-to-string field) *html*))
@@ -137,7 +137,7 @@
                                                            "form-control")))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -193,7 +193,7 @@
                                                            "form-control")))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -209,7 +209,7 @@
                                                            "form-control")))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -226,7 +226,7 @@
                                                            "form-control")))
   (when (forms::field-placeholder field)
     (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
-  (renderer-render-field-attributes renderer theme field form)
+  (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
             (forms:format-field-value-to-string field)))
@@ -311,6 +311,6 @@
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              (theme bootstrap-form-theme)
-                                             field form)
+                                             field form &rest args)
   (format *html* " class=\"form-control\"")
   (call-next-method))
