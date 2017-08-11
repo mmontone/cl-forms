@@ -36,8 +36,8 @@
 (defmethod field-read-from-request ((field list-form-field) form parameters)
   ;; First, create a regex to filter the list-field parameters. It's those with the format <field>[<index>]
   (let ((regex
-         (ppcre:create-scanner `(:sequence ,(field-request-name field form)
-                                           ;(:non-greedy-repetition 0 nil :everything)
+         (ppcre:create-scanner `(:sequence :start-anchor
+                                           ,(field-request-name field form)
                                            "["
                                            (:register (:greedy-repetition 1 nil :digit-class))
                                            "]"))))
