@@ -34,6 +34,7 @@
                          "form-inline")
                     (and (getf args :horizontal)
                          "form-horizontal")))
+           :enctype (forms::form-enctype form)
            :data-parsley-validate (when (forms::client-validation form)
                                     "true")
            (when (forms::form-csrf-protection-p form)
@@ -42,26 +43,28 @@
                 (:input :name (forms::form-csrf-field-name form)
                         :type "hidden" :value token))))
            (loop for field in (forms::form-fields form)
-              do
-                (forms::renderer-render-field renderer theme (cdr field) form)))))
+                 do
+                    (forms::renderer-render-field renderer theme (cdr field) form)))))
 
 (defmethod forms::renderer-render-form-start ((renderer (eql :who))
                                               (theme bootstrap-form-theme)
                                               form &rest args)
   "Start form rendering"
   (fmt:fmt *html* "<form id=\"" (forms::form-id form) "\""
-           "action=\"" (forms::form-action form) "\""
-           "method=\"" (forms::form-method form) "\""
-           "class=\"" (format-css-classes
+           " action=\"" (forms::form-action form) "\""
+           " method=\"" (forms::form-method form) "\""
+           " class=\"" (format-css-classes
                        (list
                         (getf args :class)
                         (and (getf args :inline)
                              "form-inline")
                         (and (getf args :horizontal)
-                             "form-horizontal")))
-               (:when (forms::client-validation form)
-                 " data-parsley-validate")
-           "\">")
+                             "form-horizontal"))) "\""
+           (:when (forms::form-enctype form)
+             " enctype=\"" (forms::form-enctype form) "\"")
+           (:when (forms::client-validation form)
+             " data-parsley-validate")
+           ">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
       (who:with-html-output (html *html*)
@@ -120,7 +123,7 @@
   (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
   (when (getf args :class)
     (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
-                                                           "form-control"))))
+                                                             "form-control"))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (format *html* ">")
   (when (forms::field-value field)
@@ -145,9 +148,9 @@
 
 
 (defmethod forms::renderer-render-field
-  ((renderer (eql :who))
-   (theme bootstrap-form-theme)
-   (field forms::boolean-form-field) form &rest args)
+    ((renderer (eql :who))
+     (theme bootstrap-form-theme)
+     (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:div :class "checkbox"
           (:label
@@ -155,7 +158,7 @@
            (who:str (or (forms::field-label field)
                         (forms::field-name field)))))
     ))
-   
+
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (theme bootstrap-form-theme)
@@ -163,7 +166,7 @@
   (with-html-output (*html*)
     (:input :type "checkbox"
             :class (format-css-classes (list (getf args :class)
-                                                           "form-control"))
+                                             "form-control"))
             :name (forms::render-field-request-name field form)
             :checked (when (forms::field-value field)
                        "checked"))))
@@ -252,29 +255,29 @@
        ;; Render checkboxes
        (with-html-output (*html*)
          (loop for (key . choice) in (forms::field-choices-alist field)
-            do
-              (htm
-               (:input :type "checkbox" :name (forms::render-field-request-name field form)
-                       :value key
-                       :checked (when (member key selected-keys)
-                                  "checked")
-                       (str (forms:format-field-value-to-string field
-                                     choice))))))))
+               do
+                  (htm
+                   (:input :type "checkbox" :name (forms::render-field-request-name field form)
+                           :value key
+                           :checked (when (member key selected-keys)
+                                      "checked")
+                           (str (forms:format-field-value-to-string field
+                                                                    choice))))))))
     ((and (forms::field-expanded field)
           (not (forms::field-multiple field)))
      ;; Render radio buttons
      (let ((selected-value (forms::field-key-and-value field)))
        (with-html-output (*html*)
          (loop for (key . choice) in (forms::field-choices-alist field)
-            do
-              (htm
-               (:input :type "radio" :name (forms::render-field-request-name field form)
-                       :value (princ-to-string key)
-                       :checked (when (equalp (first selected-value)
-                                              key)
-                                  "checked")
-                       (str (forms:format-field-value-to-string field
-                                     choice))))))))
+               do
+                  (htm
+                   (:input :type "radio" :name (forms::render-field-request-name field form)
+                           :value (princ-to-string key)
+                           :checked (when (equalp (first selected-value)
+                                                  key)
+                                      "checked")
+                           (str (forms:format-field-value-to-string field
+                                                                    choice))))))))
     ((and (not (forms::field-expanded field))
           (forms::field-multiple field))
      ;; A multiple select box
@@ -284,13 +287,13 @@
           :name (forms::render-field-request-name field form)
           :multiple "multiple"
           (loop for (key . choice) in (forms::field-choices-alist field)
-             do
-               (htm
-                (:option :value (princ-to-string key)
-                         :selected (when (member key selected-keys)
-                                     "selected")
-                         (str (forms:format-field-value-to-string field
-                                       choice)))))))))
+                do
+                   (htm
+                    (:option :value (princ-to-string key)
+                             :selected (when (member key selected-keys)
+                                         "selected")
+                             (str (forms:format-field-value-to-string field
+                                                                      choice)))))))))
     ((and (not (forms::field-expanded field))
           (not (forms::field-multiple field)))
      ;; A single select box
@@ -300,14 +303,14 @@
           :name (forms::render-field-request-name field form)
           :class "form-control"
           (loop for (key . choice) in (forms::field-choices-alist field)
-             do
-               (htm
-                (:option :value (princ-to-string key)
-                         :selected (when (equalp (first selected-value)
-                                                 key)
-                                     "selected")
-                         (str (forms:format-field-value-to-string field
-                                                                  choice)))))))))))
+                do
+                   (htm
+                    (:option :value (princ-to-string key)
+                             :selected (when (equalp (first selected-value)
+                                                     key)
+                                         "selected")
+                             (str (forms:format-field-value-to-string field
+                                                                      choice)))))))))))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              (theme bootstrap-form-theme)
