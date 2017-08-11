@@ -249,8 +249,7 @@
   (with-html-output (*html*)
     (:input :type "file"
             :class (getf args :class)
-            :name (forms::render-field-request-name field form)
-            :value (forms::format-field-value-to-string field))))
+            :name (forms::render-field-request-name field form))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
