@@ -10,6 +10,7 @@
            :get-form
            :get-field
            :get-field-value
+           :set-field-value
            :render-form
            :render-form-start
            :render-form-end

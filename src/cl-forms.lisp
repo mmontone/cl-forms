@@ -99,6 +99,9 @@
 (defun get-field-value (form field-name &optional (error-p t))
   (field-value (get-field form field-name)))
 
+(defun set-field-value (form field-name value)
+  (setf (field-value (get-field form field-name)) value))
+
 (defclass form ()
   ((id :initarg :id
        :accessor form-id
