@@ -238,8 +238,17 @@
              :documentation "Whether the field is disabled")
    (accessor :initarg :accessor
              :initform nil
+             :type (or null symbol)
              :accessor field-accessor
              :documentation "The field accessor to the underlying model")
+   (reader :initarg :reader
+           :initform nil
+           :type (or null symbol function)
+           :documentation "The function to use to read from the underlying model")
+   (writer :initarg :writer
+           :initform nil
+           :type (or null symbol function)
+           :documentation "The function to use to write to underlying model")
    (trim :initarg :trim-p
          :initform t
          :accessor field-trim-p
@@ -289,6 +298,15 @@
     (if *base64-encode*
         (base64:string-to-base64-string request-name :uri t)
         request-name)))
+
+(defmethod field-reader ((field form-field))
+  (or (slot-value field 'reader)
+      (field-accessor field)))
+
+(defmethod field-writer ((field form-field))
+  (or (slot-value field 'writer)
+      (and (field-accessor field)
+           (fdefinition `(setf ,(field-accessor field)))))) 
 
 (defmethod field-value ((field form-field))
   (if (and (field-accessor field) (form-model (field-form field)))

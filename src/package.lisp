@@ -25,6 +25,9 @@
            :field-valid-p
            :field-formatter
            :field-parser
+           :field-accessor
+           :field-writer
+           :field-reader
            :handle-request
            :validate-form
            :form-valid-p
