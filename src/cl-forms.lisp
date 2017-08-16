@@ -309,14 +309,14 @@
            (fdefinition `(setf ,(field-accessor field)))))) 
 
 (defmethod field-value ((field form-field))
-  (if (and (field-accessor field) (form-model (field-form field)))
-      (funcall (fdefinition (field-accessor field))
+  (if (and (field-reader field) (form-model (field-form field)))
+      (funcall (field-reader field)
                (form-model (field-form field)))
       (slot-value field 'value)))
 
 (defmethod (setf field-value) (value (field form-field))
-  (if (and (field-accessor field) (form-model (field-form field)))
-      (funcall (fdefinition `(setf ,(field-accessor field)))
+  (if (and (field-writer field) (form-model (field-form field)))
+      (funcall (field-writer field)
                value
                (form-model (field-form field)))
       (setf (slot-value field 'value) value)))
