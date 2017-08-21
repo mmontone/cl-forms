@@ -321,6 +321,22 @@
                (form-model (field-form field)))
       (setf (slot-value field 'value) value)))
 
+(defun fill-form-from-model (form model)
+  "Fill a FORM from a MODEL"
+  (loop for field in (mapcar 'cdr (forms::form-fields form))
+        when (forms:field-reader field)
+          do (setf (forms:field-value field)
+                   (funcall (forms:field-reader field) model)))
+  form)
+
+(defun fill-model-from-form (form model)
+  "Set a MODEL's values from FORM field values"
+  (loop for field in (mapcar 'cdr (forms::form-fields form))
+        when (forms:field-writer field)
+          do (funcall (forms:field-writer field)
+                      (forms:field-value field)
+                      model)))
+
 (defclass field-validator (clavier::validator)
   ((field :initarg :field
           :initform (error "Provide the field")

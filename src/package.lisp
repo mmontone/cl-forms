@@ -19,6 +19,8 @@
            :render-field-errors
            :render-field-widget
            :render-form-errors
+           :fill-form-from-model
+           :fill-model-from-form
            :with-form-fields
            :with-form-field-values
            :field-value
