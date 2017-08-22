@@ -249,7 +249,8 @@
   (with-html-output (*html*)
     (:input :type "file"
             :class (getf args :class)
-            :name (forms::render-field-request-name field form))))
+            :name (forms::render-field-request-name field form)
+            :accept (forms::file-accept field))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))

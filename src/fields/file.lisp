@@ -15,14 +15,19 @@
                  :accessor file-content-type
                  :initform nil)
    (upload-handler :initarg :upload-handler
-                    :accessor upload-handler
-                    :initform nil
-                    :documentation "Function that handles the file upload"))
+                   :accessor upload-handler
+                   :initform nil
+                   :documentation "Function that handles the file upload")
+   (accept :initarg :accept
+           :accessor file-accept
+           :type (or null string)
+           :initform nil
+           :documentation "Files accepted. See https://www.w3schools.com/tags/att_input_accept.asp"))
   (:documentation "A file input field"))
 
 (defmethod field-read-from-request ((field file-form-field) form parameters)
   (let ((fvalue
-         (cdr (assoc (field-request-name field form) parameters :test #'string=))))
+          (cdr (assoc (field-request-name field form) parameters :test #'string=))))
     (if (and fvalue (listp fvalue))
         (destructuring-bind (path file-name content-type) fvalue
           (setf (file-path field) path)
