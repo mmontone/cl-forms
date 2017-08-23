@@ -24,5 +24,7 @@
 (defmethod field-read-from-request ((field subform-form-field) form parameters)
   (let ((field-subform (field-subform field)))
     (let ((*field-path* (cons "." *field-path*)))
-      (handle-request field-subform)
+      (loop for field in (form-fields field-subform)
+          do (field-read-from-request (cdr field) form
+                                      parameters))
       (setf (field-value field) field-subform))))
