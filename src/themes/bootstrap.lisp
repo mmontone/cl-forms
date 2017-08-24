@@ -241,7 +241,7 @@
      (field forms::submit-form-field) form &rest args)
   (with-html-output (*html*)
     (:button :type "submit"
-             :class "btn btn-default"
+             :class "btn btn-primary"
              (who:str (or (forms::field-label field) "Submit")))))
 
 (defmethod forms::renderer-render-field-widget
