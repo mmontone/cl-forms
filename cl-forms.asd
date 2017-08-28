@@ -9,8 +9,7 @@
                #:ironclad
                #:uuid
                #:clavier
-               #:fmt
-               #:parenscript)
+               #:fmt)
   :components ((:module :src
                         :components
                         ((:file "package")

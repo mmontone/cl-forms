@@ -82,11 +82,7 @@
           ;; if the file is not required, render a delete button
           (when (not (forms::field-required-p field))
             (htm (:a :href "#" :class "delete-file"
-                     :onclick (ps:ps-inline
-                                  (progn
-                                    (ps:chain ($ this) (parent) (remove))
-                                    (return-from nil false)))
-                     (str "Delete"))))))))
+                     :onclick "javascript:$(this).parent().remove();return false;")))))))
     (:input :type "file"
             :class (getf args :class)
             :accept (forms::file-accept field)
