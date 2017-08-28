@@ -83,7 +83,7 @@
           (when (not (forms::field-required-p field))
             (htm (:a :href "#" :class "delete-file"
                      :onclick "javascript:$(this).parent().remove();return false;"
-                     (who:str "Delete"))))))))
+                     (str "Delete"))))))))
     (:input :type "file"
             :class (getf args :class)
             :accept (forms::file-accept field)
