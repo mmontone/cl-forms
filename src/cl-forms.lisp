@@ -345,20 +345,25 @@
   (:metaclass closer-mop:funcallable-standard-class)
   (:documentation "Generic field validator. Needs a field to be initialized"))
 
+(defun empty-value-p (val)
+  (or (null val)
+      (and (stringp val)
+           (zerop (length val)))))
+
 (defgeneric validate-form-field (form-field))
 
 (defmethod validate-form-field :around ((form-field form-field))
   (cond
     ((and (field-required-p form-field)
-          (null (field-value form-field)))
+          (empty-value-p (field-value form-field)))
      (values nil
              (list (format nil (or (field-required-message form-field)
                                    "~A is required")
                            (or (field-label form-field)
                                (field-name form-field))))))
     ((and (not (field-required-p form-field))
-          (null (field-value form-field)))
-     (values t nil))
+          (empty-value-p (field-value form-field)))
+          (values t nil))
     (t (call-next-method))))
 
 (defmethod validate-form-field ((form-field form-field))
