@@ -146,4 +146,5 @@
      (setf (field-value field)
            (cdr (assoc (funcall (field-key-reader field)
                                 (cdr (assoc (field-request-name field form) parameters :test #'string=)))
-                       (field-choices-alist field)))))))
+                       (field-choices-alist field)
+                       :test 'equalp))))))
