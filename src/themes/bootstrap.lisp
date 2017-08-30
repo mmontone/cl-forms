@@ -240,9 +240,10 @@
      (theme bootstrap-form-theme)
      (field forms::submit-form-field) form &rest args)
   (with-html-output (*html*)
-    (:button :type "submit"
-             :class "btn btn-primary"
-             (who:str (or (forms::field-label field) "Submit")))))
+    (:input :type "submit"
+            :class "btn btn-primary"
+            :value
+            (or (forms::field-label field) "Submit"))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
