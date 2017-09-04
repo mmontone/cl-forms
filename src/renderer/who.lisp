@@ -311,6 +311,7 @@
        (with-html-output (*html*)
          (:select
           :name (forms::render-field-request-name field form)
+          :id (getf args :id)
           :multiple "multiple"
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
@@ -327,6 +328,7 @@
        (with-html-output (*html*)
          (:select
           :name (forms::render-field-request-name field form)
+          :id (getf args :id)
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm
