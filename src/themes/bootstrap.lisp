@@ -165,6 +165,7 @@
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"
+            :id (getf args :id)
             :class (format-css-classes (list (getf args :class)
                                              "form-control"))
             :name (forms::render-field-request-name field form)

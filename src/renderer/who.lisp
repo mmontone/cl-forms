@@ -237,6 +237,7 @@
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
     (:input :type "checkbox"
+            :id (getf args :id)
             :class (getf args :class)
             :name (forms::render-field-request-name field form)
             :checked (when (forms::field-value field)
@@ -249,6 +250,7 @@
   (with-html-output (*html*)
     (:input :type "file"
             :class (getf args :class)
+            :id (getf args :id)
             :name (forms::render-field-request-name field form)
             :accept (forms::file-accept field))))
 
