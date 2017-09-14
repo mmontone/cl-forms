@@ -6,6 +6,10 @@
    (ready :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
    (avatar :file :upload-handler 'handle-file-upload)
+   (disabled :string :disabled-p t :required-p nil)
+   (readonly :string :read-only-p t :required-p nil)
+   (readonly-checkbox :boolean :read-only-p t :required-p nil)
+   (disabled-checkbox :boolean :disabled-p t :required-p nil)
    (submit :submit :label "Create")))
 
 (defun fields-demo ()

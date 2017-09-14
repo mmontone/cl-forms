@@ -236,12 +236,16 @@
      (theme forms::default-form-theme)
      (field forms::boolean-form-field) form &rest args)
   (with-html-output (*html*)
-    (:input :type "checkbox"
-            :id (getf args :id)
-            :class (getf args :class)
-            :name (forms::render-field-request-name field form)
-            :checked (when (forms::field-value field)
-                       "checked"))))
+    (format *html* "<input type=\"checkbox\"")
+    (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
+    (when (getf args :class)
+      (format *html* " class=\"~A\"" (getf args :class)))
+    (when (getf args :id)
+      (format *html* " id=\"~A\"" (getf args :id)))
+    (apply #'renderer-render-field-attributes renderer theme field form args)
+    (when (forms::field-value field)
+      (format *html* " checked=\"checked\""))
+    (format *html* "></input>")))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -353,6 +357,12 @@
       (fmt:fmt *html* " data-parsley-trigger=\""
                (:join "," (forms::field-validation-triggers field) (:a _ :downcase))
                "\"")))
+
+  (when (forms::field-disabled-p field)
+    (format *html* " disabled=\"disabled\""))
+  (when (forms::field-read-only-p field)
+    (format *html* " readonly=\"readonly\""))
+  
   ;; HTML attributes
   (loop for key in (getf args :attrs) by #'cddr
         for val in (cdr (getf args :attrs)) by #'cddr
