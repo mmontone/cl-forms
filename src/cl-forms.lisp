@@ -277,6 +277,13 @@
   (setf (form-fields form)
         (append (form-fields form) field)))
 
+(defun remove-field (form field)
+  (setf (form-fields form)
+        (remove (if (symbolp field)
+                    (get-field form field)
+                    field)
+                (form-fields form))))
+
 (defmethod field-render-label-p ((field form-field))
   t)
 

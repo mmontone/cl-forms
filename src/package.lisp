@@ -30,6 +30,8 @@
            :field-accessor
            :field-writer
            :field-reader
+           :add-field
+           :remove-field
            :handle-request
            :validate-form
            :form-valid-p
