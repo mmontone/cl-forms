@@ -280,10 +280,11 @@
 
 (defun remove-field (form field)
   (setf (form-fields form)
-        (remove (if (symbolp field)
-                    (get-field form field)
+        (remove (if (not (symbolp field))
+                    (field-name field)
                     field)
-                (form-fields form))))
+                (form-fields form)
+                :key 'car)))
 
 (defmethod field-render-label-p ((field form-field))
   t)
