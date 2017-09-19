@@ -275,7 +275,8 @@
 
 (defun add-field (form field)
   (setf (form-fields form)
-        (append (form-fields form) field)))
+        (append (form-fields form)
+                (list (cons (field-name field) field)))))
 
 (defun remove-field (form field)
   (setf (form-fields form)
