@@ -91,7 +91,7 @@
     (if (alistp (field-choices field))
         (find (field-value field)
               (field-choices field)
-              :key #'cdr
+              :key (if (use-key-as-value field) 'car 'cdr)
               :test #'equalp)
         (cons (funcall (field-hash-function field)
                        (field-value field))
