@@ -28,7 +28,11 @@
    (test :initarg :test
          :initform #'eql
          :accessor field-test
-         :documentation "Function to test equality between choices"))
+         :documentation "Function to test equality between choices")
+   (use-key-as-value :initarg :use-key-as-value
+                     :initform nil
+                     :accessor use-key-as-value
+                     :documentation "When T, use the key/s of the field as value of the field when it is read from request"))
   (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes."))
 
 (defmethod initialize-instance :after ((field choice-form-field) &rest initargs)
@@ -97,11 +101,17 @@
   (assert (listp (field-value field)))
   (if (alistp (field-value field))
       (field-value field)
-      (mapcar (lambda (value)
-                (cons (funcall (field-hash-function field)
-                               value)
-                      value))
-              (field-value field))))
+      (if (use-key-as-value field)
+          (let ((choices-alist (field-choices-alist field)))
+            (mapcar (lambda (key)
+                      (cons key
+                            (cdr (assoc key choices-alist))))
+                    (field-value field)))
+          (mapcar (lambda (value)
+                    (cons (funcall (field-hash-function field)
+                                   value)
+                          value))
+                  (field-value field)))))
 
 (defmethod field-read-from-request ((field choice-form-field) form parameters)
   (cond
@@ -116,16 +126,21 @@
                                                  parameters)))
            (choices-alist (field-choices-alist field)))
        (setf (field-value field)
-             (mapcar (lambda (key)
-                       (cdr (assoc key choices-alist)))
-                     selected-keys))))
+             (if (use-key-as-value field)
+                 selected-keys
+                 (mapcar (lambda (key)
+                           (cdr (assoc key choices-alist)))
+                         selected-keys)))))
     ((and (field-expanded field)
           (not (field-multiple field)))
      ;; Radio buttons rendered
      (setf (field-value field)
-           (cdr (assoc (funcall (field-key-reader field)
-                                (cdr (assoc (field-request-name field form) parameters :test #'string=)))
-                       (field-choices-alist field)))))
+           (if (use-key-as-value field)
+               (funcall (field-key-reader field)
+                        (cdr (assoc (field-request-name field form) parameters :test #'string=)))
+               (cdr (assoc (funcall (field-key-reader field)
+                                    (cdr (assoc (field-request-name field form) parameters :test #'string=)))
+                           (field-choices-alist field))))))
     ((and (not (field-expanded field))
           (field-multiple field))
      ;; Multiple select box rendered
@@ -137,14 +152,19 @@
                                                  parameters)))
            (choices-alist (field-choices-alist field)))
        (setf (field-value field)
-             (mapcar (lambda (key)
-                       (cdr (assoc key choices-alist)))
-                     selected-keys))))
+             (if (use-key-as-value field)
+                 selected-keys
+                 (mapcar (lambda (key)
+                           (cdr (assoc key choices-alist)))
+                         selected-keys)))))
     ((and (not (field-expanded field))
           (not (field-multiple field)))
      ;; Single select box
      (setf (field-value field)
-           (cdr (assoc (funcall (field-key-reader field)
-                                (cdr (assoc (field-request-name field form) parameters :test #'string=)))
-                       (field-choices-alist field)
-                       :test 'equalp))))))
+           (if (use-key-as-value field)
+               (funcall (field-key-reader field)
+                        (cdr (assoc (field-request-name field form) parameters :test #'string=)))
+               (cdr (assoc (funcall (field-key-reader field)
+                                    (cdr (assoc (field-request-name field form) parameters :test #'string=)))
+                           (field-choices-alist field)
+                           :test 'equalp)))))))
