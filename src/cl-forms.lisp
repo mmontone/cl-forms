@@ -269,10 +269,6 @@
             (field-name field)
             (field-value field))))
 
-(defmethod field-value ((field form-field))
-  (or (slot-value field 'value)
-      (field-default-value field)))
-
 (defun add-field (form field)
   (setf (form-fields form)
         (append (form-fields form)
@@ -322,6 +318,10 @@
       (funcall (field-reader field)
                (form-model (field-form field)))
       (slot-value field 'value)))
+
+(defmethod field-value :around ((field form-field))
+  (or (call-next-method)
+      (field-default-value field)))
 
 (defmethod (setf field-value) (value (field form-field))
   (if (and (field-writer field) (form-model (field-form field)))
