@@ -76,12 +76,14 @@
                                          (theme bootstrap-form-theme)
                                          field form &rest args)
   (with-html-output (*html*)
-    (:form-group :class (when (not (forms:field-valid-p field form))
-                          "has-error")
-                 (apply #'forms::renderer-render-field-label renderer theme field form args)
-                 (apply #'forms::renderer-render-field-widget renderer theme field form args)
-                 (apply #'forms::renderer-render-field-errors renderer theme field form args)
-                 (apply #'forms::renderer-render-field-help renderer theme field form args))))
+    (:div :class (fmt:fmt nil "form-group"
+                          (:when (not (forms:field-valid-p field form))
+                            #\space
+                            "has-error"))
+          (apply #'forms::renderer-render-field-label renderer theme field form args)
+          (apply #'forms::renderer-render-field-widget renderer theme field form args)
+          (apply #'forms::renderer-render-field-errors renderer theme field form args)
+          (apply #'forms::renderer-render-field-help renderer theme field form args))))
 
 (defmethod forms::renderer-render-field-help ((renderer (eql :who))
                                               (theme bootstrap-form-theme)
