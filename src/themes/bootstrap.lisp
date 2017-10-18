@@ -310,7 +310,8 @@
          (:select
           :name (forms::render-field-request-name field form)
           :id (getf args :id)
-          :class "form-control"
+          :class (format-css-classes (list (getf args :class)
+                                           "form-control"))
           (loop for (key . choice) in (forms::field-choices-alist field)
                 do
                    (htm
