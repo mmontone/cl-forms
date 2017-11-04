@@ -319,6 +319,8 @@
           :name (forms::render-field-request-name field form)
           :id (getf args :id)
           :multiple "multiple"
+          :attrs (apply #'renderer-render-field-attributes renderer theme field form args)
+          (:option :style "display:none;") ;; Empty choice
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm
@@ -335,6 +337,8 @@
          (:select
           :name (forms::render-field-request-name field form)
           :id (getf args :id)
+          :attrs (apply #'renderer-render-field-attributes renderer theme field form args)
+          (:option :style "display:none;") ;; Empty choice
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm
