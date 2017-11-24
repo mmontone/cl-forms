@@ -141,7 +141,8 @@
                         (cdr (assoc (field-request-name field form) parameters :test #'string=)))
                (cdr (assoc (funcall (field-key-reader field)
                                     (cdr (assoc (field-request-name field form) parameters :test #'string=)))
-                           (field-choices-alist field))))))
+                           (field-choices-alist field)
+                           :test 'equalp)))))
     ((and (not (field-expanded field))
           (field-multiple field))
      ;; Multiple select box rendered
