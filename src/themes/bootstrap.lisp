@@ -264,12 +264,14 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
                do
                   (htm
-                   (:input :type "checkbox" :name (forms::render-field-request-name field form)
-                           :value key
-                           :checked (when (member key selected-keys)
-                                      "checked")
-                           (str (forms:format-field-value-to-string field
-                                                                    choice))))))))
+                   (:div :class "checkbox"
+                         (:label
+                          (:input :type "checkbox" :name (forms::render-field-request-name field form)
+                                  :value key
+                                  :checked (when (member key selected-keys)
+                                             "checked")
+                                  (str (forms:format-field-value-to-string field
+                                                                           choice))))))))))
     ((and (forms::field-expanded field)
           (not (forms::field-multiple field)))
      ;; Render radio buttons
@@ -278,13 +280,15 @@
          (loop for (key . choice) in (forms::field-choices-alist field)
                do
                   (htm
-                   (:input :type "radio" :name (forms::render-field-request-name field form)
-                           :value (princ-to-string key)
-                           :checked (when (equalp (first selected-value)
-                                                  key)
-                                      "checked")
-                           (str (forms:format-field-value-to-string field
-                                                                    choice))))))))
+                   (:div :class "radio"
+                         (:label
+                          (:input :type "radio" :name (forms::render-field-request-name field form)
+                                  :value (princ-to-string key)
+                                  :checked (when (equalp (first selected-value)
+                                                         key)
+                                             "checked")
+                                  (str (forms:format-field-value-to-string field
+                                                                           choice))))))))))
     ((and (not (forms::field-expanded field))
           (forms::field-multiple field))
      ;; A multiple select box
