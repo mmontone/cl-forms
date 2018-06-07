@@ -39,6 +39,7 @@
   `(call-with-form ,form (lambda () ,@body)))
 
 (defmacro defform (form-name args fields)
+  "Define a form at top-level"
   (check-duplicate-fields fields)
   (alexandria:with-gensyms (fargs)
     `(setf (get ',form-name :form)
@@ -113,14 +114,17 @@
          :documentation "The form name")
    (action :initarg :action
            :initform nil
+           :type (or null string)
            :accessor form-action
            :documentation "The form action")
    (method :initarg :method
            :initform :post
+           :type (member :get :post)
            :accessor form-method
            :documentation "The form method")
    (enctype :initarg :enctype
             :initform nil
+            :type (or null string)
             :accessor form-enctype
             :documentation "Form encoding type. i.e. Use multipart/form-data for file uploads")
    (fields :initarg :fields
@@ -133,21 +137,26 @@
           :documentation "The form model object")
    (csrf-protection :initarg :csrf-protection
                     :initform nil
+                    :type boolean
                     :accessor form-csrf-protection-p
                     :documentation "T when csrf protection is enabled")
    (csrf-field-name :initarg :csrf-field-name
                     :initform "_token"
+                    :type (or null string)
                     :accessor form-csrf-field-name
                     :documentation "csrf field name")
    (errors :initform nil
            :accessor form-errors
+           :type list
            :documentation "Form errors after validation")
    (display-errors :initarg :display-errors
                    :initform (list :list :inline)
+                   :type list
                    :accessor display-errors
                    :documentation "A list containing the places where to display errors. Valid options are :list and :inline")
    (client-validation :initarg :client-validation
                       :initform t
+                      :type boolean
                       :accessor client-validation
                       :documentation "When T, form client validation is enabled"))
   (:documentation "A form"))
@@ -181,10 +190,12 @@
   ((name :initarg :name
          :initform (error "Provide the field name")
          :accessor field-name
+         :type symbol
          :documentation "The field name")
    (label :initarg :label
           :initform nil
           :accessor field-label
+          :type (or null string)
           :documentation "The field label")
    (value :initarg :value
           :writer (setf field-value)
@@ -196,18 +207,22 @@
                   :documentation "Value to use when the field value is nil")
    (placeholder :initarg :placeholder
                 :accessor field-placeholder
+                :type (or null string)
                 :initform nil
                 :documentation "Field placeholder (text that appears when the field is empty)")
    (help-text :initarg :help-text
               :initform nil
+              :type (or null string)
               :accessor field-help-text
               :documentation "Field help text")
    (parser :initarg :parser
            :initform nil
            :accessor field-parser
+           :type (or null symbol function)
            :documentation "Custom field value parser")
    (formatter :initarg :formatter
               :initform nil
+              :type (or null symbol function)
               :accessor field-formatter
               :documentation "The field formatter")
    (constraints :initarg :constraints
@@ -216,6 +231,7 @@
                 :documentation "The field constraints")
    (required :initarg :required-p
              :initform t
+             :type boolean
              :accessor field-required-p
              :documentation "Whether the field is required")
    (required-message :initarg :required-message
@@ -230,10 +246,12 @@
                     :documentation "Message to display when field is invalid")
    (read-only :initarg :read-only-p
               :initform nil
+              :type boolean
               :accessor field-read-only-p
               :documentation "Whether the field is read only")
    (disabled :initarg :disabled-p
              :initform nil
+             :type boolean
              :accessor field-disabled-p
              :documentation "Whether the field is disabled")
    (accessor :initarg :accessor
@@ -251,6 +269,7 @@
            :documentation "The function to use to write to underlying model")
    (trim :initarg :trim-p
          :initform t
+         :type boolean
          :accessor field-trim-p
          :documentation "Trim the input")
    (validation-triggers :initarg :validation-triggers
@@ -259,6 +278,7 @@
                         :documentation "Client side validation triggers. A list of :change, :focus, :focusout, :focusin, etc")
    (form :initarg :form
          :initform nil
+         :type (or null form)
          :accessor field-form
          :documentation "The form the field belongs to"))
   (:documentation "A form field"))
