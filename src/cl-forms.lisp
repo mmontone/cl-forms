@@ -50,7 +50,7 @@
                     :fields (list ,@(loop for field in fields
                                           collect
                                           (destructuring-bind (field-name field-type &rest field-args) field
-                                            `(cons ',field-name (make-form-field ,field-type :name ,(string field-name) ,@field-args)))))
+                                            `(cons ',field-name (make-form-field ,field-type :name ',(intern (string field-name)) ,@field-args)))))
                     (append ,fargs
                             (list ,@args)))))))
 
