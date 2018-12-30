@@ -31,6 +31,7 @@
                                    (:file "integer")
                                    (:file "choice")
                                    (:file "date")
+                                   (:file "datetime")
                                    (:file "file")
                                    (:file "hidden")
                                    (:file "submit")

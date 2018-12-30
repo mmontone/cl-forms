@@ -185,6 +185,26 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (theme forms::default-form-theme)
+     (field forms::datetime-form-field) form &rest args)
+  (format *html* "<input type=\"datetime\"")
+  (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
+  (when (getf args :class)
+    (format *html* " class=\"~A\"" (getf args :class)))
+  (when (forms::field-placeholder field)
+    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+  (when (forms::datetime-min field)
+    (format *html* " min=\"~A\"" (forms::datetime-min field)))
+  (when (forms::datetime-max field)
+    (format *html* " max=\"~A\"" (forms::datetime-max field)))
+  (apply #'renderer-render-field-attributes renderer theme field form args)
+  (when (forms::field-value field)
+    (format *html* " value=\"~A\""
+            (forms:format-field-value-to-string field)))
+  (format *html* "></input>"))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
      (field forms::url-form-field) form &rest args)
   (format *html* "<input type=\"url\"")
   (format *html* " name=\"~A\"" (forms::render-field-request-name field form))
