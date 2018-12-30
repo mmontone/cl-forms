@@ -224,7 +224,7 @@
               :initform nil
               :type (or null symbol function)
               :accessor field-formatter
-              :documentation "The field formatter")
+              :documentation "The field formatter. The function takes two arguments, a VALUE and STREAM to format it into.")
    (constraints :initarg :constraints
                 :initform nil
                 :accessor field-constraints
@@ -584,3 +584,8 @@ been validated via validate-form."
              (render-form-start)
              ,@new-body
              (render-form-end)))))))
+
+(defun make-formatter (symbol)
+  "Create a field formatter. SYMBOL is the function to call."
+  (lambda (x stream)
+    (format stream "~A" (funcall symbol x))))

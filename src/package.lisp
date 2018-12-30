@@ -40,4 +40,5 @@
            :with-form-template
            :format-field-value
            :format-field-value-to-string
+           :make-formatter
            :*base64-encode*))

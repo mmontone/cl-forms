@@ -3,8 +3,9 @@
 (defclass choice-form-field (form-field)
   ((choices :initarg :choices
             :initform nil
-            :accessor field-choices
-            :documentation "An alist with the choices")
+            :writer (setf field-choices)
+            :type (or list symbol function)
+            :documentation "An alist with the choices. Or a function with which to obtain the choices.")
    (preferred-choices :initarg :preferred-choices
                       :initform nil
                       :accessor field-preferred-choices
@@ -53,6 +54,13 @@
    (make-instance 'choice-field-validator
                   :field field)
    (field-constraints field)))
+
+(defmethod field-choices ((field choice-form-field))
+  (let ((choices (slot-value field 'choices)))
+    (typecase choices
+      (list choices)
+      (symbol (funcall (fdefinition choices)))
+      (function (funcall choices)))))
 
 (defclass choice-field-validator (field-validator)
   ()
