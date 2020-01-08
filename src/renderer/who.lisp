@@ -128,7 +128,7 @@
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
