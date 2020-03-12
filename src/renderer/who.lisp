@@ -462,7 +462,7 @@
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
      (theme forms::default-form-theme)
-     (field stateful-file-field) form &rest args)
+     (field forms::stateful-file-field) form &rest args)
   (who:with-html-output (forms.who::*html*)
     (when (forms::file-path field)
       (let ((file-info-name (format nil "~A.info"
