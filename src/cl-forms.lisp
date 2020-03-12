@@ -98,6 +98,7 @@
      (error "Field ~A not found in ~A" field-name form))))
 
 (defun get-field-value (form field-name &optional (error-p t))
+  (declare (ignorable error-p))
   (field-value (get-field form field-name)))
 
 (defun set-field-value (form field-name value)
@@ -168,6 +169,7 @@
             (form-action form))))
 
 (defmethod initialize-instance :after ((form form) &rest initargs)
+  (declare (ignorable initargs))
   (loop for field in (form-fields form)
         do
            (setf (field-form (cdr field)) form)))
@@ -315,6 +317,7 @@
         (cons (field-name form-field) path))))
 
 (defun field-request-name (form-field form)
+  (declare (ignorable form-field form))
   (fmt:fmt nil
            (:join "" (alexandria:flatten (reverse *field-path*)))))
 
@@ -510,16 +513,19 @@ been validated via validate-form."
 (defgeneric renderer-render-field-widget (renderer theme field form &rest argss))
 
 (defmethod renderer-render-field-errors :around (renderer theme field form &rest args)
+  (declare (ignorable args))
   ;; Render field errors inline only when :inline is specified on form
   (when (member :inline (forms::display-errors form))
     (call-next-method)))
 
 (defmethod renderer-render-form-errors :around  (renderer theme form &rest args)
+  (declare (ignorable args))
   ;; Render form errors only when :list is specified on form
   (when (member :list (forms::display-errors form))
     (call-next-method)))
 
 (defmethod renderer-render-field-widget :around (renderer theme field form &rest args)
+  (declare (ignorable args))
   (let ((*field-path* (field-add-to-path field form *field-path*)))
     (call-next-method)))
 

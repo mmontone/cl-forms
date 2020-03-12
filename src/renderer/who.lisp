@@ -48,11 +48,11 @@
     " action=\"" (forms::form-action form) "\""
     " method=\"" (forms::form-method form) "\""
     (:when (forms::form-enctype form)
-      " enctype=\"" (forms::form-enctype form) "\"")
+           " enctype=\"" (forms::form-enctype form) "\"")
     (:when (getf args :class)
-      " class=\"" (getf args :class) "\"" )
+           " class=\"" (getf args :class) "\"" )
     (:when (forms::client-validation form)
-      " data-parsley-validate")
+           " data-parsley-validate")
     ">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
@@ -66,9 +66,9 @@
   "Finish form rendering"
   (format *html* "</form>")
   #+nil(when (forms::client-validation form)
-    (with-html-output (*html*)
-      (:script :type "text/javascript"
-               (fmt "$('#~A').parsley();" (forms::form-id form))))))
+         (with-html-output (*html*)
+           (:script :type "text/javascript"
+                    (fmt "$('#~A').parsley();" (forms::form-id form))))))
 
 (defmethod forms::renderer-render-form-errors ((renderer (eql :who))
                                                (theme forms::default-form-theme)
@@ -314,7 +314,7 @@
                        :checked (when (member key selected-keys)
                                   "checked")
                        (str (forms:format-field-value-to-string field
-                                     choice))))))))
+                                                                choice))))))))
     ((and (forms::field-expanded field)
           (not (forms::field-multiple field)))
      ;; Render radio buttons
@@ -329,7 +329,7 @@
                                               key)
                                   "checked")
                        (str (forms:format-field-value-to-string field
-                                     choice))))))))
+                                                                choice))))))))
     ((and (not (forms::field-expanded field))
           (forms::field-multiple field))
      ;; A multiple select box
@@ -348,7 +348,7 @@
                          :selected (when (member key selected-keys)
                                      "selected")
                          (str (forms:format-field-value-to-string field
-                                       choice)))))))))
+                                                                  choice)))))))))
     ((and (not (forms::field-expanded field))
           (not (forms::field-multiple field)))
      ;; A single select box
@@ -367,7 +367,7 @@
                                                  key)
                                      "selected")
                          (str (forms:format-field-value-to-string field
-                                       choice)))))))))))
+                                                                  choice)))))))))))
 
 ;; Attributes and constraints
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
@@ -386,15 +386,15 @@
     (format *html* " disabled=\"disabled\""))
   (when (forms::field-read-only-p field)
     (format *html* " readonly=\"readonly\""))
-  
+
   ;; HTML attributes
   (loop for key in (getf args :attrs) by #'cddr
-        for val in (cdr (getf args :attrs)) by #'cddr
-        do
-           (format *html* " ~A=\"~A\"" key val))
+     for val in (cdr (getf args :attrs)) by #'cddr
+     do
+       (format *html* " ~A=\"~A\"" key val))
   ;; Constraints
   (loop for constraint in (forms::field-constraints field)
-       do (renderer-render-field-constraint renderer constraint field form)))
+     do (renderer-render-field-constraint renderer constraint field form)))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              theme
@@ -458,3 +458,36 @@
        (let ((forms::*field-path* (cons (list "[" (1+ i) "].") forms::*field-path*)))
          (let ((entry (funcall (forms::list-field-type field))))
            (forms::renderer-render-field-widget renderer theme entry form)))))
+
+(defmethod forms::renderer-render-field-widget
+    ((renderer (eql :who))
+     (theme forms::default-form-theme)
+     (field stateful-file-field) form &rest args)
+  (who:with-html-output (forms.who::*html*)
+    (when (forms::file-path field)
+      (let ((file-info-name (format nil "~A.info"
+                                    (forms::render-field-request-name field form))))
+        (who:htm
+         ;; encode file info to recover it later if no file is uploaded
+         (:div
+          (:input :type :hidden
+                  :name file-info-name
+                  :value (base64:string-to-base64-string
+                          (prin1-to-string
+                           (list :path (forms::file-path field)
+                                 :file-name (forms::file-name field)
+                                 :content-type (forms::file-content-type field)))))
+          (if (download-link field)
+              (who:htm (:a :href (download-link field)
+                           :target "_blank"
+                           (who:str (forms::file-name field))))
+              (who:htm (:p (who:str (forms::file-name field)))))
+          ;; if the file is not required, render a delete button
+          (when (not (forms::field-required-p field))
+            (who:htm (:a :href "#" :class "delete-file"
+                         :onclick "javascript:$(this).parent().remove();return false;"
+                         (who:str "Delete"))))))))
+    (:input :type "file"
+            :class (getf args :class)
+            :accept (forms::file-accept field)
+            :name (forms::render-field-request-name field form))))

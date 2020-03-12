@@ -27,7 +27,7 @@
 
 (defmethod field-read-from-request ((field file-form-field) form parameters)
   (let ((fvalue
-          (cdr (assoc (field-request-name field form) parameters :test #'string=))))
+         (cdr (assoc (field-request-name field form) parameters :test #'string=))))
     (if (and fvalue (listp fvalue))
         (destructuring-bind (path file-name content-type) fvalue
           (setf (file-path field) path)
@@ -56,42 +56,9 @@
         download-link
         (funcall download-link field))))
 
-(defmethod forms::renderer-render-field-widget
-    ((renderer (eql :who))
-     (theme forms::default-form-theme)
-     (field stateful-file-field) form &rest args)
-  (with-html-output (*html*)
-    (when (forms::file-path field)
-      (let ((file-info-name (format nil "~A.info"
-                                    (forms::render-field-request-name field form))))
-        (htm
-         ;; encode file info to recover it later if no file is uploaded
-         (:div
-          (:input :type :hidden
-                  :name file-info-name
-                  :value (encode-string
-                          (prin1-to-string
-                           (list :path (forms::file-path field)
-                                 :file-name (forms::file-name field)
-                                 :content-type (forms::file-content-type field)))))
-          (if (download-link field)
-              (htm (:a :href (download-link field)
-                       :target "_blank"
-                       (str (forms::file-name field))))
-              (htm (:p (str (forms::file-name field)))))
-          ;; if the file is not required, render a delete button
-          (when (not (forms::field-required-p field))
-            (htm (:a :href "#" :class "delete-file"
-                     :onclick "javascript:$(this).parent().remove();return false;"
-                     (str "Delete"))))))))
-    (:input :type "file"
-            :class (getf args :class)
-            :accept (forms::file-accept field)
-            :name (forms::render-field-request-name field form))))
-
 (defmethod forms::field-read-from-request ((field stateful-file-field) form parameters)
   (let ((fvalue
-          (cdr (assoc (forms::field-request-name field form) parameters :test #'string=))))
+         (cdr (assoc (forms::field-request-name field form) parameters :test #'string=))))
     (if (and fvalue (listp fvalue))
         ;; A file was uploaded
         (destructuring-bind (path file-name content-type) fvalue
@@ -102,9 +69,9 @@
             (funcall (forms::upload-handler field) field)))
         ;; else, recover file info, if it is there
         (let ((file-info
-                (cdr (assoc (format nil "~A.info" (forms::field-request-name field form)) parameters :test #'string=))))
+               (cdr (assoc (format nil "~A.info" (forms::field-request-name field form)) parameters :test #'string=))))
           (when file-info
-            (let ((finfo (read-from-string (decode-string file-info))))
+            (let ((finfo (read-from-string (base64:base64-string-to-string file-info))))
               (setf (forms::file-path field) (getf finfo :path)
                     (forms::file-name field) (getf finfo :file-name)
                     (forms::file-content-type field) (getf finfo :content-type))))))))

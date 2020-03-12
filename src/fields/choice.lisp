@@ -37,6 +37,7 @@
   (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes."))
 
 (defmethod initialize-instance :after ((field choice-form-field) &rest initargs)
+  (declare (ignorable initargs))
   ;; Initialize the key reader and writer
   (let ((choices (field-choices-alist field)))
     (let ((choice-key (first (first choices))))
@@ -68,6 +69,7 @@
   (:default-initargs :message "The option is not valid"))
 
 (defmethod clavier::%validate ((validator choice-field-validator) object &rest args)
+  (declare (ignorable args))
   (let ((valid-choices (field-choices (validator-field validator))))
     (if (forms::field-multiple (validator-field validator))
         (every (lambda (elem)
