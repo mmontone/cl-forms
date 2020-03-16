@@ -34,6 +34,7 @@
 (defmethod forms::renderer-render-form :after ((renderer (eql :who))
                                                (theme forms::default-form-theme)
                                                form &rest args)
+  (declare (ignorable args))
   (when (forms::client-validation form)
     (with-html-output (*html*)
       (:script :type "text/javascript"
@@ -282,6 +283,7 @@
     ((renderer (eql :who))
      (theme forms::default-form-theme)
      (field forms::hidden-form-field) form &rest args)
+  (declare (ignorable args))
   (with-html-output (*html*)
     (:input :type "hidden"
             :name (forms::render-field-request-name field form)
@@ -291,6 +293,7 @@
     ((renderer (eql :who))
      (theme forms::default-form-theme)
      (field forms::submit-form-field) form &rest args)
+  (declare (ignorable args))
   (with-html-output (*html*)
     (:input :type "submit"
             :class (getf args :class)
@@ -300,6 +303,7 @@
     ((renderer (eql :who))
      (theme forms::default-form-theme)
      (field forms::choice-form-field) form &rest args)
+  (declare (ignorable args))
   (cond
     ((and (forms::field-expanded field)
           (forms::field-multiple field))
@@ -400,6 +404,7 @@
                                              theme
                                              (field forms::integer-form-field)
                                              form &rest args)
+  (declare (ignorable args))
   (format *html* " data-parsley-type=\"integer\"")
   (call-next-method))
 
@@ -477,8 +482,8 @@
                            (list :path (forms::file-path field)
                                  :file-name (forms::file-name field)
                                  :content-type (forms::file-content-type field)))))
-          (if (download-link field)
-              (who:htm (:a :href (download-link field)
+          (if (forms::download-link field)
+              (who:htm (:a :href (forms::download-link field)
                            :target "_blank"
                            (who:str (forms::file-name field))))
               (who:htm (:p (who:str (forms::file-name field)))))

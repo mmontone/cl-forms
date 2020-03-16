@@ -3,9 +3,6 @@
 (defclass bootstrap-form-theme (forms::default-form-theme)
   ())
 
-(defun merge-css-classes (cls1 cls2)
-  )
-
 (defun format-css-classes (classes)
   (format nil "~{~a~^ ~}" (mapcar (lambda (class)
                                     (string-downcase (string class)))
@@ -14,6 +11,7 @@
 (defmethod forms::renderer-render-form-errors ((renderer (eql :who))
                                                (theme bootstrap-form-theme)
                                                form &rest args)
+  (declare (ignorable args))
   (when (forms::form-errors form)
     (with-html-output (*html*)
       (:div :class "alert alert-danger"
@@ -22,6 +20,7 @@
 (defmethod forms::renderer-render-form ((renderer (eql :who))
                                         (theme bootstrap-form-theme)
                                         form &rest args)
+  (declare (ignorable args))
   (with-html-output (*html*)
     (apply #'forms::renderer-render-form-errors renderer theme form args)
     (:form :id (forms::form-id form)
@@ -88,6 +87,7 @@
 (defmethod forms::renderer-render-field-help ((renderer (eql :who))
                                               (theme bootstrap-form-theme)
                                               field form &rest args)
+  (declare (ignorable args))
   (when (forms::field-help-text field)
     (with-html-output (*html*)
       (:p :class "help-block"
@@ -245,6 +245,7 @@
     ((renderer (eql :who))
      (theme bootstrap-form-theme)
      (field forms::submit-form-field) form &rest args)
+  (declare (ignorable args))
   (with-html-output (*html*)
     (:input :type "submit"
             :class "btn btn-primary"
@@ -333,5 +334,6 @@
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              (theme bootstrap-form-theme)
                                              field form &rest args)
+  (declare (ignorable args))
   (format *html* " class=\"form-control\"")
   (call-next-method))

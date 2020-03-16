@@ -200,7 +200,6 @@
           :type (or null string)
           :documentation "The field label")
    (value :initarg :value
-          :writer (setf field-value)
           :initform nil
           :documentation "Field value")
    (default-value :initarg :default-value
