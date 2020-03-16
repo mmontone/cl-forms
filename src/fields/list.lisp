@@ -48,7 +48,8 @@
                when (ppcre:scan regex (car param))
                collect (ppcre:register-groups-bind (index)
                            (regex (car param))
-                         (parse-integer index))))))
+                         (when (stringp index)
+                           (parse-integer index)))))))
       ;; With the indexes posted, read the list items from the request parameters
       (let ((items
              (mapcar (lambda (i)
