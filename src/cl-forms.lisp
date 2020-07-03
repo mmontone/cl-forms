@@ -108,10 +108,12 @@
   ((id :initarg :id
        :accessor form-id
        :initform (string (gensym))
+       :type string
        :documentation "The form id")
    (name :initarg :name
          :accessor form-name
          :initform (error "Provide a name for the form")
+         :type symbol
          :documentation "The form name")
    (action :initarg :action
            :initform nil
