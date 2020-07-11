@@ -24,6 +24,7 @@
                                    (:file "layout")
                                    (:file "form-templates")
                                    (:file "themes")
+                                   (:file "renderers")
                                    (:file "composition")
                                    (:file "tests"))
                                   :serial t))
