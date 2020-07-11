@@ -73,7 +73,8 @@
   (loop for field in fields
         collect
         (destructuring-bind (field-name field-type &rest field-args) field
-          (cons field-name (apply #'make-form-field field-type :name (string field-name) field-args)))))
+          (cons field-name (apply #'make-form-field field-type
+                                  :name field-name field-args)))))
 
 (defun get-form (name &rest args)
   (let ((form-builder (get name :form)))
