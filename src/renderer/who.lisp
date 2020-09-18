@@ -1,6 +1,7 @@
 (defpackage :cl-forms.who
   (:nicknames :forms.who)
-  (:use :cl :forms :who))
+  (:use :cl :forms :who)
+  (:export :*html*))
 
 (in-package :forms.who)
 

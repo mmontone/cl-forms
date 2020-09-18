@@ -3,6 +3,8 @@
 (defclass bootstrap-form-theme (forms::default-form-theme)
   ())
 
+(export 'bootstrap-form-theme)
+
 (defun format-css-classes (classes)
   (format nil "~{~a~^ ~}" (mapcar (lambda (class)
                                     (string-downcase (string class)))
