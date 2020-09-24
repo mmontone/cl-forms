@@ -162,7 +162,12 @@
                       :initform t
                       :type boolean
                       :accessor client-validation
-                      :documentation "When T, form client validation is enabled"))
+                      :documentation "When T, form client validation is enabled")
+   (use-field-paths :initarg :use-field-paths
+                    :initform t
+                    :type boolean
+                    :accessor use-field-paths
+                    :documentation "By default, field names in web forms are constructed using a 'path', prefixed with the name of the forms they belong too. This is in order to support subforms. You may want to disable this if you just want to read form fields from POST parameters with the same. If this is disabled, subforms can not be used anymore. See: FIELD-REQUEST-NAME"))
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
