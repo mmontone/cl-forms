@@ -314,14 +314,17 @@
 (defgeneric field-add-to-path (form-field form &optional path)
   (:method (form-field form &optional (path *field-path*))
     (if (null path)
-        (cons (list (form-name form) "." (field-name form-field))
+        (cons (list (string-downcase (string (form-name form)))
+                    "."
+                    (string-downcase (string (field-name form-field))))
               path)
-        (cons (field-name form-field) path))))
+        (cons (string-downcase (string (field-name form-field))) path))))
 
 (defun field-request-name (form-field form)
-  (declare (ignorable form-field form))
-  (fmt:fmt nil
-           (:join "" (alexandria:flatten (reverse *field-path*)))))
+  (if (use-field-paths form)
+      (fmt:fmt nil
+               (:join "" (alexandria:flatten (reverse *field-path*))))
+      (string-downcase (string (field-name form-field)))))
 
 (defun render-field-request-name (form-field form)
   (let ((request-name (field-request-name form-field form)))
