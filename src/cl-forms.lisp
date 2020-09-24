@@ -452,6 +452,7 @@ been validated via validate-form."
         (make-csrf-token form)))
 
 (defun validate-form (&optional (form *form*))
+  "Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors."
   (setf (form-errors form)
         (loop for field in (form-fields form)
               appending
@@ -540,6 +541,7 @@ been validated via validate-form."
     (call-next-method)))
 
 (defun handle-request (&optional (form *form*))
+  "Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after."
   (when (form-csrf-protection-p form)
     ;; Check the csrf token
     (let ((session-token (get-form-session-csrf-token form)))
