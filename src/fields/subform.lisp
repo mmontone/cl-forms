@@ -28,3 +28,9 @@
           do (field-read-from-request (cdr field) form
                                       parameters))
       (setf (field-value field) field-subform))))
+
+(defmethod field-add-to-path ((form-field subform-form-field) form &optional (path *field-path*))
+  (cons (list (string-downcase (string (form-name form)))
+              "."
+              (string-downcase (string (field-name form-field))))
+        path))

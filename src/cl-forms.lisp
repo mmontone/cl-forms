@@ -152,7 +152,7 @@
    (errors :initform nil
            :accessor form-errors
            :type list
-           :documentation "Form errors after validation")
+           :documentation "Form errors after validation. An association list with elements (<field> . <field errors strings list>).")
    (display-errors :initarg :display-errors
                    :initform (list :list :inline)
                    :type list
@@ -162,12 +162,7 @@
                       :initform t
                       :type boolean
                       :accessor client-validation
-                      :documentation "When T, form client validation is enabled")
-   (use-field-paths :initarg :use-field-paths
-                    :initform t
-                    :type boolean
-                    :accessor use-field-paths
-                    :documentation "By default, field names in web forms are constructed using a 'path', prefixed with the name of the forms they belong too. This is in order to support subforms. You may want to disable this if you just want to read form fields from POST parameters with the same. If this is disabled, subforms can not be used anymore. See: FIELD-REQUEST-NAME"))
+                      :documentation "When T, form client validation is enabled"))
   (:documentation "A form"))
 
 (defmethod print-object ((form form) stream)
@@ -318,18 +313,11 @@
 
 (defgeneric field-add-to-path (form-field form &optional path)
   (:method (form-field form &optional (path *field-path*))
-    (if (null path)
-        (cons (list (string-downcase (string (form-name form)))
-                    "."
-                    (string-downcase (string (field-name form-field))))
-              path)
-        (cons (string-downcase (string (field-name form-field))) path))))
+    (cons (string-downcase (string (field-name form-field))) path)))
 
 (defun field-request-name (form-field form)
-  (if (use-field-paths form)
-      (fmt:fmt nil
-               (:join "" (alexandria:flatten (reverse *field-path*))))
-      (string-downcase (string (field-name form-field)))))
+  (fmt:fmt nil
+           (:join "" (alexandria:flatten (reverse *field-path*)))))
 
 (defun render-field-request-name (form-field form)
   (let ((request-name (field-request-name form-field form)))
@@ -452,7 +440,8 @@ been validated via validate-form."
         (make-csrf-token form)))
 
 (defun validate-form (&optional (form *form*))
-  "Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors."
+  "Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
+The list of errors is an association list with elements (<field> . <field errors strings list>)."
   (setf (form-errors form)
         (loop for field in (form-fields form)
               appending
