@@ -72,7 +72,7 @@
    :use-key-as-value t
    :choices (mapcar (lambda (x)
                       (cons (cdr x) (car x)))
-                    peppol/code-lists:|ISO 4217 Currency codes|)
+                    peppol/code-lists::|ISO 4217 Currency codes|)
    :test (lambda (key key-and-value)
            (string= key (car key-and-value)))))
 
@@ -87,7 +87,7 @@
    :use-key-as-value t
    :choices (mapcar (lambda (x)
                       (cons (cdr x) (car x)))
-                    peppol/code-lists:|ISO 3166-1:Alpha2 Country codes|)
+                    peppol/code-lists::|ISO 3166-1:Alpha2 Country codes|)
    :test (lambda (key key-and-value)
            (string= key (car key-and-value)))))
 
