@@ -178,7 +178,7 @@
            (setf (field-form (cdr field)) form)))
 
 (defun post-parameters (&optional (request hunchentoot:*request*))
-  (let ((post-parameters (hunchentoot:post-parameters request)))
+  (let ((post-parameters (request-post-parameters request)))
     (if *base64-encode*
         (mapcar (lambda (param)
                   (cons (base64:base64-string-to-string (car param) :uri t)
@@ -529,18 +529,18 @@ The list of errors is an association list with elements (<field> . <field errors
   (let ((*field-path* (field-add-to-path field form *field-path*)))
     (call-next-method)))
 
-(defun handle-request (&optional (form *form*))
+(defun handle-request (&optional (form *form*) (request hunchentoot:*request*))
   "Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after."
   (when (form-csrf-protection-p form)
     ;; Check the csrf token
     (let ((session-token (get-form-session-csrf-token form)))
       (when (or (not session-token)
                 (not (equalp session-token
-                             (hunchentoot:post-parameter (form-csrf-field-name form)))))
+                             (hunchentoot:post-parameter (form-csrf-field-name form) request))))
         ;; The form is not valid. Throw an error, but reset its CSRF token for next time
         (set-form-session-csrf-token form)
         (error "Invalid CSRF token"))))
-  (let ((post-parameters (post-parameters)))
+  (let ((post-parameters (post-parameters request)))
     (loop for field in (form-fields form)
           do (field-read-from-request (cdr field) form
                                       post-parameters))))
@@ -559,6 +559,11 @@ The list of errors is an association list with elements (<field> . <field errors
                    (field-value field)))))
 
 (defgeneric make-form-field (field-type &rest args))
+
+(defmethod make-form-field (field-type &rest args)
+  "Provide a good error message when a field cannot be built"
+  (declare (ignore args))
+  (error "Form field of type ~s not defined. Check that ~s is a correct field type." field-type field-type))
 
 ;; Form templates
 

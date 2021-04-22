@@ -27,29 +27,39 @@
                   :accessor field-hash-function
                   :documentation "The function to use for choices key")
    (test :initarg :test
-         :initform #'eql
-         :accessor field-test
-         :documentation "Function to test equality between choices")
+     :initform #'eql
+     :accessor field-test
+     :documentation "Function to test equality between choices")
    (use-key-as-value :initarg :use-key-as-value
                      :initform nil
                      :accessor use-key-as-value
                      :documentation "When T, use the key/s of the field as value of the field when it is read from request"))
-  (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes."))
+  (:documentation "A multi-purpose field used to allow the user to \"choose\" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes.
+NOTE: the defaults of this field type are too complicated for just working with string choices. STRING-CHOICE-FIELD is more convenient for that."))
+
+(defclass string-choice-form-field (choice-form-field)
+  ()
+  (:default-initargs
+   :test 'string=
+   :hash-function 'identity
+   :use-key-as-value t)
+  (:documentation "A choice field for working with string options"))
 
 (defmethod initialize-instance :after ((field choice-form-field) &rest initargs)
   (declare (ignorable initargs))
   ;; Initialize the key reader and writer
   (let ((choices (field-choices-alist field)))
-    (let ((choice-key (first (first choices))))
-      (cond
-        ((stringp choice-key)
-         (setf (field-key-reader field) #'identity))
-        ((integerp choice-key)
-         (setf (field-key-reader field)
-               (lambda (x) (parse-integer x :junk-allowed t))))
-        ((keywordp choice-key)
-         (setf (field-key-reader field) #'alexandria:make-keyword))
-        (t (error "Invalid key ~A" choice-key)))))
+    (when choices
+      (let ((choice-key (first (first choices))))
+        (cond
+          ((stringp choice-key)
+           (setf (field-key-reader field) #'identity))
+          ((integerp choice-key)
+           (setf (field-key-reader field)
+                 (lambda (x) (parse-integer x :junk-allowed t))))
+          ((keywordp choice-key)
+           (setf (field-key-reader field) #'alexandria:make-keyword))
+          (t (error "Invalid key: ~A" choice-key))))))
   ;; Add the choices constraint
   (push
    (make-instance 'choice-field-validator
@@ -82,6 +92,9 @@
 
 (defmethod make-form-field ((field-type (eql :choice)) &rest args)
   (apply #'make-instance 'choice-form-field args))
+
+(defmethod make-form-field ((field-type (eql :string-choice)) &rest args)
+  (apply #'make-instance 'string-choice-form-field args))
 
 (defun alistp (alist)
   (and (listp alist)           ; a list

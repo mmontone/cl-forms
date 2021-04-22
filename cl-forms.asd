@@ -1,7 +1,7 @@
 (asdf:defsystem #:cl-forms
   :serial t
   :description "A web forms handling library"
-  :author "Mariano Montone"
+  :author "Mariano Montone <marianomontone@gmail.com>"
   :license "MIT"
   :depends-on (#:alexandria
                #:cl-ppcre
@@ -13,6 +13,7 @@
   :components ((:module :src
                         :components
                         ((:file "package")
+			 (:file "request")
                          (:module :themes
                                   :components
                                   ((:file "theme")

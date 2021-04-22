@@ -94,18 +94,84 @@
     (setf (forms::field-value field) (list "foo" "baz"))
     (is (not (forms::validate-form-field field)))))
 
-;; (forms:defform subform1 ()
-;;   ((foo :string :value "")
-;;    (bar :number :value 1)))
 
-;; (forms:defform subform2 ()
-;;   ((sex :choice :choices (list "Male" "Female") :value "Male")))
+(defclass mock-request ()
+  ((post-parameters :initarg :post-parameters
+		    :accessor forms::request-post-parameters)))
 
-;; (forms:defform subform-test-form ()
-;;   ((subform1 :subform :subform 'subform1)
-;;    (subform2 :subform :subform 'subform2)))
+(forms:defform test-form-1 ()
+  ((foo :string :value "")
+   (bar :integer :value 1)
+   (choice :choice :choices (list "foo" "bar" "baz")
+		   :test 'string=
+		   :hash-function 'identity
+		   :use-key-as-value t
+		   :required-p nil)))
 
-;; (test subform-field-test
-;;   (let ((form (get-form 'subform-test-form)))
-;;     (
-;;   (let ((field
+(forms:defform subform1 ()
+  ((foo :string :value "")
+   (bar :integer :value 1)))
+
+(forms:defform subform2 ()
+  ((sex :choice :choices (list "Male" "Female") :value "Male")))
+
+(forms:defform subform-test-form ()
+  ((subform1 :subform :subform 'subform1)
+   (subform2 :subform :subform 'subform2)))
+
+(test form-test-1 ()
+  (let* ((form (get-form 'test-form-1))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("foo" . "foo")
+						    ("bar" . "22")
+						    ("choice" . "")))))
+    (handle-request form request)
+    (is-true (validate-form form))
+    (with-form-field-values (foo bar) form
+      (list foo bar)))
+
+  (let* ((form (get-form 'test-form-1))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("foo" . "foo")
+						    ("bar" . "bar")
+						    ("choice" . "")))))
+    (handle-request form request)
+    (is-false (validate-form form)))
+
+  (let* ((form (get-form 'test-form-1))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("foo" . "foo")
+						    ("bar" . "44")
+						    ("choice" . "badchoice")))))
+    (handle-request form request)
+    (is-false (validate-form form)))
+
+  (let* ((form (get-form 'test-form-1))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("foo" . "foo")
+						    ("bar" . "44")
+						    ("choice" . "foo")))))
+    (handle-request form request)
+    (is-true (validate-form form))))
+
+(defform string-choice-test-form ()
+  ((choice :string-choice :choices '("foo" "bar" "baz"))))
+
+(test string-choice-test
+  (let* ((form (get-form 'string-choice-test-form))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("foo" . "foo")
+						    ("bar" . "44")
+						    ("choice" . "badchoice")))))
+    (handle-request form request)
+    (is-false (validate-form form)))
+
+  (let* ((form (get-form 'string-choice-test-form))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("foo" . "foo")
+						    ("bar" . "44")
+						    ("choice" . "foo")))))
+    (handle-request form request)
+    (is-true (validate-form form))))
+
+;; TODO: implement tests for every field, and subforms
