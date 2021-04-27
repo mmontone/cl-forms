@@ -3,6 +3,10 @@
   :description "A web forms handling library"
   :author "Mariano Montone <marianomontone@gmail.com>"
   :license "MIT"
+  :homepage "https://github.com/mmontone/cl-forms"
+  :long-description
+  #.(uiop:read-file-string
+     (uiop:subpathname *load-pathname* "README.md"))
   :depends-on (#:alexandria
                #:cl-ppcre
                #:hunchentoot
