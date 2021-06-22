@@ -1,7 +1,8 @@
 (defpackage #:cl-forms
   (:nicknames :forms)
   (:use #:cl)
-  (:export :form-field
+  (:export :form
+           :form-field
            :with-form
            :with-form-renderer
            :with-form-theme
