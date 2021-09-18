@@ -1,0 +1,140 @@
+\input texinfo   @c -*-texinfo-*-
+@comment $Id@w{$}
+@comment %**start of header
+@settitle CL-FORMS
+@syncodeindex pg cp
+@setfilename cl-forms.info
+@include common-lisp.texi
+
+@copying
+
+Copyright @copyright{} 2021 Mariano Montone
+
+@end copying
+
+
+@dircategory Common Lisp
+@direntry
+* Cl-Forms: (cl-forms)Common Lisp client for ODATA services.
+@end direntry
+
+@titlepage
+@title Common Lisp ODATA Client
+
+@author Mariano Montone ( @email{marianomontone@@gmail.com} )
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top Top
+@cindex cl-forms
+
+@emph{CL-FORMS} is a Common Lisp client for accessing ODATA services.
+
+@menu
+* Intro::
+* Installation::
+* Usage::
+* API::
+* Index::
+@end menu
+
+@node Intro
+@chapter Introduction
+@anchor{introduction}
+
+CL-FORMS is a web forms handling library for Common Lisp.
+
+Although it is potentially framework agnostic, it runs on top of Hunchentoot at the moment.
+
+It features:
+
+@itemize @bullet
+@item
+Several form field types: String, boolean, integer, email, password fields. And more.
+@item Custom fields. CL-FORMS is extensible and it is possible to define new field types.
+@item Server and client side validation
+@item Rendering backends. Forms can be rendered via CL-WHO, or Djula, or something else; the backend is pluggable. The default renderer is CL-WHO.
+@item Themes (like Bootstrap)
+@item Control on rendering and layout.
+@item Handling of form errors.
+@item CSRF protection
+@end itemize
+
+@node Installation
+@chapter Installation
+@anchor{installation}
+
+@node Usage
+@chapter Usage
+@anchor{usage}
+
+@section Basics
+
+Use @clref{CL-FORMS, DEFFORM, macro} to define a form. Example:
+
+@example
+(defform fields-form (:action "/fields-post")
+  ((name :string :value "")
+   (ready :boolean :value t)
+   (sex :choice :choices (list "Male" "Female") :value "Male")
+   (submit :submit :label "Create")))
+@end example
+
+On your web handler, grab the form via `get-form`, select a renderer with `with-form-renderer`and then render the form with `render-form`:
+
+@example
+(let ((form (forms::get-form 'fields-form)))
+   (forms:with-form-renderer :who
+      (forms:render-form form))
+@end example
+
+To handle the form, grab it via `get-form` and then call `handle-request` (you should probably also call `validate-form` after). 
+Then bind form fields via either `with-form-field-values`, that binds the form field values; or `with-form-fields` that binds the form fields.
+
+@example
+(let ((form (forms:get-form 'fields-form)))
+    (forms::handle-request form)
+    (forms::with-form-field-values (name ready sex) form
+       (who:with-html-output (forms.who::*html*)
+          (:ul
+            (:li (who:fmt "Name: ~A" name))
+            (:li (who:fmt "Ready: ~A" ready))
+            (:li (who:fmt "Sex: ~A" sex))))))
+@end example
+
+Plase have a look at the demo sources for more examples of how to use the library
+
+@section Demo
+
+There's a demo included. To run:
+
+@example
+(require :cl-forms.demo)
+(forms.test:run-demo)
+@end example
+
+@node API
+@chapter API
+@anchor{api}
+
+@menu
+* CL-FORMS package::
+@end menu
+
+@node CL-FORMS package
+@section CL-FORMS package
+(@clpackage :cl-forms)
+
+@node Index
+@chapter Index
+
+@printindex cp
+@printindex vr
+@printindex fn
+
+@bye
