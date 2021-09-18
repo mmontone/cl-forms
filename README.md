@@ -55,12 +55,6 @@ Plase have a look at the demo sources for more examples of how to use the librar
 
 There's a demo included. To run:
 
-Download web assets. From /test/static directory run:
-```
-bower install
-```
-and then:
-
 ```lisp
 (require :cl-forms.demo)
 (forms.test:run-demo)
