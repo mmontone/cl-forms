@@ -44,7 +44,27 @@
   `(call-with-form ,form (lambda () ,@body)))
 
 (defmacro defform (form-name args fields)
-  "Define a form at top-level"
+  "Define a form at top-level.
+
+ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
+FIELDS are the form field specs.
+
+@example
+(forms:defform client-validated-form (:action \"/client-validation-post\"
+                                              :client-validation t)
+  ((name :string :value \"\" :constraints (list (clavier:is-a-string)
+                                              (clavier:not-blank)
+                                              (clavier:len :max 5))
+         :validation-triggers '(:focusin))
+   (single :boolean :value t)
+   (sex :choice :choices (list \"Male\" \"Female\") :value \"Male\")
+   (age :integer :constraints (list (clavier:is-an-integer)
+                                    (clavier:greater-than -1)
+                                    (clavier:less-than 200)))
+   (email :email)
+   (submit :submit :label \"Create\")))
+@end example
+"
   (check-duplicate-fields fields)
   (alexandria:with-gensyms (fargs)
     `(setf (get ',form-name :form)
@@ -60,10 +80,18 @@
                             (list ,@args)))))))
 
 (defmacro defform-builder (form-name args &body body)
+  "Registers a function with arguments ARGS and body BODY as a form builder.
+
+BODY is expected to instantiate a FORM object using ARGS in some way.
+
+FORM-NAME is the symbol under which the FORM is registered.
+
+Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form."
   (alexandria:with-unique-names (form)
     `(setf (get ',form-name :form)
            (lambda ,args
              (let ((,form (progn ,@body)))
+	       (check-type ,form 'forms:form)
                (setf (form-name ,form) ',form-name)
                ,form)))))
 
@@ -82,12 +110,23 @@
                                   :name field-name field-args)))))
 
 (defun get-form (name &rest args)
+  "Get the form named NAME.
+
+ARGS is the list of arguments to pass to a possible form builder function.
+
+See: DEFFORM-BUILDER macro."
   (let ((form-builder (get name :form)))
     (when (not form-builder)
       (error "Form not found: ~A" name))
     (apply form-builder args)))
 
 (defmacro with-form-fields (fields form &body body)
+  "Bind FIELDS to the form fields in FORM under BODY.
+
+@example
+(with-form-field-values (name single sex age email) form
+   (print (list name single sex age email)))
+@end example"
   `(let ,(loop for field in fields
                collect `(,field (get-field ,form ',field)))
      ,@body))
@@ -237,7 +276,7 @@
    (constraints :initarg :constraints
                 :initform nil
                 :accessor field-constraints
-                :documentation "The field constraints")
+                :documentation "A list of CLAVIER validators.")
    (required :initarg :required-p
              :initform t
              :type boolean

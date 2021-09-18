@@ -137,38 +137,69 @@ There's a demo included. To run:
 @subheading Variables
 @cldefvar {CL-FORMS, *BASE64-ENCODE*}
 
-If , encode form parameters in base64
+If T, encode form parameters in base64
 @endcldefvar
 
 @subheading Macros
 @cldefmacro {CL-FORMS, DEFFORM-BUILDER, (form-name args &body body)}
 
+Registers a function with arguments ARGS and body BODY as a form builder.
 
+BODY is expected to instantiate a FORM object using ARGS in some way.
+
+FORM-NAME is the symbol under which the FORM is registered.
+
+Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form.
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-RENDERER, (renderer &body body)}
 
-Bind @clref{CL-FORMS, *FORM-RENDERER*, variable} to @var{RENDERER} and evaluate @var{BODY} in that context.
+Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-THEME, (form-theme &body body)}
 
-Bind @clref{CL-FORMS, *FORM-THEME*, variable} to @var{FORM-THEME} and evaluate @var{BODY} in that context.
+Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM, (form &body body)}
 
-Bind @clref{CL-FORMS, *FORM*, variable} to @var{FORM} and evaluate @var{BODY} in that context.
+Bind *FORM* to FORM and evaluate BODY in that context.
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, DEFFORM, (form-name args fields)}
 
-Define a form at top-level
+Define a form at top-level.
+
+ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
+FIELDS are the form field specs.
+
+@example
+(forms:defform client-validated-form (:action "/client-validation-post"
+                                              :client-validation t)
+  ((name :string :value "" :constraints (list (clavier:is-a-string)
+                                              (clavier:not-blank)
+                                              (clavier:len :max 5))
+         :validation-triggers '(:focusin))
+   (single :boolean :value t)
+   (sex :choice :choices (list "Male" "Female") :value "Male")
+   (age :integer :constraints (list (clavier:is-an-integer)
+                                    (clavier:greater-than -1)
+                                    (clavier:less-than 200)))
+   (email :email)
+   (submit :submit :label "Create")))
+@end example
+
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-FIELDS, (fields form &body body)}
 
+Bind FIELDS to the form fields in FORM under BODY.
 
+@example
+(with-form-field-values (name single sex age email) form
+   (print (list name single sex age email)))
+@end example
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-TEMPLATE, ((&optional form-var) form-name args &body body)}
@@ -230,7 +261,11 @@ Define a form at top-level
 @subheading Functions
 @cldefun {CL-FORMS, GET-FORM, (name &rest args)}
 
+Get the form named NAME.
 
+ARGS is the list of arguments to pass to a possible form builder function.
+
+See: DEFFORM-BUILDER macro.
 @endcldefun
 
 @cldefun {CL-FORMS, GET-FIELD, (form field-name &optional (error-p t))}
@@ -240,7 +275,7 @@ Define a form at top-level
 
 @cldefun {CL-FORMS, HANDLE-REQUEST, (&optional (form *form*) (request hunchentoot:*request*))}
 
-Populates @var{FORM} from parameters in HTTP @var{request}. After this, the @var{form} field contains values, but they are not validated. To validate call @clref{CL-FORMS, VALIDATE-FORM, function} after.
+Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after.
 @endcldefun
 
 @cldefun {CL-FORMS, RENDER-FIELD-ERRORS, (field &optional (form *form*) &rest args)}
@@ -260,7 +295,7 @@ Populates @var{FORM} from parameters in HTTP @var{request}. After this, the @var
 
 @cldefun {CL-FORMS, ADD-FORM-ERROR, (field error-msg &optional (form *form*))}
 
-Add an error on @var{FIELD}
+Add an error on FIELD
 @endcldefun
 
 @cldefun {CL-FORMS, RENDER-FORM-ERRORS, (&optional (form *form*) &rest args)}
@@ -275,18 +310,18 @@ Add an error on @var{FIELD}
 
 @cldefun {CL-FORMS, FILL-FORM-FROM-MODEL, (form model)}
 
-Fill a @var{FORM} from a @var{MODEL}
+Fill a FORM from a MODEL
 @endcldefun
 
 @cldefun {CL-FORMS, VALIDATE-FORM, (&optional (form *form*))}
 
-Validates a @var{form}. Usually called after @clref{CL-FORMS, HANDLE-REQUEST, function}. Returns multiple values; first value is true if the @var{form} is valid; second value a list of errors.@*
+Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
 The list of errors is an association list with elements (<field> . <field errors strings list>).
 @endcldefun
 
 @cldefun {CL-FORMS, MAKE-FORMATTER, (symbol)}
 
-Create a field formatter. @var{SYMBOL} is the function to call.
+Create a field formatter. SYMBOL is the function to call.
 @endcldefun
 
 @cldefun {CL-FORMS, RENDER-FIELD-LABEL, (field &optional (form *form*) &rest args)}
@@ -321,7 +356,7 @@ Create a field formatter. @var{SYMBOL} is the function to call.
 
 @cldefun {CL-FORMS, FILL-MODEL-FROM-FORM, (form model)}
 
-Set a @var{MODEL}'s values from @var{FORM} field values
+Set a MODEL's values from FORM field values
 @endcldefun
 
 @cldefun {CL-FORMS, SET-FIELD-VALUE, (form field-name value)}
@@ -402,7 +437,7 @@ Custom field value parser@item @code{formatter} --- initarg: @code{@w{:formatter
 
 The field formatter. The function takes two arguments, a VALUE and STREAM to format it into.@item @code{constraints} --- initarg: @code{@w{:constraints}}; reader: @code{@w{cl-forms::field-constraints}}; writer: @code{@w{(setf cl-forms::field-constraints)}}
 
-The field constraints@item @code{required} --- initarg: @code{@w{:required-p}}; reader: @code{@w{cl-forms::field-required-p}}; writer: @code{@w{(setf cl-forms::field-required-p)}}
+A list of CLAVIER validators.@item @code{required} --- initarg: @code{@w{:required-p}}; reader: @code{@w{cl-forms::field-required-p}}; writer: @code{@w{(setf cl-forms::field-required-p)}}
 
 Whether the field is required@item @code{required-message} --- initarg: @code{@w{:required-message}}; reader: @code{@w{cl-forms::field-required-message}}; writer: @code{@w{(setf cl-forms::field-required-message)}}
 

@@ -131,33 +131,63 @@ Variables
 
  -- CL-FORMS: *BASE64-ENCODE*
 
-     If , encode form parameters in base64
+     If T, encode form parameters in base64
 
 Macros
 ------
 
  -- Macro: CL-FORMS:DEFFORM-BUILDER (form-name args &body body)
 
+     Registers a function with arguments ARGS and body BODY as a form
+     builder.
+
+     BODY is expected to instantiate a FORM object using ARGS in some
+     way.
+
+     FORM-NAME is the symbol under which the FORM is registered.
+
+     Use GET-FORM with FORM-NAME and expected arguments to obtain the
+     registered form.
+
  -- Macro: CL-FORMS:WITH-FORM-RENDERER (renderer &body body)
 
-     Bind *note *FORM-RENDERER*: CL-FORMS:*FORM-RENDERER* variable. to
-     RENDERER and evaluate BODY in that context.
+     Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
 
  -- Macro: CL-FORMS:WITH-FORM-THEME (form-theme &body body)
 
-     Bind *note *FORM-THEME*: CL-FORMS:*FORM-THEME* variable. to
-     FORM-THEME and evaluate BODY in that context.
+     Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
 
  -- Macro: CL-FORMS:WITH-FORM (form &body body)
 
-     Bind *note *FORM*: CL-FORMS:*FORM* variable. to FORM and evaluate
-     BODY in that context.
+     Bind *FORM* to FORM and evaluate BODY in that context.
 
  -- Macro: CL-FORMS:DEFFORM (form-name args fields)
 
-     Define a form at top-level
+     Define a form at top-level.
+
+     ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
+     FIELDS are the form field specs.
+
+          (forms:defform client-validated-form (:action "/client-validation-post"
+                                                        :client-validation t)
+            ((name :string :value "" :constraints (list (clavier:is-a-string)
+                                                        (clavier:not-blank)
+                                                        (clavier:len :max 5))
+                   :validation-triggers '(:focusin))
+             (single :boolean :value t)
+             (sex :choice :choices (list "Male" "Female") :value "Male")
+             (age :integer :constraints (list (clavier:is-an-integer)
+                                              (clavier:greater-than -1)
+                                              (clavier:less-than 200)))
+             (email :email)
+             (submit :submit :label "Create")))
 
  -- Macro: CL-FORMS:WITH-FORM-FIELDS (fields form &body body)
+
+     Bind FIELDS to the form fields in FORM under BODY.
+
+          (with-form-field-values (name single sex age email) form
+             (print (list name single sex age email)))
 
  -- Macro: CL-FORMS:WITH-FORM-TEMPLATE ((&optional form-var) form-name
           args &body body)
@@ -192,15 +222,21 @@ Functions
 
  -- Function: CL-FORMS:GET-FORM (name &rest args)
 
+     Get the form named NAME.
+
+     ARGS is the list of arguments to pass to a possible form builder
+     function.
+
+     See: DEFFORM-BUILDER macro.
+
  -- Function: CL-FORMS:GET-FIELD (form field-name &optional (error-p t))
 
  -- Function: CL-FORMS:HANDLE-REQUEST (&optional (form *form*) (request
           hunchentoot:*request*))
 
-     Populates FORM from parameters in HTTP REQUEST.  After this, the
-     FORM field contains values, but they are not validated.  To
-     validate call *note VALIDATE-FORM: CL-FORMS:VALIDATE-FORM function.
-     after.
+     Populates FORM from parameters in HTTP request.  After this, the
+     form field contains values, but they are not validated.  To
+     validate call VALIDATE-FORM after.
 
  -- Function: CL-FORMS:RENDER-FIELD-ERRORS (field &optional (form
           *form*) &rest args)
@@ -227,11 +263,10 @@ Functions
 
  -- Function: CL-FORMS:VALIDATE-FORM (&optional (form *form*))
 
-     Validates a FORM.  Usually called after *note HANDLE-REQUEST:
-     CL-FORMS:HANDLE-REQUEST function.  Returns multiple values; first
-     value is true if the FORM is valid; second value a list of errors.
-     The list of errors is an association list with elements (<field> .
-     <field errors strings list>).
+     Validates a form.  Usually called after HANDLE-REQUEST. Returns
+     multiple values; first value is true if the form is valid; second
+     value a list of errors.  The list of errors is an association list
+     with elements (<field> .  <field errors strings list>).
 
  -- Function: CL-FORMS:MAKE-FORMATTER (symbol)
 
@@ -381,7 +416,7 @@ Classes
           'cl-forms::field-constraints'; writer:
           '(setf cl-forms::field-constraints)'
 
-          The field constraints
+          A list of CLAVIER validators.
         * 'required' -- initarg: ':required-p'; reader:
           'cl-forms::field-required-p'; writer:
           '(setf cl-forms::field-required-p)'
@@ -454,85 +489,85 @@ File: cl-forms.info,  Node: Index,  Prev: API,  Up: Top
  [index ]
 * Menu:
 
-* CL-FORMS:ADD-FIELD:                    CL-FORMS package.    (line 125)
-* CL-FORMS:ADD-FIELD <1>:                CL-FORMS package.    (line 125)
-* CL-FORMS:ADD-FORM-ERROR:               CL-FORMS package.    (line  95)
-* CL-FORMS:ADD-FORM-ERROR <1>:           CL-FORMS package.    (line  95)
-* CL-FORMS:DEFFORM:                      CL-FORMS package.    (line  38)
-* CL-FORMS:DEFFORM <1>:                  CL-FORMS package.    (line  38)
+* CL-FORMS:ADD-FIELD:                    CL-FORMS package.    (line 160)
+* CL-FORMS:ADD-FIELD <1>:                CL-FORMS package.    (line 160)
+* CL-FORMS:ADD-FORM-ERROR:               CL-FORMS package.    (line 131)
+* CL-FORMS:ADD-FORM-ERROR <1>:           CL-FORMS package.    (line 131)
+* CL-FORMS:DEFFORM:                      CL-FORMS package.    (line  46)
+* CL-FORMS:DEFFORM <1>:                  CL-FORMS package.    (line  46)
 * CL-FORMS:DEFFORM-BUILDER:              CL-FORMS package.    (line  21)
 * CL-FORMS:DEFFORM-BUILDER <1>:          CL-FORMS package.    (line  21)
-* CL-FORMS:FIELD-ACCESSOR:               CL-FORMS package.    (line  68)
-* CL-FORMS:FIELD-ACCESSOR <1>:           CL-FORMS package.    (line  68)
-* CL-FORMS:FIELD-FORMATTER:              CL-FORMS package.    (line  52)
-* CL-FORMS:FIELD-FORMATTER <1>:          CL-FORMS package.    (line  52)
-* CL-FORMS:FIELD-PARSER:                 CL-FORMS package.    (line  54)
-* CL-FORMS:FIELD-PARSER <1>:             CL-FORMS package.    (line  54)
-* CL-FORMS:FIELD-READER:                 CL-FORMS package.    (line  59)
-* CL-FORMS:FIELD-READER <1>:             CL-FORMS package.    (line  59)
-* CL-FORMS:FIELD-VALID-P:                CL-FORMS package.    (line  56)
-* CL-FORMS:FIELD-VALID-P <1>:            CL-FORMS package.    (line  56)
-* CL-FORMS:FIELD-VALUE:                  CL-FORMS package.    (line  66)
-* CL-FORMS:FIELD-VALUE <1>:              CL-FORMS package.    (line  66)
-* CL-FORMS:FIELD-WRITER:                 CL-FORMS package.    (line  61)
-* CL-FORMS:FIELD-WRITER <1>:             CL-FORMS package.    (line  61)
-* CL-FORMS:FILL-FORM-FROM-MODEL:         CL-FORMS package.    (line 106)
-* CL-FORMS:FILL-FORM-FROM-MODEL <1>:     CL-FORMS package.    (line 106)
-* CL-FORMS:FILL-MODEL-FROM-FORM:         CL-FORMS package.    (line 137)
-* CL-FORMS:FILL-MODEL-FROM-FORM <1>:     CL-FORMS package.    (line 137)
-* CL-FORMS:FORM-ERRORS:                  CL-FORMS package.    (line  70)
-* CL-FORMS:FORM-ERRORS <1>:              CL-FORMS package.    (line  70)
-* CL-FORMS:FORM-VALID-P:                 CL-FORMS package.    (line 132)
-* CL-FORMS:FORM-VALID-P <1>:             CL-FORMS package.    (line 132)
-* CL-FORMS:FORMAT-FIELD-VALUE:           CL-FORMS package.    (line  63)
-* CL-FORMS:FORMAT-FIELD-VALUE <1>:       CL-FORMS package.    (line  63)
-* CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING: CL-FORMS package.    (line 143)
+* CL-FORMS:FIELD-ACCESSOR:               CL-FORMS package.    (line  98)
+* CL-FORMS:FIELD-ACCESSOR <1>:           CL-FORMS package.    (line  98)
+* CL-FORMS:FIELD-FORMATTER:              CL-FORMS package.    (line  82)
+* CL-FORMS:FIELD-FORMATTER <1>:          CL-FORMS package.    (line  82)
+* CL-FORMS:FIELD-PARSER:                 CL-FORMS package.    (line  84)
+* CL-FORMS:FIELD-PARSER <1>:             CL-FORMS package.    (line  84)
+* CL-FORMS:FIELD-READER:                 CL-FORMS package.    (line  89)
+* CL-FORMS:FIELD-READER <1>:             CL-FORMS package.    (line  89)
+* CL-FORMS:FIELD-VALID-P:                CL-FORMS package.    (line  86)
+* CL-FORMS:FIELD-VALID-P <1>:            CL-FORMS package.    (line  86)
+* CL-FORMS:FIELD-VALUE:                  CL-FORMS package.    (line  96)
+* CL-FORMS:FIELD-VALUE <1>:              CL-FORMS package.    (line  96)
+* CL-FORMS:FIELD-WRITER:                 CL-FORMS package.    (line  91)
+* CL-FORMS:FIELD-WRITER <1>:             CL-FORMS package.    (line  91)
+* CL-FORMS:FILL-FORM-FROM-MODEL:         CL-FORMS package.    (line 142)
+* CL-FORMS:FILL-FORM-FROM-MODEL <1>:     CL-FORMS package.    (line 142)
+* CL-FORMS:FILL-MODEL-FROM-FORM:         CL-FORMS package.    (line 172)
+* CL-FORMS:FILL-MODEL-FROM-FORM <1>:     CL-FORMS package.    (line 172)
+* CL-FORMS:FORM-ERRORS:                  CL-FORMS package.    (line 100)
+* CL-FORMS:FORM-ERRORS <1>:              CL-FORMS package.    (line 100)
+* CL-FORMS:FORM-VALID-P:                 CL-FORMS package.    (line 167)
+* CL-FORMS:FORM-VALID-P <1>:             CL-FORMS package.    (line 167)
+* CL-FORMS:FORMAT-FIELD-VALUE:           CL-FORMS package.    (line  93)
+* CL-FORMS:FORMAT-FIELD-VALUE <1>:       CL-FORMS package.    (line  93)
+* CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING: CL-FORMS package.    (line 178)
 * CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING <1>: CL-FORMS package.
-                                                              (line 143)
-* CL-FORMS:GET-FIELD:                    CL-FORMS package.    (line  77)
-* CL-FORMS:GET-FIELD <1>:                CL-FORMS package.    (line  77)
-* CL-FORMS:GET-FIELD-VALUE:              CL-FORMS package.    (line 129)
-* CL-FORMS:GET-FIELD-VALUE <1>:          CL-FORMS package.    (line 129)
-* CL-FORMS:GET-FORM:                     CL-FORMS package.    (line  75)
-* CL-FORMS:GET-FORM <1>:                 CL-FORMS package.    (line  75)
-* CL-FORMS:HANDLE-REQUEST:               CL-FORMS package.    (line  79)
-* CL-FORMS:HANDLE-REQUEST <1>:           CL-FORMS package.    (line  79)
-* CL-FORMS:MAKE-FORMATTER:               CL-FORMS package.    (line 118)
-* CL-FORMS:MAKE-FORMATTER <1>:           CL-FORMS package.    (line 118)
-* CL-FORMS:REMOVE-FIELD:                 CL-FORMS package.    (line 127)
-* CL-FORMS:REMOVE-FIELD <1>:             CL-FORMS package.    (line 127)
-* CL-FORMS:RENDER-FIELD:                 CL-FORMS package.    (line 134)
-* CL-FORMS:RENDER-FIELD <1>:             CL-FORMS package.    (line 134)
-* CL-FORMS:RENDER-FIELD-ERRORS:          CL-FORMS package.    (line  87)
-* CL-FORMS:RENDER-FIELD-ERRORS <1>:      CL-FORMS package.    (line  87)
-* CL-FORMS:RENDER-FIELD-LABEL:           CL-FORMS package.    (line 122)
-* CL-FORMS:RENDER-FIELD-LABEL <1>:       CL-FORMS package.    (line 122)
-* CL-FORMS:RENDER-FIELD-WIDGET:          CL-FORMS package.    (line 103)
-* CL-FORMS:RENDER-FIELD-WIDGET <1>:      CL-FORMS package.    (line 103)
-* CL-FORMS:RENDER-FORM:                  CL-FORMS package.    (line  90)
-* CL-FORMS:RENDER-FORM <1>:              CL-FORMS package.    (line  90)
-* CL-FORMS:RENDER-FORM-END:              CL-FORMS package.    (line 146)
-* CL-FORMS:RENDER-FORM-END <1>:          CL-FORMS package.    (line 146)
-* CL-FORMS:RENDER-FORM-ERRORS:           CL-FORMS package.    (line 100)
-* CL-FORMS:RENDER-FORM-ERRORS <1>:       CL-FORMS package.    (line 100)
-* CL-FORMS:RENDER-FORM-START:            CL-FORMS package.    (line  92)
-* CL-FORMS:RENDER-FORM-START <1>:        CL-FORMS package.    (line  92)
-* CL-FORMS:SET-FIELD-VALUE:              CL-FORMS package.    (line 141)
-* CL-FORMS:SET-FIELD-VALUE <1>:          CL-FORMS package.    (line 141)
-* CL-FORMS:VALIDATE-FORM:                CL-FORMS package.    (line 110)
-* CL-FORMS:VALIDATE-FORM <1>:            CL-FORMS package.    (line 110)
-* CL-FORMS:WITH-FORM:                    CL-FORMS package.    (line  33)
-* CL-FORMS:WITH-FORM <1>:                CL-FORMS package.    (line  33)
-* CL-FORMS:WITH-FORM-FIELD-VALUES:       CL-FORMS package.    (line  47)
-* CL-FORMS:WITH-FORM-FIELD-VALUES <1>:   CL-FORMS package.    (line  47)
-* CL-FORMS:WITH-FORM-FIELDS:             CL-FORMS package.    (line  42)
-* CL-FORMS:WITH-FORM-FIELDS <1>:         CL-FORMS package.    (line  42)
-* CL-FORMS:WITH-FORM-RENDERER:           CL-FORMS package.    (line  23)
-* CL-FORMS:WITH-FORM-RENDERER <1>:       CL-FORMS package.    (line  23)
-* CL-FORMS:WITH-FORM-TEMPLATE:           CL-FORMS package.    (line  44)
-* CL-FORMS:WITH-FORM-TEMPLATE <1>:       CL-FORMS package.    (line  44)
-* CL-FORMS:WITH-FORM-THEME:              CL-FORMS package.    (line  28)
-* CL-FORMS:WITH-FORM-THEME <1>:          CL-FORMS package.    (line  28)
+                                                              (line 178)
+* CL-FORMS:GET-FIELD:                    CL-FORMS package.    (line 114)
+* CL-FORMS:GET-FIELD <1>:                CL-FORMS package.    (line 114)
+* CL-FORMS:GET-FIELD-VALUE:              CL-FORMS package.    (line 164)
+* CL-FORMS:GET-FIELD-VALUE <1>:          CL-FORMS package.    (line 164)
+* CL-FORMS:GET-FORM:                     CL-FORMS package.    (line 105)
+* CL-FORMS:GET-FORM <1>:                 CL-FORMS package.    (line 105)
+* CL-FORMS:HANDLE-REQUEST:               CL-FORMS package.    (line 116)
+* CL-FORMS:HANDLE-REQUEST <1>:           CL-FORMS package.    (line 116)
+* CL-FORMS:MAKE-FORMATTER:               CL-FORMS package.    (line 153)
+* CL-FORMS:MAKE-FORMATTER <1>:           CL-FORMS package.    (line 153)
+* CL-FORMS:REMOVE-FIELD:                 CL-FORMS package.    (line 162)
+* CL-FORMS:REMOVE-FIELD <1>:             CL-FORMS package.    (line 162)
+* CL-FORMS:RENDER-FIELD:                 CL-FORMS package.    (line 169)
+* CL-FORMS:RENDER-FIELD <1>:             CL-FORMS package.    (line 169)
+* CL-FORMS:RENDER-FIELD-ERRORS:          CL-FORMS package.    (line 123)
+* CL-FORMS:RENDER-FIELD-ERRORS <1>:      CL-FORMS package.    (line 123)
+* CL-FORMS:RENDER-FIELD-LABEL:           CL-FORMS package.    (line 157)
+* CL-FORMS:RENDER-FIELD-LABEL <1>:       CL-FORMS package.    (line 157)
+* CL-FORMS:RENDER-FIELD-WIDGET:          CL-FORMS package.    (line 139)
+* CL-FORMS:RENDER-FIELD-WIDGET <1>:      CL-FORMS package.    (line 139)
+* CL-FORMS:RENDER-FORM:                  CL-FORMS package.    (line 126)
+* CL-FORMS:RENDER-FORM <1>:              CL-FORMS package.    (line 126)
+* CL-FORMS:RENDER-FORM-END:              CL-FORMS package.    (line 181)
+* CL-FORMS:RENDER-FORM-END <1>:          CL-FORMS package.    (line 181)
+* CL-FORMS:RENDER-FORM-ERRORS:           CL-FORMS package.    (line 136)
+* CL-FORMS:RENDER-FORM-ERRORS <1>:       CL-FORMS package.    (line 136)
+* CL-FORMS:RENDER-FORM-START:            CL-FORMS package.    (line 128)
+* CL-FORMS:RENDER-FORM-START <1>:        CL-FORMS package.    (line 128)
+* CL-FORMS:SET-FIELD-VALUE:              CL-FORMS package.    (line 176)
+* CL-FORMS:SET-FIELD-VALUE <1>:          CL-FORMS package.    (line 176)
+* CL-FORMS:VALIDATE-FORM:                CL-FORMS package.    (line 146)
+* CL-FORMS:VALIDATE-FORM <1>:            CL-FORMS package.    (line 146)
+* CL-FORMS:WITH-FORM:                    CL-FORMS package.    (line  42)
+* CL-FORMS:WITH-FORM <1>:                CL-FORMS package.    (line  42)
+* CL-FORMS:WITH-FORM-FIELD-VALUES:       CL-FORMS package.    (line  77)
+* CL-FORMS:WITH-FORM-FIELD-VALUES <1>:   CL-FORMS package.    (line  77)
+* CL-FORMS:WITH-FORM-FIELDS:             CL-FORMS package.    (line  67)
+* CL-FORMS:WITH-FORM-FIELDS <1>:         CL-FORMS package.    (line  67)
+* CL-FORMS:WITH-FORM-RENDERER:           CL-FORMS package.    (line  34)
+* CL-FORMS:WITH-FORM-RENDERER <1>:       CL-FORMS package.    (line  34)
+* CL-FORMS:WITH-FORM-TEMPLATE:           CL-FORMS package.    (line  74)
+* CL-FORMS:WITH-FORM-TEMPLATE <1>:       CL-FORMS package.    (line  74)
+* CL-FORMS:WITH-FORM-THEME:              CL-FORMS package.    (line  38)
+* CL-FORMS:WITH-FORM-THEME <1>:          CL-FORMS package.    (line  38)
 
 
 
@@ -548,47 +583,47 @@ Node: API2890
 Ref: api2976
 Node: CL-FORMS package3007
 Ref: CL-FORMS:*BASE64-ENCODE* variable3195
-Ref: CL-FORMS:DEFFORM-BUILDER macro3285
-Ref: CL-FORMS:WITH-FORM-RENDERER macro3350
-Ref: CL-FORMS:WITH-FORM-THEME macro3533
-Ref: CL-FORMS:WITH-FORM macro3711
-Ref: CL-FORMS:DEFFORM macro3859
-Ref: CL-FORMS:WITH-FORM-FIELDS macro3945
-Ref: CL-FORMS:WITH-FORM-TEMPLATE macro4008
-Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro4107
-Ref: CL-FORMS:FIELD-FORMATTER function4213
-Ref: CL-FORMS:FIELD-PARSER function4278
-Ref: CL-FORMS:FIELD-VALID-P function4340
-Ref: CL-FORMS:FIELD-READER function4426
-Ref: CL-FORMS:FIELD-WRITER function4479
-Ref: CL-FORMS:FORMAT-FIELD-VALUE function4532
-Ref: CL-FORMS:FIELD-VALUE function4635
-Ref: CL-FORMS:FIELD-ACCESSOR function4687
-Ref: CL-FORMS:FORM-ERRORS function4751
-Ref: CL-FORMS:GET-FORM function4833
-Ref: CL-FORMS:GET-FIELD function4884
-Ref: CL-FORMS:HANDLE-REQUEST function4958
-Ref: CL-FORMS:RENDER-FIELD-ERRORS function5286
-Ref: CL-FORMS:RENDER-FORM function5383
-Ref: CL-FORMS:RENDER-FORM-START function5456
-Ref: CL-FORMS:ADD-FORM-ERROR function5545
-Ref: CL-FORMS:RENDER-FORM-ERRORS function5664
-Ref: CL-FORMS:RENDER-FIELD-WIDGET function5754
-Ref: CL-FORMS:FILL-FORM-FROM-MODEL function5851
-Ref: CL-FORMS:VALIDATE-FORM function5940
-Ref: CL-FORMS:MAKE-FORMATTER function6322
-Ref: CL-FORMS:RENDER-FIELD-LABEL function6435
-Ref: CL-FORMS:ADD-FIELD function6531
-Ref: CL-FORMS:REMOVE-FIELD function6578
-Ref: CL-FORMS:GET-FIELD-VALUE function6628
-Ref: CL-FORMS:FORM-VALID-P function6718
-Ref: CL-FORMS:RENDER-FIELD function6762
-Ref: CL-FORMS:FILL-MODEL-FROM-FORM function6852
-Ref: CL-FORMS:SET-FIELD-VALUE function6960
-Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function7024
-Ref: CL-FORMS:RENDER-FORM-END function7149
-Ref: CL-FORMS:FORM class7232
-Ref: CL-FORMS:FORM-FIELD class9606
-Node: Index13376
+Ref: CL-FORMS:DEFFORM-BUILDER macro3286
+Ref: CL-FORMS:WITH-FORM-RENDERER macro3676
+Ref: CL-FORMS:WITH-FORM-THEME macro3812
+Ref: CL-FORMS:WITH-FORM macro3946
+Ref: CL-FORMS:DEFFORM macro4056
+Ref: CL-FORMS:WITH-FORM-FIELDS macro5099
+Ref: CL-FORMS:WITH-FORM-TEMPLATE macro5342
+Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro5441
+Ref: CL-FORMS:FIELD-FORMATTER function5547
+Ref: CL-FORMS:FIELD-PARSER function5612
+Ref: CL-FORMS:FIELD-VALID-P function5674
+Ref: CL-FORMS:FIELD-READER function5760
+Ref: CL-FORMS:FIELD-WRITER function5813
+Ref: CL-FORMS:FORMAT-FIELD-VALUE function5866
+Ref: CL-FORMS:FIELD-VALUE function5969
+Ref: CL-FORMS:FIELD-ACCESSOR function6021
+Ref: CL-FORMS:FORM-ERRORS function6085
+Ref: CL-FORMS:GET-FORM function6167
+Ref: CL-FORMS:GET-FIELD function6369
+Ref: CL-FORMS:HANDLE-REQUEST function6443
+Ref: CL-FORMS:RENDER-FIELD-ERRORS function6726
+Ref: CL-FORMS:RENDER-FORM function6823
+Ref: CL-FORMS:RENDER-FORM-START function6896
+Ref: CL-FORMS:ADD-FORM-ERROR function6985
+Ref: CL-FORMS:RENDER-FORM-ERRORS function7104
+Ref: CL-FORMS:RENDER-FIELD-WIDGET function7194
+Ref: CL-FORMS:FILL-FORM-FROM-MODEL function7291
+Ref: CL-FORMS:VALIDATE-FORM function7380
+Ref: CL-FORMS:MAKE-FORMATTER function7718
+Ref: CL-FORMS:RENDER-FIELD-LABEL function7831
+Ref: CL-FORMS:ADD-FIELD function7927
+Ref: CL-FORMS:REMOVE-FIELD function7974
+Ref: CL-FORMS:GET-FIELD-VALUE function8024
+Ref: CL-FORMS:FORM-VALID-P function8114
+Ref: CL-FORMS:RENDER-FIELD function8158
+Ref: CL-FORMS:FILL-MODEL-FROM-FORM function8248
+Ref: CL-FORMS:SET-FIELD-VALUE function8356
+Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function8420
+Ref: CL-FORMS:RENDER-FORM-END function8545
+Ref: CL-FORMS:FORM class8628
+Ref: CL-FORMS:FORM-FIELD class11002
+Node: Index14780
 
 End Tag Table

@@ -221,47 +221,82 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="CL_002dFORMS_003a_002aBASE64_002dENCODE_002a-variable"></span><dl>
 <dt id="index-_002aBASE64_002dENCODE_002a">CL-FORMS: <strong>*BASE64-ENCODE*</strong></dt>
 <dd>
-<p>If , encode form parameters in base64
+<p>If T, encode form parameters in base64
 </p></dd></dl>
 
 <span id="Macros"></span><h4 class="subheading">Macros</h4>
 <span id="index-CL_002dFORMS_003aDEFFORM_002dBUILDER"></span>
 <span id="CL_002dFORMS_003aDEFFORM_002dBUILDER-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aDEFFORM_002dBUILDER-1">Macro: <strong>CL-FORMS:DEFFORM-BUILDER</strong> <em>(form-name args &amp;body body)</em></dt>
-</dl>
+<dd>
+<p>Registers a function with arguments ARGS and body BODY as a form builder.
+</p>
+<p>BODY is expected to instantiate a FORM object using ARGS in some way.
+</p>
+<p>FORM-NAME is the symbol under which the FORM is registered.
+</p>
+<p>Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-1">Macro: <strong>CL-FORMS:WITH-FORM-RENDERER</strong> <em>(renderer &amp;body body)</em></dt>
 <dd>
-<p>Bind &lsquo;*FORM-RENDERER*&rsquo; to <var>RENDERER</var> and evaluate <var>BODY</var> in that context.
+<p>Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTHEME"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dTHEME-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dTHEME-1">Macro: <strong>CL-FORMS:WITH-FORM-THEME</strong> <em>(form-theme &amp;body body)</em></dt>
 <dd>
-<p>Bind &lsquo;*FORM-THEME*&rsquo; to <var>FORM-THEME</var> and evaluate <var>BODY</var> in that context.
+<p>Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM-1">Macro: <strong>CL-FORMS:WITH-FORM</strong> <em>(form &amp;body body)</em></dt>
 <dd>
-<p>Bind &lsquo;*FORM*&rsquo; to <var>FORM</var> and evaluate <var>BODY</var> in that context.
+<p>Bind *FORM* to FORM and evaluate BODY in that context.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aDEFFORM"></span>
 <span id="CL_002dFORMS_003aDEFFORM-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aDEFFORM-1">Macro: <strong>CL-FORMS:DEFFORM</strong> <em>(form-name args fields)</em></dt>
 <dd>
-<p>Define a form at top-level
-</p></dd></dl>
+<p>Define a form at top-level.
+</p>
+<p>ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
+FIELDS are the form field specs.
+</p>
+<div class="example">
+<pre class="example">(forms:defform client-validated-form (:action &quot;/client-validation-post&quot;
+                                              :client-validation t)
+  ((name :string :value &quot;&quot; :constraints (list (clavier:is-a-string)
+                                              (clavier:not-blank)
+                                              (clavier:len :max 5))
+         :validation-triggers '(:focusin))
+   (single :boolean :value t)
+   (sex :choice :choices (list &quot;Male&quot; &quot;Female&quot;) :value &quot;Male&quot;)
+   (age :integer :constraints (list (clavier:is-an-integer)
+                                    (clavier:greater-than -1)
+                                    (clavier:less-than 200)))
+   (email :email)
+   (submit :submit :label &quot;Create&quot;)))
+</pre></div>
+
+</dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELDS"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dFIELDS-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELDS-1">Macro: <strong>CL-FORMS:WITH-FORM-FIELDS</strong> <em>(fields form &amp;body body)</em></dt>
-</dl>
+<dd>
+<p>Bind FIELDS to the form fields in FORM under BODY.
+</p>
+<div class="example">
+<pre class="example">(with-form-field-values (name single sex age email) form
+   (print (list name single sex age email)))
+</pre></div>
+</dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-macro"></span><dl>
@@ -323,7 +358,13 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="index-CL_002dFORMS_003aGET_002dFORM"></span>
 <span id="CL_002dFORMS_003aGET_002dFORM-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aGET_002dFORM-1">Function: <strong>CL-FORMS:GET-FORM</strong> <em>(name &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Get the form named NAME.
+</p>
+<p>ARGS is the list of arguments to pass to a possible form builder function.
+</p>
+<p>See: DEFFORM-BUILDER macro.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aGET_002dFIELD"></span>
 <span id="CL_002dFORMS_003aGET_002dFIELD-function"></span><dl>
@@ -334,7 +375,7 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="CL_002dFORMS_003aHANDLE_002dREQUEST-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aHANDLE_002dREQUEST-1">Function: <strong>CL-FORMS:HANDLE-REQUEST</strong> <em>(&amp;optional (form *form*) (request hunchentoot:*request*))</em></dt>
 <dd>
-<p>Populates <var>FORM</var> from parameters in HTTP <var>request</var>. After this, the <var>form</var> field contains values, but they are not validated. To validate call <a href="#CL_002dFORMS_003aVALIDATE_002dFORM-function">VALIDATE-FORM</a> after.
+<p>Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS"></span>
@@ -356,7 +397,7 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="CL_002dFORMS_003aADD_002dFORM_002dERROR-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aADD_002dFORM_002dERROR-1">Function: <strong>CL-FORMS:ADD-FORM-ERROR</strong> <em>(field error-msg &amp;optional (form *form*))</em></dt>
 <dd>
-<p>Add an error on <var>FIELD</var>
+<p>Add an error on FIELD
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dERRORS"></span>
@@ -373,14 +414,14 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="CL_002dFORMS_003aFILL_002dFORM_002dFROM_002dMODEL-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aFILL_002dFORM_002dFROM_002dMODEL-1">Function: <strong>CL-FORMS:FILL-FORM-FROM-MODEL</strong> <em>(form model)</em></dt>
 <dd>
-<p>Fill a <var>FORM</var> from a <var>MODEL</var>
+<p>Fill a FORM from a MODEL
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aVALIDATE_002dFORM"></span>
 <span id="CL_002dFORMS_003aVALIDATE_002dFORM-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aVALIDATE_002dFORM-1">Function: <strong>CL-FORMS:VALIDATE-FORM</strong> <em>(&amp;optional (form *form*))</em></dt>
 <dd>
-<p>Validates a <var>form</var>. Usually called after <a href="#CL_002dFORMS_003aHANDLE_002dREQUEST-function">HANDLE-REQUEST</a>. Returns multiple values; first value is true if the <var>form</var> is valid; second value a list of errors.<br>
+<p>Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
 The list of errors is an association list with elements (&lt;field&gt; . &lt;field errors strings list&gt;).
 </p></dd></dl>
 
@@ -388,7 +429,7 @@ The list of errors is an association list with elements (&lt;field&gt; . &lt;fie
 <span id="CL_002dFORMS_003aMAKE_002dFORMATTER-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aMAKE_002dFORMATTER-1">Function: <strong>CL-FORMS:MAKE-FORMATTER</strong> <em>(symbol)</em></dt>
 <dd>
-<p>Create a field formatter. <var>SYMBOL</var> is the function to call.
+<p>Create a field formatter. SYMBOL is the function to call.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL"></span>
@@ -425,7 +466,7 @@ The list of errors is an association list with elements (&lt;field&gt; . &lt;fie
 <span id="CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-1">Function: <strong>CL-FORMS:FILL-MODEL-FROM-FORM</strong> <em>(form model)</em></dt>
 <dd>
-<p>Set a <var>MODEL</var>&rsquo;s values from <var>FORM</var> field values
+<p>Set a MODEL&rsquo;s values from FORM field values
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aSET_002dFIELD_002dVALUE"></span>
@@ -510,7 +551,7 @@ The list of errors is an association list with elements (&lt;field&gt; . &lt;fie
 
 <p>The field formatter. The function takes two arguments, a VALUE and STREAM to format it into.</p></li><li> <code>constraints</code> &mdash; initarg: <code>:constraints<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-constraints</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-constraints)</span><!-- /@w --></code>
 
-<p>The field constraints</p></li><li> <code>required</code> &mdash; initarg: <code><span class="nolinebreak">:required-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-p)</span><!-- /@w --></code>
+<p>A list of CLAVIER validators.</p></li><li> <code>required</code> &mdash; initarg: <code><span class="nolinebreak">:required-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-p)</span><!-- /@w --></code>
 
 <p>Whether the field is required</p></li><li> <code>required-message</code> &mdash; initarg: <code><span class="nolinebreak">:required-message</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-message</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-message)</span><!-- /@w --></code>
 
