@@ -1,10 +1,12 @@
 (in-package #:cl-forms)
 
-(defvar *form-renderer* nil)
-(defvar *default-form-renderer* :who)
+(defvar *form-renderer* nil "The current form renderer.")
+(defvar *default-form-renderer* :who
+  "The default form renderer.")
 (defvar *form* nil "The current form")
 (defvar *base64-encode* nil "If T, encode form parameters in base64")
-(defvar *field-required-message* nil)
+(defvar *field-required-message* nil
+  "The default message to displayed when a field is required.")
 
 (defun check-duplicate-fields (fields)
   (when (not (equal
@@ -19,6 +21,7 @@
     (funcall function)))
 
 (defmacro with-form-renderer (renderer &body body)
+  "Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context."
   `(call-with-form-renderer ,renderer (lambda () ,@body)))
 
 (defun call-with-form-theme (form-theme function)
@@ -29,6 +32,7 @@
       (funcall function))))
 
 (defmacro with-form-theme (form-theme &body body)
+  "Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context."
   `(call-with-form-theme ,form-theme (lambda () ,@body)))
 
 (defun call-with-form (form function)
@@ -36,6 +40,7 @@
     (funcall function)))
 
 (defmacro with-form (form &body body)
+  "Bind *FORM* to FORM and evaluate BODY in that context."
   `(call-with-form ,form (lambda () ,@body)))
 
 (defmacro defform (form-name args fields)
