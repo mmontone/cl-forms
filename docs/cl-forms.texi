@@ -15,11 +15,11 @@ Copyright @copyright{} 2021 Mariano Montone
 
 @dircategory Common Lisp
 @direntry
-* Cl-Forms: (cl-forms)Common Lisp client for ODATA services.
+* cl-forms: (cl-forms) Common Lisp web forms handling library.
 @end direntry
 
 @titlepage
-@title Common Lisp ODATA Client
+@title CL-FORMS
 
 @author Mariano Montone ( @email{marianomontone@@gmail.com} )
 @page
@@ -32,8 +32,6 @@ Copyright @copyright{} 2021 Mariano Montone
 @node Top
 @top Top
 @cindex cl-forms
-
-@emph{CL-FORMS} is a Common Lisp client for accessing ODATA services.
 
 @menu
 * Intro::
