@@ -536,6 +536,12 @@ Variables
 Macros
 ------
 
+ -- Macro: CL-FORMS:WITH-FORM-FIELD-VALUES (fields form &body body)
+
+ -- Macro: CL-FORMS:WITH-FORM (form &body body)
+
+     Bind *FORM* to FORM and evaluate BODY in that context.
+
  -- Macro: CL-FORMS:DEFFORM-BUILDER (form-name args &body body)
 
      Registers a function with arguments ARGS and body BODY as a form
@@ -549,17 +555,23 @@ Macros
      Use GET-FORM with FORM-NAME and expected arguments to obtain the
      registered form.
 
- -- Macro: CL-FORMS:WITH-FORM-RENDERER (renderer &body body)
-
-     Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
-
  -- Macro: CL-FORMS:WITH-FORM-THEME (form-theme &body body)
 
      Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
 
- -- Macro: CL-FORMS:WITH-FORM (form &body body)
+ -- Macro: CL-FORMS:WITH-FORM-FIELDS (fields form &body body)
 
-     Bind *FORM* to FORM and evaluate BODY in that context.
+     Bind FIELDS to the form fields in FORM under BODY.
+
+          (with-form-field-values (name single sex age email) form
+             (print (list name single sex age email)))
+
+ -- Macro: CL-FORMS:WITH-FORM-TEMPLATE ((&optional form-var) form-name
+          args &body body)
+
+ -- Macro: CL-FORMS:WITH-FORM-RENDERER (renderer &body body)
+
+     Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
 
  -- Macro: CL-FORMS:DEFFORM (form-name args fields)
 
@@ -582,43 +594,69 @@ Macros
              (email :email)
              (submit :submit :label "Create")))
 
- -- Macro: CL-FORMS:WITH-FORM-FIELDS (fields form &body body)
-
-     Bind FIELDS to the form fields in FORM under BODY.
-
-          (with-form-field-values (name single sex age email) form
-             (print (list name single sex age email)))
-
- -- Macro: CL-FORMS:WITH-FORM-TEMPLATE ((&optional form-var) form-name
-          args &body body)
-
- -- Macro: CL-FORMS:WITH-FORM-FIELD-VALUES (fields form &body body)
-
 Generic functions
 -----------------
 
- -- Generic-Function: CL-FORMS:FIELD-FORMATTER (sb-pcl::object)
+ -- Generic-Function: CL-FORMS:FIELD-ACCESSOR (sb-pcl::object)
 
- -- Generic-Function: CL-FORMS:FIELD-PARSER (sb-pcl::object)
-
- -- Generic-Function: CL-FORMS:FIELD-VALID-P (form-field &optional
-          (form))
+ -- Generic-Function: CL-FORMS:FIELD-WRITER (field)
 
  -- Generic-Function: CL-FORMS:FIELD-READER (field)
 
- -- Generic-Function: CL-FORMS:FIELD-WRITER (field)
+ -- Generic-Function: CL-FORMS:FIELD-PARSER (sb-pcl::object)
+
+ -- Generic-Function: CL-FORMS:FORM-ERRORS (sb-pcl::object)
 
  -- Generic-Function: CL-FORMS:FORMAT-FIELD-VALUE (form-field
           field-value &optional stream)
 
+ -- Generic-Function: CL-FORMS:FIELD-FORMATTER (sb-pcl::object)
+
  -- Generic-Function: CL-FORMS:FIELD-VALUE (field)
 
- -- Generic-Function: CL-FORMS:FIELD-ACCESSOR (sb-pcl::object)
-
- -- Generic-Function: CL-FORMS:FORM-ERRORS (sb-pcl::object)
+ -- Generic-Function: CL-FORMS:FIELD-VALID-P (form-field &optional
+          (form))
 
 Functions
 ---------
+
+ -- Function: CL-FORMS:RENDER-FORM (&optional (form *form*) &rest args)
+
+ -- Function: CL-FORMS:FILL-FORM-FROM-MODEL (form model)
+
+     Fill a FORM from a MODEL
+
+ -- Function: CL-FORMS:RENDER-FIELD (field &optional (form *form*) &rest
+          args)
+
+ -- Function: CL-FORMS:REMOVE-FIELD (form field)
+
+ -- Function: CL-FORMS:FORM-VALID-P (form)
+
+ -- Function: CL-FORMS:GET-FIELD (form field-name &optional (error-p t))
+
+ -- Function: CL-FORMS:GET-FIELD-VALUE (form field-name &optional
+          (error-p t))
+
+ -- Function: CL-FORMS:RENDER-FORM-END (&optional (form *form*))
+
+ -- Function: CL-FORMS:HANDLE-REQUEST (&optional (form *form*) (request
+          hunchentoot:*request*))
+
+     Populates FORM from parameters in HTTP request.  After this, the
+     form field contains values, but they are not validated.  To
+     validate call VALIDATE-FORM after.
+
+ -- Function: CL-FORMS:FILL-MODEL-FROM-FORM (form model)
+
+     Set a MODEL's values from FORM field values
+
+ -- Function: CL-FORMS:MAKE-FORMATTER (symbol)
+
+     Create a field formatter.  SYMBOL is the function to call.
+
+ -- Function: CL-FORMS:RENDER-FIELD-LABEL (field &optional (form *form*)
+          &rest args)
 
  -- Function: CL-FORMS:GET-FORM (name &rest args)
 
@@ -629,22 +667,26 @@ Functions
 
      See: DEFFORM-BUILDER macro.
 
- -- Function: CL-FORMS:GET-FIELD (form field-name &optional (error-p t))
-
- -- Function: CL-FORMS:HANDLE-REQUEST (&optional (form *form*) (request
-          hunchentoot:*request*))
-
-     Populates FORM from parameters in HTTP request.  After this, the
-     form field contains values, but they are not validated.  To
-     validate call VALIDATE-FORM after.
+ -- Function: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING (form-field
+          &optional (field-value (field-value form-field)))
 
  -- Function: CL-FORMS:RENDER-FIELD-ERRORS (field &optional (form
           *form*) &rest args)
 
- -- Function: CL-FORMS:RENDER-FORM (&optional (form *form*) &rest args)
+ -- Function: CL-FORMS:SET-FIELD-VALUE (form field-name value)
+
+ -- Function: CL-FORMS:VALIDATE-FORM (&optional (form *form*))
+
+     Validates a form.  Usually called after HANDLE-REQUEST. Returns
+     multiple values; first value is true if the form is valid; second
+     value a list of errors.  The list of errors is an association list
+     with elements (<field> .  <field errors strings list>).
 
  -- Function: CL-FORMS:RENDER-FORM-START (&optional (form *form*) &rest
           args)
+
+ -- Function: CL-FORMS:RENDER-FIELD-WIDGET (field &optional (form
+          *form*) &rest args)
 
  -- Function: CL-FORMS:ADD-FORM-ERROR (field error-msg &optional (form
           *form*))
@@ -654,119 +696,150 @@ Functions
  -- Function: CL-FORMS:RENDER-FORM-ERRORS (&optional (form *form*) &rest
           args)
 
- -- Function: CL-FORMS:RENDER-FIELD-WIDGET (field &optional (form
-          *form*) &rest args)
-
- -- Function: CL-FORMS:FILL-FORM-FROM-MODEL (form model)
-
-     Fill a FORM from a MODEL
-
- -- Function: CL-FORMS:VALIDATE-FORM (&optional (form *form*))
-
-     Validates a form.  Usually called after HANDLE-REQUEST. Returns
-     multiple values; first value is true if the form is valid; second
-     value a list of errors.  The list of errors is an association list
-     with elements (<field> .  <field errors strings list>).
-
- -- Function: CL-FORMS:MAKE-FORMATTER (symbol)
-
-     Create a field formatter.  SYMBOL is the function to call.
-
- -- Function: CL-FORMS:RENDER-FIELD-LABEL (field &optional (form *form*)
-          &rest args)
-
  -- Function: CL-FORMS:ADD-FIELD (form field)
-
- -- Function: CL-FORMS:REMOVE-FIELD (form field)
-
- -- Function: CL-FORMS:GET-FIELD-VALUE (form field-name &optional
-          (error-p t))
-
- -- Function: CL-FORMS:FORM-VALID-P (form)
-
- -- Function: CL-FORMS:RENDER-FIELD (field &optional (form *form*) &rest
-          args)
-
- -- Function: CL-FORMS:FILL-MODEL-FROM-FORM (form model)
-
-     Set a MODEL's values from FORM field values
-
- -- Function: CL-FORMS:SET-FIELD-VALUE (form field-name value)
-
- -- Function: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING (form-field
-          &optional (field-value (field-value form-field)))
-
- -- Function: CL-FORMS:RENDER-FORM-END (&optional (form *form*))
 
 Classes
 -------
 
- -- Class: CL-FORMS:FORM
+ -- Class: CL-FORMS:INTEGER-FORM-FIELD
 
-     A form
+     An integer input field
 
-     Class precedence list: 'form, standard-object, t'
+     Class precedence list: 'integer-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:SUBFORM-FORM-FIELD
+
+     A field that contains a form (subform)
+
+     Class precedence list: 'subform-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:URL-FORM-FIELD
+
+     An url input field
+
+     Class precedence list: 'url-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:DATETIME-FORM-FIELD
+
+     A date input field
+
+     Class precedence list: 'datetime-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:PASSWORD-FORM-FIELD
+
+     A password input field
+
+     Class precedence list: 'password-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:EMAIL-FORM-FIELD
+
+     A string input field
+
+     Class precedence list: 'email-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:CHOICE-FORM-FIELD
+
+     A multi-purpose field used to allow the user to "choose" one or
+     more options.  It can be rendered as a select tag, radio buttons,
+     or checkboxes.  NOTE: the defaults of this field type are too
+     complicated for just working with string choices.
+     STRING-CHOICE-FIELD is more convenient for that.
+
+     Class precedence list: 'choice-form-field, form-field,
+     standard-object, t'
 
      Slots:
-        * 'id' -- initarg: ':id'; reader: 'cl-forms::form-id'; writer:
-          '(setf cl-forms::form-id)'
+        * 'choices' -- initarg: ':choices'; writer:
+          '(setf cl-forms::field-choices)'
 
-          The form id
-        * 'name' -- initarg: ':name'; reader: 'cl-forms::form-name';
-          writer: '(setf cl-forms::form-name)'
+          An alist with the choices.  Or a function with which to obtain
+          the choices.
+        * 'preferred-choices' -- initarg: ':preferred-choices'; reader:
+          'cl-forms::field-preferred-choices'; writer:
+          '(setf cl-forms::field-preferred-choices)'
 
-          The form name
-        * 'action' -- initarg: ':action'; reader:
-          'cl-forms::form-action'; writer:
-          '(setf cl-forms::form-action)'
+          If this option is specified, then a sub-set of all of the
+          options will be moved to the top of the select menu.
+        * 'expanded' -- initarg: ':expanded'; reader:
+          'cl-forms::field-expanded'; writer:
+          '(setf cl-forms::field-expanded)'
 
-          The form action
-        * 'method' -- initarg: ':method'; reader:
-          'cl-forms::form-method'; writer:
-          '(setf cl-forms::form-method)'
+          If set to true, radio buttons or checkboxes will be rendered
+          (depending on the multiple value).  If false, a select element
+          will be rendered.
+        * 'multiple' -- initarg: ':multiple'; reader:
+          'cl-forms::field-multiple'; writer:
+          '(setf cl-forms::field-multiple)'
 
-          The form method
-        * 'enctype' -- initarg: ':enctype'; reader:
-          'cl-forms::form-enctype'; writer:
-          '(setf cl-forms::form-enctype)'
+          If true, the user will be able to select multiple options (as
+          opposed to choosing just one option).  Depending on the value
+          of the expanded option, this will render either a select tag
+          or checkboxes if true and a select tag or radio buttons if
+          false.
+        * 'key-reader' -- initarg: ':key-reader'; reader:
+          'cl-forms::field-key-reader'; writer:
+          '(setf cl-forms::field-key-reader)'
 
-          Form encoding type.  i.e.  Use multipart/form-data for file
-          uploads
-        * 'fields' -- initarg: ':fields'; reader:
-          'cl-forms::form-fields'; writer:
-          '(setf cl-forms::form-fields)'
+          Function to read the option key from the request
+        * 'hash-function' -- initarg: ':hash-function'; reader:
+          'cl-forms::field-hash-function'; writer:
+          '(setf cl-forms::field-hash-function)'
 
-          Form fields
-        * 'model' -- initarg: ':model'; reader: 'cl-forms::form-model';
-          writer: '(setf cl-forms::form-model)'
+          The function to use for choices key
+        * 'test' -- initarg: ':test'; reader: 'cl-forms::field-test';
+          writer: '(setf cl-forms::field-test)'
 
-          The form model object
-        * 'csrf-protection' -- initarg: ':csrf-protection'; reader:
-          'cl-forms::form-csrf-protection-p'; writer:
-          '(setf cl-forms::form-csrf-protection-p)'
+          Function to test equality between choices
+        * 'use-key-as-value' -- initarg: ':use-key-as-value'; reader:
+          'cl-forms::use-key-as-value'; writer:
+          '(setf cl-forms::use-key-as-value)'
 
-          T when csrf protection is enabled
-        * 'csrf-field-name' -- initarg: ':csrf-field-name'; reader:
-          'cl-forms::form-csrf-field-name'; writer:
-          '(setf cl-forms::form-csrf-field-name)'
+          When T, use the key/s of the field as value of the field when
+          it is read from request
 
-          csrf field name
-        * 'errors' -- reader: 'cl-forms:form-errors'; writer:
-          '(setf cl-forms:form-errors)'
+ -- Class: CL-FORMS:FILE-FORM-FIELD
 
-          Form errors after validation.  An association list with
-          elements (<field> .  <field errors strings list>).
-        * 'display-errors' -- initarg: ':display-errors'; reader:
-          'cl-forms::display-errors'; writer:
-          '(setf cl-forms::display-errors)'
+     A file input field
 
-          A list containing the places where to display errors.  Valid
-          options are :list and :inline
-        * 'client-validation' -- initarg: ':client-validation'; reader:
-          'cl-forms::client-validation'; writer:
-          '(setf cl-forms::client-validation)'
+     Class precedence list: 'file-form-field, form-field,
+     standard-object, t'
 
-          When T, form client validation is enabled
+     Slots:
+        * 'multiple' -- initarg: ':multiple-p'; reader:
+          'cl-forms::multiple-p'; writer: '(setf cl-forms::multiple-p)'
+
+          If this fields handles multiple file uploads
+        * 'upload-handler' -- initarg: ':upload-handler'; reader:
+          'cl-forms::upload-handler'; writer:
+          '(setf cl-forms::upload-handler)'
+
+          Function that handles the file upload
+        * 'accept' -- initarg: ':accept'; reader:
+          'cl-forms::file-accept'; writer:
+          '(setf cl-forms::file-accept)'
+
+          Files accepted.  See
+          https://www.w3schools.com/tags/att_input_accept.asp
+
+ -- Class: CL-FORMS:BOOLEAN-FORM-FIELD
+
+     A boolean input
+
+     Class precedence list: 'boolean-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:DATE-FORM-FIELD
+
+     A date input field
+
+     Class precedence list: 'date-form-field, form-field,
+     standard-object, t'
 
  -- Class: CL-FORMS:FORM-FIELD
 
@@ -869,6 +942,132 @@ Classes
 
           The form the field belongs to
 
+ -- Class: CL-FORMS:SUBMIT-FORM-FIELD
+
+     A submit input button
+
+     Class precedence list: 'submit-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:HIDDEN-FORM-FIELD
+
+     A hidden form field
+
+     Class precedence list: 'hidden-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:STRING-FORM-FIELD
+
+     A string input field
+
+     Class precedence list: 'string-form-field, form-field,
+     standard-object, t'
+
+ -- Class: CL-FORMS:LIST-FORM-FIELD
+
+     A field that contains a list of elements (either other fields or
+     subforms)
+
+     Class precedence list: 'list-form-field, form-field,
+     standard-object, t'
+
+     Slots:
+        * 'type' -- initarg: ':type'; reader:
+          'cl-forms::list-field-type'; writer:
+          '(setf cl-forms::list-field-type)'
+
+          The list elements type.
+        * 'empty-item-predicate' -- initarg: ':empty-item-predicate';
+          reader: 'cl-forms::empty-item-predicate'; writer:
+          '(setf cl-forms::empty-item-predicate)'
+
+          A predicate that tells when a list item is considered empty,
+          and so it is removed from the list
+        * 'add-button' -- initarg: ':add-button'; reader:
+          'cl-forms::add-button-p'; writer:
+          '(setf cl-forms::add-button-p)'
+
+          Whether have a list 'ADD' button or not
+        * 'remove-button' -- initarg: ':remove-button'; reader:
+          'cl-forms::remove-button-p'; writer:
+          '(setf cl-forms::remove-button-p)'
+
+          Whether add an item removal button or not
+
+ -- Class: CL-FORMS:FORM
+
+     A form
+
+     Class precedence list: 'form, standard-object, t'
+
+     Slots:
+        * 'id' -- initarg: ':id'; reader: 'cl-forms::form-id'; writer:
+          '(setf cl-forms::form-id)'
+
+          The form id
+        * 'name' -- initarg: ':name'; reader: 'cl-forms::form-name';
+          writer: '(setf cl-forms::form-name)'
+
+          The form name
+        * 'action' -- initarg: ':action'; reader:
+          'cl-forms::form-action'; writer:
+          '(setf cl-forms::form-action)'
+
+          The form action
+        * 'method' -- initarg: ':method'; reader:
+          'cl-forms::form-method'; writer:
+          '(setf cl-forms::form-method)'
+
+          The form method
+        * 'enctype' -- initarg: ':enctype'; reader:
+          'cl-forms::form-enctype'; writer:
+          '(setf cl-forms::form-enctype)'
+
+          Form encoding type.  i.e.  Use multipart/form-data for file
+          uploads
+        * 'fields' -- initarg: ':fields'; reader:
+          'cl-forms::form-fields'; writer:
+          '(setf cl-forms::form-fields)'
+
+          Form fields
+        * 'model' -- initarg: ':model'; reader: 'cl-forms::form-model';
+          writer: '(setf cl-forms::form-model)'
+
+          The form model object
+        * 'csrf-protection' -- initarg: ':csrf-protection'; reader:
+          'cl-forms::form-csrf-protection-p'; writer:
+          '(setf cl-forms::form-csrf-protection-p)'
+
+          T when csrf protection is enabled
+        * 'csrf-field-name' -- initarg: ':csrf-field-name'; reader:
+          'cl-forms::form-csrf-field-name'; writer:
+          '(setf cl-forms::form-csrf-field-name)'
+
+          csrf field name
+        * 'errors' -- reader: 'cl-forms:form-errors'; writer:
+          '(setf cl-forms:form-errors)'
+
+          Form errors after validation.  An association list with
+          elements (<field> .  <field errors strings list>).
+        * 'display-errors' -- initarg: ':display-errors'; reader:
+          'cl-forms::display-errors'; writer:
+          '(setf cl-forms::display-errors)'
+
+          A list containing the places where to display errors.  Valid
+          options are :list and :inline
+        * 'client-validation' -- initarg: ':client-validation'; reader:
+          'cl-forms::client-validation'; writer:
+          '(setf cl-forms::client-validation)'
+
+          When T, form client validation is enabled
+
+ -- Class: CL-FORMS:TEXT-FORM-FIELD
+
+     A text field.  Renders as a text area
+
+     Class precedence list: 'text-form-field, string-form-field,
+     form-field, standard-object, t'
+
 
 File: cl-forms.info,  Node: Index,  Prev: API,  Up: Top
 
@@ -889,85 +1088,85 @@ File: cl-forms.info,  Node: Index,  Prev: API,  Up: Top
  [index ]
 * Menu:
 
-* CL-FORMS:ADD-FIELD:                    CL-FORMS package.    (line 160)
-* CL-FORMS:ADD-FIELD <1>:                CL-FORMS package.    (line 160)
-* CL-FORMS:ADD-FORM-ERROR:               CL-FORMS package.    (line 131)
-* CL-FORMS:ADD-FORM-ERROR <1>:           CL-FORMS package.    (line 131)
-* CL-FORMS:DEFFORM:                      CL-FORMS package.    (line  46)
-* CL-FORMS:DEFFORM <1>:                  CL-FORMS package.    (line  46)
-* CL-FORMS:DEFFORM-BUILDER:              CL-FORMS package.    (line  21)
-* CL-FORMS:DEFFORM-BUILDER <1>:          CL-FORMS package.    (line  21)
-* CL-FORMS:FIELD-ACCESSOR:               CL-FORMS package.    (line  98)
-* CL-FORMS:FIELD-ACCESSOR <1>:           CL-FORMS package.    (line  98)
-* CL-FORMS:FIELD-FORMATTER:              CL-FORMS package.    (line  82)
-* CL-FORMS:FIELD-FORMATTER <1>:          CL-FORMS package.    (line  82)
-* CL-FORMS:FIELD-PARSER:                 CL-FORMS package.    (line  84)
-* CL-FORMS:FIELD-PARSER <1>:             CL-FORMS package.    (line  84)
-* CL-FORMS:FIELD-READER:                 CL-FORMS package.    (line  89)
-* CL-FORMS:FIELD-READER <1>:             CL-FORMS package.    (line  89)
-* CL-FORMS:FIELD-VALID-P:                CL-FORMS package.    (line  86)
-* CL-FORMS:FIELD-VALID-P <1>:            CL-FORMS package.    (line  86)
-* CL-FORMS:FIELD-VALUE:                  CL-FORMS package.    (line  96)
-* CL-FORMS:FIELD-VALUE <1>:              CL-FORMS package.    (line  96)
-* CL-FORMS:FIELD-WRITER:                 CL-FORMS package.    (line  91)
-* CL-FORMS:FIELD-WRITER <1>:             CL-FORMS package.    (line  91)
-* CL-FORMS:FILL-FORM-FROM-MODEL:         CL-FORMS package.    (line 142)
-* CL-FORMS:FILL-FORM-FROM-MODEL <1>:     CL-FORMS package.    (line 142)
-* CL-FORMS:FILL-MODEL-FROM-FORM:         CL-FORMS package.    (line 172)
-* CL-FORMS:FILL-MODEL-FROM-FORM <1>:     CL-FORMS package.    (line 172)
-* CL-FORMS:FORM-ERRORS:                  CL-FORMS package.    (line 100)
-* CL-FORMS:FORM-ERRORS <1>:              CL-FORMS package.    (line 100)
-* CL-FORMS:FORM-VALID-P:                 CL-FORMS package.    (line 167)
-* CL-FORMS:FORM-VALID-P <1>:             CL-FORMS package.    (line 167)
-* CL-FORMS:FORMAT-FIELD-VALUE:           CL-FORMS package.    (line  93)
-* CL-FORMS:FORMAT-FIELD-VALUE <1>:       CL-FORMS package.    (line  93)
-* CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING: CL-FORMS package.    (line 178)
+* CL-FORMS:ADD-FIELD:                    CL-FORMS package.    (line 181)
+* CL-FORMS:ADD-FIELD <1>:                CL-FORMS package.    (line 181)
+* CL-FORMS:ADD-FORM-ERROR:               CL-FORMS package.    (line 173)
+* CL-FORMS:ADD-FORM-ERROR <1>:           CL-FORMS package.    (line 173)
+* CL-FORMS:DEFFORM:                      CL-FORMS package.    (line  58)
+* CL-FORMS:DEFFORM <1>:                  CL-FORMS package.    (line  58)
+* CL-FORMS:DEFFORM-BUILDER:              CL-FORMS package.    (line  27)
+* CL-FORMS:DEFFORM-BUILDER <1>:          CL-FORMS package.    (line  27)
+* CL-FORMS:FIELD-ACCESSOR:               CL-FORMS package.    (line  82)
+* CL-FORMS:FIELD-ACCESSOR <1>:           CL-FORMS package.    (line  82)
+* CL-FORMS:FIELD-FORMATTER:              CL-FORMS package.    (line  95)
+* CL-FORMS:FIELD-FORMATTER <1>:          CL-FORMS package.    (line  95)
+* CL-FORMS:FIELD-PARSER:                 CL-FORMS package.    (line  88)
+* CL-FORMS:FIELD-PARSER <1>:             CL-FORMS package.    (line  88)
+* CL-FORMS:FIELD-READER:                 CL-FORMS package.    (line  86)
+* CL-FORMS:FIELD-READER <1>:             CL-FORMS package.    (line  86)
+* CL-FORMS:FIELD-VALID-P:                CL-FORMS package.    (line  99)
+* CL-FORMS:FIELD-VALID-P <1>:            CL-FORMS package.    (line  99)
+* CL-FORMS:FIELD-VALUE:                  CL-FORMS package.    (line  97)
+* CL-FORMS:FIELD-VALUE <1>:              CL-FORMS package.    (line  97)
+* CL-FORMS:FIELD-WRITER:                 CL-FORMS package.    (line  84)
+* CL-FORMS:FIELD-WRITER <1>:             CL-FORMS package.    (line  84)
+* CL-FORMS:FILL-FORM-FROM-MODEL:         CL-FORMS package.    (line 107)
+* CL-FORMS:FILL-FORM-FROM-MODEL <1>:     CL-FORMS package.    (line 107)
+* CL-FORMS:FILL-MODEL-FROM-FORM:         CL-FORMS package.    (line 132)
+* CL-FORMS:FILL-MODEL-FROM-FORM <1>:     CL-FORMS package.    (line 132)
+* CL-FORMS:FORM-ERRORS:                  CL-FORMS package.    (line  90)
+* CL-FORMS:FORM-ERRORS <1>:              CL-FORMS package.    (line  90)
+* CL-FORMS:FORM-VALID-P:                 CL-FORMS package.    (line 116)
+* CL-FORMS:FORM-VALID-P <1>:             CL-FORMS package.    (line 116)
+* CL-FORMS:FORMAT-FIELD-VALUE:           CL-FORMS package.    (line  92)
+* CL-FORMS:FORMAT-FIELD-VALUE <1>:       CL-FORMS package.    (line  92)
+* CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING: CL-FORMS package.    (line 152)
 * CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING <1>: CL-FORMS package.
-                                                              (line 178)
-* CL-FORMS:GET-FIELD:                    CL-FORMS package.    (line 114)
-* CL-FORMS:GET-FIELD <1>:                CL-FORMS package.    (line 114)
-* CL-FORMS:GET-FIELD-VALUE:              CL-FORMS package.    (line 164)
-* CL-FORMS:GET-FIELD-VALUE <1>:          CL-FORMS package.    (line 164)
-* CL-FORMS:GET-FORM:                     CL-FORMS package.    (line 105)
-* CL-FORMS:GET-FORM <1>:                 CL-FORMS package.    (line 105)
-* CL-FORMS:HANDLE-REQUEST:               CL-FORMS package.    (line 116)
-* CL-FORMS:HANDLE-REQUEST <1>:           CL-FORMS package.    (line 116)
-* CL-FORMS:MAKE-FORMATTER:               CL-FORMS package.    (line 153)
-* CL-FORMS:MAKE-FORMATTER <1>:           CL-FORMS package.    (line 153)
-* CL-FORMS:REMOVE-FIELD:                 CL-FORMS package.    (line 162)
-* CL-FORMS:REMOVE-FIELD <1>:             CL-FORMS package.    (line 162)
-* CL-FORMS:RENDER-FIELD:                 CL-FORMS package.    (line 169)
-* CL-FORMS:RENDER-FIELD <1>:             CL-FORMS package.    (line 169)
-* CL-FORMS:RENDER-FIELD-ERRORS:          CL-FORMS package.    (line 123)
-* CL-FORMS:RENDER-FIELD-ERRORS <1>:      CL-FORMS package.    (line 123)
-* CL-FORMS:RENDER-FIELD-LABEL:           CL-FORMS package.    (line 157)
-* CL-FORMS:RENDER-FIELD-LABEL <1>:       CL-FORMS package.    (line 157)
-* CL-FORMS:RENDER-FIELD-WIDGET:          CL-FORMS package.    (line 139)
-* CL-FORMS:RENDER-FIELD-WIDGET <1>:      CL-FORMS package.    (line 139)
-* CL-FORMS:RENDER-FORM:                  CL-FORMS package.    (line 126)
-* CL-FORMS:RENDER-FORM <1>:              CL-FORMS package.    (line 126)
-* CL-FORMS:RENDER-FORM-END:              CL-FORMS package.    (line 181)
-* CL-FORMS:RENDER-FORM-END <1>:          CL-FORMS package.    (line 181)
-* CL-FORMS:RENDER-FORM-ERRORS:           CL-FORMS package.    (line 136)
-* CL-FORMS:RENDER-FORM-ERRORS <1>:       CL-FORMS package.    (line 136)
-* CL-FORMS:RENDER-FORM-START:            CL-FORMS package.    (line 128)
-* CL-FORMS:RENDER-FORM-START <1>:        CL-FORMS package.    (line 128)
-* CL-FORMS:SET-FIELD-VALUE:              CL-FORMS package.    (line 176)
-* CL-FORMS:SET-FIELD-VALUE <1>:          CL-FORMS package.    (line 176)
-* CL-FORMS:VALIDATE-FORM:                CL-FORMS package.    (line 146)
-* CL-FORMS:VALIDATE-FORM <1>:            CL-FORMS package.    (line 146)
-* CL-FORMS:WITH-FORM:                    CL-FORMS package.    (line  42)
-* CL-FORMS:WITH-FORM <1>:                CL-FORMS package.    (line  42)
-* CL-FORMS:WITH-FORM-FIELD-VALUES:       CL-FORMS package.    (line  77)
-* CL-FORMS:WITH-FORM-FIELD-VALUES <1>:   CL-FORMS package.    (line  77)
-* CL-FORMS:WITH-FORM-FIELDS:             CL-FORMS package.    (line  67)
-* CL-FORMS:WITH-FORM-FIELDS <1>:         CL-FORMS package.    (line  67)
-* CL-FORMS:WITH-FORM-RENDERER:           CL-FORMS package.    (line  34)
-* CL-FORMS:WITH-FORM-RENDERER <1>:       CL-FORMS package.    (line  34)
-* CL-FORMS:WITH-FORM-TEMPLATE:           CL-FORMS package.    (line  74)
-* CL-FORMS:WITH-FORM-TEMPLATE <1>:       CL-FORMS package.    (line  74)
-* CL-FORMS:WITH-FORM-THEME:              CL-FORMS package.    (line  38)
-* CL-FORMS:WITH-FORM-THEME <1>:          CL-FORMS package.    (line  38)
+                                                              (line 152)
+* CL-FORMS:GET-FIELD:                    CL-FORMS package.    (line 118)
+* CL-FORMS:GET-FIELD <1>:                CL-FORMS package.    (line 118)
+* CL-FORMS:GET-FIELD-VALUE:              CL-FORMS package.    (line 120)
+* CL-FORMS:GET-FIELD-VALUE <1>:          CL-FORMS package.    (line 120)
+* CL-FORMS:GET-FORM:                     CL-FORMS package.    (line 143)
+* CL-FORMS:GET-FORM <1>:                 CL-FORMS package.    (line 143)
+* CL-FORMS:HANDLE-REQUEST:               CL-FORMS package.    (line 125)
+* CL-FORMS:HANDLE-REQUEST <1>:           CL-FORMS package.    (line 125)
+* CL-FORMS:MAKE-FORMATTER:               CL-FORMS package.    (line 136)
+* CL-FORMS:MAKE-FORMATTER <1>:           CL-FORMS package.    (line 136)
+* CL-FORMS:REMOVE-FIELD:                 CL-FORMS package.    (line 114)
+* CL-FORMS:REMOVE-FIELD <1>:             CL-FORMS package.    (line 114)
+* CL-FORMS:RENDER-FIELD:                 CL-FORMS package.    (line 111)
+* CL-FORMS:RENDER-FIELD <1>:             CL-FORMS package.    (line 111)
+* CL-FORMS:RENDER-FIELD-ERRORS:          CL-FORMS package.    (line 155)
+* CL-FORMS:RENDER-FIELD-ERRORS <1>:      CL-FORMS package.    (line 155)
+* CL-FORMS:RENDER-FIELD-LABEL:           CL-FORMS package.    (line 140)
+* CL-FORMS:RENDER-FIELD-LABEL <1>:       CL-FORMS package.    (line 140)
+* CL-FORMS:RENDER-FIELD-WIDGET:          CL-FORMS package.    (line 170)
+* CL-FORMS:RENDER-FIELD-WIDGET <1>:      CL-FORMS package.    (line 170)
+* CL-FORMS:RENDER-FORM:                  CL-FORMS package.    (line 105)
+* CL-FORMS:RENDER-FORM <1>:              CL-FORMS package.    (line 105)
+* CL-FORMS:RENDER-FORM-END:              CL-FORMS package.    (line 123)
+* CL-FORMS:RENDER-FORM-END <1>:          CL-FORMS package.    (line 123)
+* CL-FORMS:RENDER-FORM-ERRORS:           CL-FORMS package.    (line 178)
+* CL-FORMS:RENDER-FORM-ERRORS <1>:       CL-FORMS package.    (line 178)
+* CL-FORMS:RENDER-FORM-START:            CL-FORMS package.    (line 167)
+* CL-FORMS:RENDER-FORM-START <1>:        CL-FORMS package.    (line 167)
+* CL-FORMS:SET-FIELD-VALUE:              CL-FORMS package.    (line 158)
+* CL-FORMS:SET-FIELD-VALUE <1>:          CL-FORMS package.    (line 158)
+* CL-FORMS:VALIDATE-FORM:                CL-FORMS package.    (line 160)
+* CL-FORMS:VALIDATE-FORM <1>:            CL-FORMS package.    (line 160)
+* CL-FORMS:WITH-FORM:                    CL-FORMS package.    (line  23)
+* CL-FORMS:WITH-FORM <1>:                CL-FORMS package.    (line  23)
+* CL-FORMS:WITH-FORM-FIELD-VALUES:       CL-FORMS package.    (line  21)
+* CL-FORMS:WITH-FORM-FIELD-VALUES <1>:   CL-FORMS package.    (line  21)
+* CL-FORMS:WITH-FORM-FIELDS:             CL-FORMS package.    (line  44)
+* CL-FORMS:WITH-FORM-FIELDS <1>:         CL-FORMS package.    (line  44)
+* CL-FORMS:WITH-FORM-RENDERER:           CL-FORMS package.    (line  54)
+* CL-FORMS:WITH-FORM-RENDERER <1>:       CL-FORMS package.    (line  54)
+* CL-FORMS:WITH-FORM-TEMPLATE:           CL-FORMS package.    (line  51)
+* CL-FORMS:WITH-FORM-TEMPLATE <1>:       CL-FORMS package.    (line  51)
+* CL-FORMS:WITH-FORM-THEME:              CL-FORMS package.    (line  40)
+* CL-FORMS:WITH-FORM-THEME <1>:          CL-FORMS package.    (line  40)
 
 
 
@@ -983,47 +1182,62 @@ Node: API22757
 Ref: api22843
 Node: CL-FORMS package22874
 Ref: CL-FORMS:*BASE64-ENCODE* variable23062
-Ref: CL-FORMS:DEFFORM-BUILDER macro23153
-Ref: CL-FORMS:WITH-FORM-RENDERER macro23543
-Ref: CL-FORMS:WITH-FORM-THEME macro23679
-Ref: CL-FORMS:WITH-FORM macro23813
-Ref: CL-FORMS:DEFFORM macro23923
-Ref: CL-FORMS:WITH-FORM-FIELDS macro24966
-Ref: CL-FORMS:WITH-FORM-TEMPLATE macro25209
-Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro25308
-Ref: CL-FORMS:FIELD-FORMATTER function25414
-Ref: CL-FORMS:FIELD-PARSER function25479
-Ref: CL-FORMS:FIELD-VALID-P function25541
-Ref: CL-FORMS:FIELD-READER function25627
-Ref: CL-FORMS:FIELD-WRITER function25680
-Ref: CL-FORMS:FORMAT-FIELD-VALUE function25733
-Ref: CL-FORMS:FIELD-VALUE function25836
-Ref: CL-FORMS:FIELD-ACCESSOR function25888
-Ref: CL-FORMS:FORM-ERRORS function25952
-Ref: CL-FORMS:GET-FORM function26034
-Ref: CL-FORMS:GET-FIELD function26236
-Ref: CL-FORMS:HANDLE-REQUEST function26310
-Ref: CL-FORMS:RENDER-FIELD-ERRORS function26593
-Ref: CL-FORMS:RENDER-FORM function26690
-Ref: CL-FORMS:RENDER-FORM-START function26763
-Ref: CL-FORMS:ADD-FORM-ERROR function26852
-Ref: CL-FORMS:RENDER-FORM-ERRORS function26971
-Ref: CL-FORMS:RENDER-FIELD-WIDGET function27061
-Ref: CL-FORMS:FILL-FORM-FROM-MODEL function27158
-Ref: CL-FORMS:VALIDATE-FORM function27247
-Ref: CL-FORMS:MAKE-FORMATTER function27585
-Ref: CL-FORMS:RENDER-FIELD-LABEL function27698
-Ref: CL-FORMS:ADD-FIELD function27794
-Ref: CL-FORMS:REMOVE-FIELD function27841
-Ref: CL-FORMS:GET-FIELD-VALUE function27891
-Ref: CL-FORMS:FORM-VALID-P function27981
-Ref: CL-FORMS:RENDER-FIELD function28025
-Ref: CL-FORMS:FILL-MODEL-FROM-FORM function28115
-Ref: CL-FORMS:SET-FIELD-VALUE function28223
-Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function28287
-Ref: CL-FORMS:RENDER-FORM-END function28412
-Ref: CL-FORMS:FORM class28495
-Ref: CL-FORMS:FORM-FIELD class30869
-Node: Index34647
+Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro23153
+Ref: CL-FORMS:WITH-FORM macro23222
+Ref: CL-FORMS:DEFFORM-BUILDER macro23332
+Ref: CL-FORMS:WITH-FORM-THEME macro23722
+Ref: CL-FORMS:WITH-FORM-FIELDS macro23856
+Ref: CL-FORMS:WITH-FORM-TEMPLATE macro24099
+Ref: CL-FORMS:WITH-FORM-RENDERER macro24198
+Ref: CL-FORMS:DEFFORM macro24334
+Ref: CL-FORMS:FIELD-ACCESSOR function25414
+Ref: CL-FORMS:FIELD-WRITER function25478
+Ref: CL-FORMS:FIELD-READER function25531
+Ref: CL-FORMS:FIELD-PARSER function25584
+Ref: CL-FORMS:FORM-ERRORS function25646
+Ref: CL-FORMS:FORMAT-FIELD-VALUE function25707
+Ref: CL-FORMS:FIELD-FORMATTER function25810
+Ref: CL-FORMS:FIELD-VALUE function25875
+Ref: CL-FORMS:FIELD-VALID-P function25927
+Ref: CL-FORMS:RENDER-FORM function26034
+Ref: CL-FORMS:FILL-FORM-FROM-MODEL function26107
+Ref: CL-FORMS:RENDER-FIELD function26196
+Ref: CL-FORMS:REMOVE-FIELD function26286
+Ref: CL-FORMS:FORM-VALID-P function26336
+Ref: CL-FORMS:GET-FIELD function26380
+Ref: CL-FORMS:GET-FIELD-VALUE function26454
+Ref: CL-FORMS:RENDER-FORM-END function26544
+Ref: CL-FORMS:HANDLE-REQUEST function26610
+Ref: CL-FORMS:FILL-MODEL-FROM-FORM function26893
+Ref: CL-FORMS:MAKE-FORMATTER function27001
+Ref: CL-FORMS:RENDER-FIELD-LABEL function27114
+Ref: CL-FORMS:GET-FORM function27210
+Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function27412
+Ref: CL-FORMS:RENDER-FIELD-ERRORS function27537
+Ref: CL-FORMS:SET-FIELD-VALUE function27634
+Ref: CL-FORMS:VALIDATE-FORM function27698
+Ref: CL-FORMS:RENDER-FORM-START function28036
+Ref: CL-FORMS:RENDER-FIELD-WIDGET function28125
+Ref: CL-FORMS:ADD-FORM-ERROR function28222
+Ref: CL-FORMS:RENDER-FORM-ERRORS function28341
+Ref: CL-FORMS:ADD-FIELD function28431
+Ref: CL-FORMS:INTEGER-FORM-FIELD class28495
+Ref: CL-FORMS:SUBFORM-FORM-FIELD class28651
+Ref: CL-FORMS:URL-FORM-FIELD class28823
+Ref: CL-FORMS:DATETIME-FORM-FIELD class28967
+Ref: CL-FORMS:PASSWORD-FORM-FIELD class29121
+Ref: CL-FORMS:EMAIL-FORM-FIELD class29279
+Ref: CL-FORMS:CHOICE-FORM-FIELD class29429
+Ref: CL-FORMS:FILE-FORM-FIELD class32016
+Ref: CL-FORMS:BOOLEAN-FORM-FIELD class32792
+Ref: CL-FORMS:DATE-FORM-FIELD class32941
+Ref: CL-FORMS:FORM-FIELD class33087
+Ref: CL-FORMS:SUBMIT-FORM-FIELD class36865
+Ref: CL-FORMS:HIDDEN-FORM-FIELD class37018
+Ref: CL-FORMS:STRING-FORM-FIELD class37169
+Ref: CL-FORMS:LIST-FORM-FIELD class37321
+Ref: CL-FORMS:FORM class38415
+Ref: CL-FORMS:TEXT-FORM-FIELD class40789
+Node: Index40973
 
 End Tag Table

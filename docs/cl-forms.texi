@@ -188,6 +188,16 @@ If T, encode form parameters in base64
 @endcldefvar
 
 @subheading Macros
+@cldefmacro {CL-FORMS, WITH-FORM-FIELD-VALUES, (fields form &body body)}
+
+
+@endcldefmacro
+
+@cldefmacro {CL-FORMS, WITH-FORM, (form &body body)}
+
+Bind *FORM* to FORM and evaluate BODY in that context.
+@endcldefmacro
+
 @cldefmacro {CL-FORMS, DEFFORM-BUILDER, (form-name args &body body)}
 
 Registers a function with arguments ARGS and body BODY as a form builder.
@@ -199,19 +209,29 @@ FORM-NAME is the symbol under which the FORM is registered.
 Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form.
 @endcldefmacro
 
-@cldefmacro {CL-FORMS, WITH-FORM-RENDERER, (renderer &body body)}
-
-Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
-@endcldefmacro
-
 @cldefmacro {CL-FORMS, WITH-FORM-THEME, (form-theme &body body)}
 
 Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
 @endcldefmacro
 
-@cldefmacro {CL-FORMS, WITH-FORM, (form &body body)}
+@cldefmacro {CL-FORMS, WITH-FORM-FIELDS, (fields form &body body)}
 
-Bind *FORM* to FORM and evaluate BODY in that context.
+Bind FIELDS to the form fields in FORM under BODY.
+
+@lisp
+(with-form-field-values (name single sex age email) form
+   (print (list name single sex age email)))
+@end lisp
+@endcldefmacro
+
+@cldefmacro {CL-FORMS, WITH-FORM-TEMPLATE, ((&optional form-var) form-name args &body body)}
+
+
+@endcldefmacro
+
+@cldefmacro {CL-FORMS, WITH-FORM-RENDERER, (renderer &body body)}
+
+Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, DEFFORM, (form-name args fields)}
@@ -238,43 +258,8 @@ FIELDS are the form field specs.
 @end lisp
 @endcldefmacro
 
-@cldefmacro {CL-FORMS, WITH-FORM-FIELDS, (fields form &body body)}
-
-Bind FIELDS to the form fields in FORM under BODY.
-
-@lisp
-(with-form-field-values (name single sex age email) form
-   (print (list name single sex age email)))
-@end lisp
-@endcldefmacro
-
-@cldefmacro {CL-FORMS, WITH-FORM-TEMPLATE, ((&optional form-var) form-name args &body body)}
-
-
-@endcldefmacro
-
-@cldefmacro {CL-FORMS, WITH-FORM-FIELD-VALUES, (fields form &body body)}
-
-
-@endcldefmacro
-
 @subheading Generic functions
-@cldefgeneric {CL-FORMS, FIELD-FORMATTER, (sb-pcl::object)}
-
-
-@endcldefgeneric
-
-@cldefgeneric {CL-FORMS, FIELD-PARSER, (sb-pcl::object)}
-
-
-@endcldefgeneric
-
-@cldefgeneric {CL-FORMS, FIELD-VALID-P, (form-field &optional (form))}
-
-
-@endcldefgeneric
-
-@cldefgeneric {CL-FORMS, FIELD-READER, (field)}
+@cldefgeneric {CL-FORMS, FIELD-ACCESSOR, (sb-pcl::object)}
 
 
 @endcldefgeneric
@@ -284,17 +269,12 @@ Bind FIELDS to the form fields in FORM under BODY.
 
 @endcldefgeneric
 
-@cldefgeneric {CL-FORMS, FORMAT-FIELD-VALUE, (form-field field-value &optional stream)}
+@cldefgeneric {CL-FORMS, FIELD-READER, (field)}
 
 
 @endcldefgeneric
 
-@cldefgeneric {CL-FORMS, FIELD-VALUE, (field)}
-
-
-@endcldefgeneric
-
-@cldefgeneric {CL-FORMS, FIELD-ACCESSOR, (sb-pcl::object)}
+@cldefgeneric {CL-FORMS, FIELD-PARSER, (sb-pcl::object)}
 
 
 @endcldefgeneric
@@ -304,17 +284,63 @@ Bind FIELDS to the form fields in FORM under BODY.
 
 @endcldefgeneric
 
+@cldefgeneric {CL-FORMS, FORMAT-FIELD-VALUE, (form-field field-value &optional stream)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {CL-FORMS, FIELD-FORMATTER, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {CL-FORMS, FIELD-VALUE, (field)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {CL-FORMS, FIELD-VALID-P, (form-field &optional (form))}
+
+
+@endcldefgeneric
+
 @subheading Functions
-@cldefun {CL-FORMS, GET-FORM, (name &rest args)}
+@cldefun {CL-FORMS, RENDER-FORM, (&optional (form *form*) &rest args)}
 
-Get the form named NAME.
 
-ARGS is the list of arguments to pass to a possible form builder function.
+@endcldefun
 
-See: DEFFORM-BUILDER macro.
+@cldefun {CL-FORMS, FILL-FORM-FROM-MODEL, (form model)}
+
+Fill a FORM from a MODEL
+@endcldefun
+
+@cldefun {CL-FORMS, RENDER-FIELD, (field &optional (form *form*) &rest args)}
+
+
+@endcldefun
+
+@cldefun {CL-FORMS, REMOVE-FIELD, (form field)}
+
+
+@endcldefun
+
+@cldefun {CL-FORMS, FORM-VALID-P, (form)}
+
+
 @endcldefun
 
 @cldefun {CL-FORMS, GET-FIELD, (form field-name &optional (error-p t))}
+
+
+@endcldefun
+
+@cldefun {CL-FORMS, GET-FIELD-VALUE, (form field-name &optional (error-p t))}
+
+
+@endcldefun
+
+@cldefun {CL-FORMS, RENDER-FORM-END, (&optional (form *form*))}
 
 
 @endcldefun
@@ -324,17 +350,57 @@ See: DEFFORM-BUILDER macro.
 Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after.
 @endcldefun
 
+@cldefun {CL-FORMS, FILL-MODEL-FROM-FORM, (form model)}
+
+Set a MODEL's values from FORM field values
+@endcldefun
+
+@cldefun {CL-FORMS, MAKE-FORMATTER, (symbol)}
+
+Create a field formatter. SYMBOL is the function to call.
+@endcldefun
+
+@cldefun {CL-FORMS, RENDER-FIELD-LABEL, (field &optional (form *form*) &rest args)}
+
+
+@endcldefun
+
+@cldefun {CL-FORMS, GET-FORM, (name &rest args)}
+
+Get the form named NAME.
+
+ARGS is the list of arguments to pass to a possible form builder function.
+
+See: DEFFORM-BUILDER macro.
+@endcldefun
+
+@cldefun {CL-FORMS, FORMAT-FIELD-VALUE-TO-STRING, (form-field &optional (field-value (field-value form-field)))}
+
+
+@endcldefun
+
 @cldefun {CL-FORMS, RENDER-FIELD-ERRORS, (field &optional (form *form*) &rest args)}
 
 
 @endcldefun
 
-@cldefun {CL-FORMS, RENDER-FORM, (&optional (form *form*) &rest args)}
+@cldefun {CL-FORMS, SET-FIELD-VALUE, (form field-name value)}
 
 
 @endcldefun
 
+@cldefun {CL-FORMS, VALIDATE-FORM, (&optional (form *form*))}
+
+Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
+The list of errors is an association list with elements (<field> . <field errors strings list>).
+@endcldefun
+
 @cldefun {CL-FORMS, RENDER-FORM-START, (&optional (form *form*) &rest args)}
+
+
+@endcldefun
+
+@cldefun {CL-FORMS, RENDER-FIELD-WIDGET, (field &optional (form *form*) &rest args)}
 
 
 @endcldefun
@@ -349,111 +415,120 @@ Add an error on FIELD
 
 @endcldefun
 
-@cldefun {CL-FORMS, RENDER-FIELD-WIDGET, (field &optional (form *form*) &rest args)}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, FILL-FORM-FROM-MODEL, (form model)}
-
-Fill a FORM from a MODEL
-@endcldefun
-
-@cldefun {CL-FORMS, VALIDATE-FORM, (&optional (form *form*))}
-
-Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
-The list of errors is an association list with elements (<field> . <field errors strings list>).
-@endcldefun
-
-@cldefun {CL-FORMS, MAKE-FORMATTER, (symbol)}
-
-Create a field formatter. SYMBOL is the function to call.
-@endcldefun
-
-@cldefun {CL-FORMS, RENDER-FIELD-LABEL, (field &optional (form *form*) &rest args)}
-
-
-@endcldefun
-
 @cldefun {CL-FORMS, ADD-FIELD, (form field)}
 
 
 @endcldefun
 
-@cldefun {CL-FORMS, REMOVE-FIELD, (form field)}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, GET-FIELD-VALUE, (form field-name &optional (error-p t))}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, FORM-VALID-P, (form)}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, RENDER-FIELD, (field &optional (form *form*) &rest args)}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, FILL-MODEL-FROM-FORM, (form model)}
-
-Set a MODEL's values from FORM field values
-@endcldefun
-
-@cldefun {CL-FORMS, SET-FIELD-VALUE, (form field-name value)}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, FORMAT-FIELD-VALUE-TO-STRING, (form-field &optional (field-value (field-value form-field)))}
-
-
-@endcldefun
-
-@cldefun {CL-FORMS, RENDER-FORM-END, (&optional (form *form*))}
-
-
-@endcldefun
-
 @subheading Classes
-@cldefclass {CL-FORMS, FORM}
+@cldefclass {CL-FORMS, INTEGER-FORM-FIELD}
 
-A form
+An integer input field
 
-Class precedence list: @code{form, standard-object, t}
+Class precedence list: @code{integer-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, SUBFORM-FORM-FIELD}
+
+A field that contains a form (subform)
+
+Class precedence list: @code{subform-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, URL-FORM-FIELD}
+
+An url input field
+
+Class precedence list: @code{url-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, DATETIME-FORM-FIELD}
+
+A date input field
+
+Class precedence list: @code{datetime-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, PASSWORD-FORM-FIELD}
+
+A password input field
+
+Class precedence list: @code{password-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, EMAIL-FORM-FIELD}
+
+A string input field
+
+Class precedence list: @code{email-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, CHOICE-FORM-FIELD}
+
+A multi-purpose field used to allow the user to "choose" one or more options. It can be rendered as a select tag, radio buttons, or checkboxes.
+NOTE: the defaults of this field type are too complicated for just working with string choices. STRING-CHOICE-FIELD is more convenient for that.
+
+Class precedence list: @code{choice-form-field, form-field, standard-object, t}
 
 Slots:
 @itemize
-@item @code{id} --- initarg: @code{@w{:id}}; reader: @code{@w{cl-forms::form-id}}; writer: @code{@w{(setf cl-forms::form-id)}}
+@item @code{choices} --- initarg: @code{@w{:choices}}; writer: @code{@w{(setf cl-forms::field-choices)}}
 
-The form id@item @code{name} --- initarg: @code{@w{:name}}; reader: @code{@w{cl-forms::form-name}}; writer: @code{@w{(setf cl-forms::form-name)}}
+An alist with the choices. Or a function with which to obtain the choices.@item @code{preferred-choices} --- initarg: @code{@w{:preferred-choices}}; reader: @code{@w{cl-forms::field-preferred-choices}}; writer: @code{@w{(setf cl-forms::field-preferred-choices)}}
 
-The form name@item @code{action} --- initarg: @code{@w{:action}}; reader: @code{@w{cl-forms::form-action}}; writer: @code{@w{(setf cl-forms::form-action)}}
+If this option is specified, then a sub-set of all of the options will be moved to the top of the select menu.@item @code{expanded} --- initarg: @code{@w{:expanded}}; reader: @code{@w{cl-forms::field-expanded}}; writer: @code{@w{(setf cl-forms::field-expanded)}}
 
-The form action@item @code{method} --- initarg: @code{@w{:method}}; reader: @code{@w{cl-forms::form-method}}; writer: @code{@w{(setf cl-forms::form-method)}}
+If set to true, radio buttons or checkboxes will be rendered (depending on the multiple value). If false, a select element will be rendered.@item @code{multiple} --- initarg: @code{@w{:multiple}}; reader: @code{@w{cl-forms::field-multiple}}; writer: @code{@w{(setf cl-forms::field-multiple)}}
 
-The form method@item @code{enctype} --- initarg: @code{@w{:enctype}}; reader: @code{@w{cl-forms::form-enctype}}; writer: @code{@w{(setf cl-forms::form-enctype)}}
+If true, the user will be able to select multiple options (as opposed to choosing just one option). Depending on the value of the expanded option, this will render either a select tag or checkboxes if true and a select tag or radio buttons if false.@item @code{key-reader} --- initarg: @code{@w{:key-reader}}; reader: @code{@w{cl-forms::field-key-reader}}; writer: @code{@w{(setf cl-forms::field-key-reader)}}
 
-Form encoding type. i.e. Use multipart/form-data for file uploads@item @code{fields} --- initarg: @code{@w{:fields}}; reader: @code{@w{cl-forms::form-fields}}; writer: @code{@w{(setf cl-forms::form-fields)}}
+Function to read the option key from the request@item @code{hash-function} --- initarg: @code{@w{:hash-function}}; reader: @code{@w{cl-forms::field-hash-function}}; writer: @code{@w{(setf cl-forms::field-hash-function)}}
 
-Form fields@item @code{model} --- initarg: @code{@w{:model}}; reader: @code{@w{cl-forms::form-model}}; writer: @code{@w{(setf cl-forms::form-model)}}
+The function to use for choices key@item @code{test} --- initarg: @code{@w{:test}}; reader: @code{@w{cl-forms::field-test}}; writer: @code{@w{(setf cl-forms::field-test)}}
 
-The form model object@item @code{csrf-protection} --- initarg: @code{@w{:csrf-protection}}; reader: @code{@w{cl-forms::form-csrf-protection-p}}; writer: @code{@w{(setf cl-forms::form-csrf-protection-p)}}
+Function to test equality between choices@item @code{use-key-as-value} --- initarg: @code{@w{:use-key-as-value}}; reader: @code{@w{cl-forms::use-key-as-value}}; writer: @code{@w{(setf cl-forms::use-key-as-value)}}
 
-T when csrf protection is enabled@item @code{csrf-field-name} --- initarg: @code{@w{:csrf-field-name}}; reader: @code{@w{cl-forms::form-csrf-field-name}}; writer: @code{@w{(setf cl-forms::form-csrf-field-name)}}
+When T, use the key/s of the field as value of the field when it is read from request@end itemize
 
-csrf field name@item @code{errors} --- reader: @code{@w{cl-forms:form-errors}}; writer: @code{@w{(setf cl-forms:form-errors)}}
+@endcldefclass
 
-Form errors after validation. An association list with elements (<field> . <field errors strings list>).@item @code{display-errors} --- initarg: @code{@w{:display-errors}}; reader: @code{@w{cl-forms::display-errors}}; writer: @code{@w{(setf cl-forms::display-errors)}}
+@cldefclass {CL-FORMS, FILE-FORM-FIELD}
 
-A list containing the places where to display errors. Valid options are :list and :inline@item @code{client-validation} --- initarg: @code{@w{:client-validation}}; reader: @code{@w{cl-forms::client-validation}}; writer: @code{@w{(setf cl-forms::client-validation)}}
+A file input field
 
-When T, form client validation is enabled@end itemize
+Class precedence list: @code{file-form-field, form-field, standard-object, t}
+
+Slots:
+@itemize
+@item @code{multiple} --- initarg: @code{@w{:multiple-p}}; reader: @code{@w{cl-forms::multiple-p}}; writer: @code{@w{(setf cl-forms::multiple-p)}}
+
+If this fields handles multiple file uploads@item @code{upload-handler} --- initarg: @code{@w{:upload-handler}}; reader: @code{@w{cl-forms::upload-handler}}; writer: @code{@w{(setf cl-forms::upload-handler)}}
+
+Function that handles the file upload@item @code{accept} --- initarg: @code{@w{:accept}}; reader: @code{@w{cl-forms::file-accept}}; writer: @code{@w{(setf cl-forms::file-accept)}}
+
+Files accepted. See https://www.w3schools.com/tags/att_input_accept.asp@end itemize
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, BOOLEAN-FORM-FIELD}
+
+A boolean input
+
+Class precedence list: @code{boolean-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, DATE-FORM-FIELD}
+
+A date input field
+
+Class precedence list: @code{date-form-field, form-field, standard-object, t}
 
 @endcldefclass
 
@@ -506,6 +581,94 @@ Trim the input@item @code{validation-triggers} --- initarg: @code{@w{:validation
 Client side validation triggers. A list of :change, :focus, :focusout, :focusin, etc@item @code{form} --- initarg: @code{@w{:form}}; reader: @code{@w{cl-forms::field-form}}; writer: @code{@w{(setf cl-forms::field-form)}}
 
 The form the field belongs to@end itemize
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, SUBMIT-FORM-FIELD}
+
+A submit input button
+
+Class precedence list: @code{submit-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, HIDDEN-FORM-FIELD}
+
+A hidden form field
+
+Class precedence list: @code{hidden-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, STRING-FORM-FIELD}
+
+A string input field
+
+Class precedence list: @code{string-form-field, form-field, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, LIST-FORM-FIELD}
+
+A field that contains a list of elements (either other fields or subforms)
+
+Class precedence list: @code{list-form-field, form-field, standard-object, t}
+
+Slots:
+@itemize
+@item @code{type} --- initarg: @code{@w{:type}}; reader: @code{@w{cl-forms::list-field-type}}; writer: @code{@w{(setf cl-forms::list-field-type)}}
+
+The list elements type.@item @code{empty-item-predicate} --- initarg: @code{@w{:empty-item-predicate}}; reader: @code{@w{cl-forms::empty-item-predicate}}; writer: @code{@w{(setf cl-forms::empty-item-predicate)}}
+
+A predicate that tells when a list item is considered empty, and so it is removed from the list@item @code{add-button} --- initarg: @code{@w{:add-button}}; reader: @code{@w{cl-forms::add-button-p}}; writer: @code{@w{(setf cl-forms::add-button-p)}}
+
+Whether have a list 'ADD' button or not@item @code{remove-button} --- initarg: @code{@w{:remove-button}}; reader: @code{@w{cl-forms::remove-button-p}}; writer: @code{@w{(setf cl-forms::remove-button-p)}}
+
+Whether add an item removal button or not@end itemize
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, FORM}
+
+A form
+
+Class precedence list: @code{form, standard-object, t}
+
+Slots:
+@itemize
+@item @code{id} --- initarg: @code{@w{:id}}; reader: @code{@w{cl-forms::form-id}}; writer: @code{@w{(setf cl-forms::form-id)}}
+
+The form id@item @code{name} --- initarg: @code{@w{:name}}; reader: @code{@w{cl-forms::form-name}}; writer: @code{@w{(setf cl-forms::form-name)}}
+
+The form name@item @code{action} --- initarg: @code{@w{:action}}; reader: @code{@w{cl-forms::form-action}}; writer: @code{@w{(setf cl-forms::form-action)}}
+
+The form action@item @code{method} --- initarg: @code{@w{:method}}; reader: @code{@w{cl-forms::form-method}}; writer: @code{@w{(setf cl-forms::form-method)}}
+
+The form method@item @code{enctype} --- initarg: @code{@w{:enctype}}; reader: @code{@w{cl-forms::form-enctype}}; writer: @code{@w{(setf cl-forms::form-enctype)}}
+
+Form encoding type. i.e. Use multipart/form-data for file uploads@item @code{fields} --- initarg: @code{@w{:fields}}; reader: @code{@w{cl-forms::form-fields}}; writer: @code{@w{(setf cl-forms::form-fields)}}
+
+Form fields@item @code{model} --- initarg: @code{@w{:model}}; reader: @code{@w{cl-forms::form-model}}; writer: @code{@w{(setf cl-forms::form-model)}}
+
+The form model object@item @code{csrf-protection} --- initarg: @code{@w{:csrf-protection}}; reader: @code{@w{cl-forms::form-csrf-protection-p}}; writer: @code{@w{(setf cl-forms::form-csrf-protection-p)}}
+
+T when csrf protection is enabled@item @code{csrf-field-name} --- initarg: @code{@w{:csrf-field-name}}; reader: @code{@w{cl-forms::form-csrf-field-name}}; writer: @code{@w{(setf cl-forms::form-csrf-field-name)}}
+
+csrf field name@item @code{errors} --- reader: @code{@w{cl-forms:form-errors}}; writer: @code{@w{(setf cl-forms:form-errors)}}
+
+Form errors after validation. An association list with elements (<field> . <field errors strings list>).@item @code{display-errors} --- initarg: @code{@w{:display-errors}}; reader: @code{@w{cl-forms::display-errors}}; writer: @code{@w{(setf cl-forms::display-errors)}}
+
+A list containing the places where to display errors. Valid options are :list and :inline@item @code{client-validation} --- initarg: @code{@w{:client-validation}}; reader: @code{@w{cl-forms::client-validation}}; writer: @code{@w{(setf cl-forms::client-validation)}}
+
+When T, form client validation is enabled@end itemize
+
+@endcldefclass
+
+@cldefclass {CL-FORMS, TEXT-FORM-FIELD}
+
+A text field. Renders as a text area
+
+Class precedence list: @code{text-form-field, string-form-field, form-field, standard-object, t}
 
 @endcldefclass
 
