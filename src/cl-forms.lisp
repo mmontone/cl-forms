@@ -49,7 +49,7 @@
 ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
 FIELDS are the form field specs.
 
-@example
+@lisp
 (forms:defform client-validated-form (:action \"/client-validation-post\"
                                               :client-validation t)
   ((name :string :value \"\" :constraints (list (clavier:is-a-string)
@@ -63,8 +63,7 @@ FIELDS are the form field specs.
                                     (clavier:less-than 200)))
    (email :email)
    (submit :submit :label \"Create\")))
-@end example
-"
+@end lisp"
   (check-duplicate-fields fields)
   (alexandria:with-gensyms (fargs)
     `(setf (get ',form-name :form)
@@ -123,10 +122,10 @@ See: DEFFORM-BUILDER macro."
 (defmacro with-form-fields (fields form &body body)
   "Bind FIELDS to the form fields in FORM under BODY.
 
-@example
+@lisp
 (with-form-field-values (name single sex age email) form
    (print (list name single sex age email)))
-@end example"
+@end lisp"
   `(let ,(loop for field in fields
                collect `(,field (get-field ,form ',field)))
      ,@body))

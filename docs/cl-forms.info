@@ -105,6 +105,406 @@ There's a demo included.  To run:
      (require :cl-forms.demo)
      (forms.test:run-demo)
 
+3.2.1 Basic example
+-------------------
+
+Define a form.  Render the form via CL-WHO backend, doing:
+
+     (forms:with-form-renderer :who
+        (forms:render-form form))
+
+   Then handle and validate the form.
+
+   Source code:
+
+     (in-package :forms.test)
+
+     (forms:defform fields-form (:action "/fields-post"
+                                         :enctype "multipart/form-data")
+       ((name :string :value "")
+        (ready :boolean :value t)
+        (sex :choice :choices (list "Male" "Female") :value "Male")
+        (avatar :file :upload-handler 'handle-file-upload)
+        (disabled :string :disabled-p t :required-p nil)
+        (readonly :string :read-only-p t :required-p nil)
+        (readonly-checkbox :boolean :read-only-p t :required-p nil)
+        (disabled-checkbox :boolean :disabled-p t :required-p nil)
+        (submit :submit :label "Create")))
+
+     (defun fields-demo ()
+       (who:with-html-output (forms.who::*html*)
+         (:h1 (who:str "Fields example"))
+         (:div :class :container
+               (:div :class :row
+                     (:div :class :heading
+                           (:h3 (who:str "Simple form")))
+                     (let ((form (forms::get-form 'fields-form)))
+                       (forms:with-form-renderer :who
+                         (forms:render-form form))))
+               (:div :class :row
+                     (:div :class :heading
+                           (:h3 (who:str "Choices")))
+                     (let ((form (forms::get-form 'choices-form)))
+                       (forms:with-form-renderer :who
+                         (forms:render-form form)))))))
+
+     (hunchentoot:define-easy-handler (fields-demo-handler :uri "/fields") ()
+       (render-demo-page :demo #'fields-demo
+                         :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                "test/demo/fields.lisp")
+                         :active-menu :fields))
+
+     (hunchentoot:define-easy-handler (fields-form-post
+                                       :uri "/fields-post"
+                                       :default-request-type :post) ()
+       (flet ((fields-post ()
+                (let ((form (forms:get-form 'fields-form)))
+                  (forms::handle-request form)
+                  (forms::with-form-fields (name ready sex avatar) form
+                    (who:with-html-output (forms.who::*html*)
+                      (:ul
+                       (:li (who:fmt "Name: ~A" (forms::field-value name)))
+                       (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
+                       (:li (who:fmt "Sex: ~A" (forms::field-value sex)))
+                       (:li (who:fmt "Avatar: ~A" (forms::file-name avatar))
+                            (when (forms::file-name avatar)
+                              (who:htm
+                               (:img :width 200 :height 200
+                                     :src (format nil "/files?f=~A" (forms::file-name avatar))))))))))))
+         (render-demo-page :demo #'fields-post
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/fields.lisp")
+                           :active-menu :fields)))
+
+     ;; Choices widget test
+
+     (forms:defform choices-form (:action "/choices-post")
+       ((sex :choice
+             :choices (list "Male" "Female")
+             :value "Male")
+        (sex2 :choice
+              :choices (list "Male" "Female")
+              :value "Female"
+              :expanded t)
+        (choices :choice
+                 :choices (list "Foo" "Bar")
+                 :value (list "Foo")
+                 :multiple t)
+        (choices2 :choice
+                  :choices (list "Foo" "Bar")
+                  :value (list "Bar")
+                  :multiple t
+                  :expanded  t)
+        (submit :submit :label "Ok")))
+
+     (hunchentoot:define-easy-handler (choices-form-post :uri "/choices-post"
+                                                         :default-request-type :post) ()
+       (flet ((choices-post ()
+                (let ((form (forms:get-form 'choices-form)))
+                  (forms::handle-request form)
+                  (forms::validate-form form)
+                  (forms::with-form-field-values (sex sex2 choices choices2) form
+                    (who:with-html-output (forms.who::*html*)
+                      (:ul
+                       (:li (who:fmt "Sex: ~A" sex))
+                       (:li (who:fmt "Sex2: ~A" sex2))
+                       (:li (who:fmt "Choices: ~A" choices))
+                       (:li (who:fmt "Choices2: ~A" choices2))))))))
+         (render-demo-page :demo #'choices-post
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/fields.lisp")
+                           :active-menu :fields)))
+
+     ;; File handling
+
+     (defvar *files* nil)
+     (defvar *files-path* (pathname "/tmp/cl-forms/"))
+
+     (defun handle-file-upload (file-field)
+       ;; Store the file
+       (let ((new-path (merge-pathnames
+                            (forms::file-name file-field)
+                            *files-path*)))
+         (rename-file (forms::file-path file-field)
+                      (ensure-directories-exist new-path))
+         ;; Save for handler
+         (push (cons (forms::file-name file-field)
+                     (list new-path (forms::file-content-type file-field)))
+               *files*)))
+
+     (defun handle-uploaded-file ()
+       (let ((finfo (cdr (assoc (hunchentoot:parameter "f") *files* :test #'equalp))))
+         (hunchentoot:handle-static-file (first finfo) (second finfo))))
+
+     (push
+      (hunchentoot:create-prefix-dispatcher "/files" 'handle-uploaded-file)
+      hunchentoot:*dispatch-table*)
+
+3.2.2 Validation
+----------------
+
+Example of forms validation.
+
+   Add Clavier constraints to the form.  Then call VALIDATE-FORM after
+HANDLE-REQUEST.
+
+     (in-package :forms.test)
+
+     (forms:defform validated-form (:action "/validation-post"
+                                            :client-validation nil)
+       ((name :string :value "" :constraints (list (clavier:is-a-string)
+                                                   (clavier:not-blank)
+                                                   (clavier:len :max 5)))
+        (single :boolean :value t)
+        (sex :choice :choices (list "Male" "Female") :value "Male")
+        (age :integer :constraints (list (clavier:is-an-integer)
+                                         (clavier:greater-than -1)
+                                         (clavier:less-than 200)))
+        (email :email)
+        (birth-date :date :required-p nil)
+        (submit :submit :label "Create")))
+
+     (defun validation-demo (&optional form)
+       (forms:with-form-renderer :who
+         (who:with-html-output (forms.who::*html*)
+           (:h1 (who:str "Server side validation"))
+           (:p (who:str "This is a demo of server side validation. Submit the form and play with the values to see how it works. Also look at field constraints in source code tab."))
+           (let ((form (or form (forms::get-form 'validated-form))))
+             (forms:render-form form)))))
+
+     (hunchentoot:define-easy-handler (validated-form-post :uri "/validation-post"
+                                                           :default-request-type :post) ()
+
+       (flet ((validation-post ()
+                (let ((form (forms:get-form 'validated-form)))
+                  (forms::handle-request form)
+                  (if (forms::validate-form form)
+                      ;; The form is valid
+                      (forms::with-form-field-values (name single sex age email birth-date) form
+                        (who:with-html-output (forms.who::*html*)
+                          (:ul
+                           (:li (who:fmt "Name: ~A" name))
+                           (:li (who:fmt "Single: ~A" single))
+                           (:li (who:fmt "Sex: ~A" sex))
+                           (:li (who:fmt "Age: ~A" age))
+                           (:li (who:fmt "Email: ~A" email))
+                           (:li (who:fmt "Birth date: ~A" birth-date)))))
+                      ;; The form is not valid
+                      (validation-demo form)))))
+         (render-demo-page :demo #'validation-post
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/validation.lisp")
+                           :active-menu :validation)))
+
+     (hunchentoot:define-easy-handler (validation-demo-handler :uri "/validation") ()
+       (render-demo-page :demo #'validation-demo
+                         :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                "test/demo/validation.lisp")
+                         :active-menu :validation))
+
+3.2.3 Client validation
+-----------------------
+
+To validate in the client, just set ':client-validation' to 'T'.
+
+     (in-package :forms.test)
+
+     (forms:defform client-validated-form (:action "/client-validation-post"
+                                                   :client-validation t)
+       ((name :string :value "" :constraints (list (clavier:is-a-string)
+                                                   (clavier:not-blank)
+                                                   (clavier:len :max 5))
+              :validation-triggers '(:focusin))
+        (single :boolean :value t)
+        (sex :choice :choices (list "Male" "Female") :value "Male")
+        (age :integer :constraints (list (clavier:is-an-integer)
+                                         (clavier:greater-than -1)
+                                         (clavier:less-than 200)))
+        (email :email)
+        (submit :submit :label "Create")))
+
+     (defun client-validation (&optional form)
+       (let ((form (or form (forms::get-form 'client-validated-form))))
+         (forms:with-form-renderer :who
+           (who:with-html-output (forms.who::*html*)
+             (:h1 (who:str "Client side validation"))
+             (:p (who:str "This is an example of how client side validation works. Client side validation uses parsleyjs library for validating client side."))
+             (:p (who:str "The interesting thing about the implementation is that validations are specified in the form definition, and are \"compiled\" to rules in javascript. Also, this example uses the exactly the same constraints than the server side validation demo."))
+             (forms:render-form form)))))
+
+     (hunchentoot:define-easy-handler (client-validation-handler
+                                       :uri "/client-validation") ()
+       (render-demo-page :demo #'client-validation
+                         :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                "test/demo/client-validation.lisp")
+                         :active-menu :client-validation))
+
+     (hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
+       (flet ((client-validation-post ()
+                (let ((form (forms:get-form 'client-validated-form)))
+                  (forms::handle-request form)
+                  (if (forms::validate-form form)
+                      ;; The form is valid
+                      (forms::with-form-field-values (name single sex age email) form
+                        (who:with-html-output (forms.who::*html*)
+                          (:ul
+                           (:li (who:fmt "Name: ~A" name))
+                           (:li (who:fmt "Single: ~A" single))
+                           (:li (who:fmt "Sex: ~A" sex))
+                           (:li (who:fmt "Age: ~A" age))
+                           (:li (who:fmt "Email: ~A" email)))))
+                      ;; The form is not valid
+                      (client-validation form)))))
+         (render-demo-page :demo #'client-validation-post
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/client-validation.lisp")
+                           :active-menu :client-validation)))
+
+3.2.4 Models
+------------
+
+     (in-package :forms.test)
+
+     (defclass person ()
+       ((name :initarg :name
+              :accessor person-name
+              :initform nil)
+        (single :initarg :single
+                :accessor person-single
+                :initform t)
+        (sex :initarg :sex
+             :accessor person-sex
+             :initform :male)))
+
+     (forms:defform-builder model-form (person)
+       (make-instance 'forms::form
+                      :name 'model-form
+                      :model person
+                      :action "/models-post"
+                      :fields (forms::make-form-fields
+                               `((name :string :label "Name"
+                                               :accessor person-name)
+                                 (single :boolean :label "Single"
+                                                  :accessor person-single)
+                                 (sex :choice :label "Sex"
+                                              :choices (:male :female)
+                                              :accessor person-sex
+                                              :formatter format-sex)
+                                 (submit :submit :label "Update")))))
+
+     (defun format-sex (sex stream)
+       (write-string
+        (if (equalp sex :male) "Male" "Female")
+        stream))
+
+     (defun models-demo ()
+       (who:with-html-output (forms.who::*html*)
+         (:h1 (who:str "Form models"))
+         (:p "Forms can be attached to model objects. Model objects are CLOS instances from where form values are read and written to.")
+         (:p "To work with models, forms are defined via defform-builder instead of defform. A form-builder is a function that takes the model objects and attaches it to the form. The form needs to define the accessors to access the model for each form field.")
+         (:p "This is an example of a form attached to a person object. Please have a look at the source code to see how it is done.")
+         (render-model-form)))
+
+     (defun render-model-form (&optional form)
+       (let ((form (or form
+                       (let ((person (make-instance 'person
+                                                    :name "Foo"
+                                                    :single t
+                                                    :sex :male)))
+                         (forms::get-form 'model-form person)))))
+         (forms:with-form-renderer :who
+           (forms:render-form form))))
+
+     (hunchentoot:define-easy-handler (model-form :uri "/models") ()
+       (render-demo-page :demo #'models-demo
+                         :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                "test/demo/models.lisp")
+                         :active-menu :models))
+
+     (hunchentoot:define-easy-handler (model-form-post :uri "/models-post"
+                                                       :default-request-type :post) ()
+       (flet ((model-post ()
+                (let ((person (make-instance 'person)))
+                  (let ((form (forms:get-form 'model-form person)))
+                    (forms::handle-request form)
+                    (forms::validate-form form)
+                    (who:with-html-output (forms.who::*html*)
+                      (:ul
+                       (:li (who:fmt "Name: ~A" (person-name person)))
+                       (:li (who:fmt "Single: ~A" (person-single person)))
+                       (:li (who:fmt "Sex: ~A" (person-sex person)))))))))
+         (render-demo-page :demo #'model-post
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/models.lisp")
+                           :active-menu :models)))
+
+3.2.5 Composition
+-----------------
+
+     (in-package :forms.test)
+
+     (forms:defform member-form ()
+       ((name :string :value "" :required-p nil)
+        (ready :boolean :value t :required-p nil)
+        (sex :choice :choices (list "Male" "Female") :value "Male")))
+
+     (forms:defform composition-form (:action "/composition-post")
+       (
+        ;; Subforms
+        (main-member :subform :subform 'member-form)
+        (secondary-member :subform :subform 'member-form)
+           ;; Simple list
+        (todo :list :type '(:string :required-p nil)
+              :empty-item-predicate (lambda (field)
+                                      (let ((val (forms:field-value field)))
+                                        (or (null val)
+                                            (string= val "")))))
+       ;; Subform list
+        (members :list :type '(:subform :subform member-form)
+                 :empty-item-predicate (lambda (field)
+                                         (let* ((subform (forms:field-value field))
+                                                (val (forms:get-field-value subform 'name)))
+                                           (or (null val)
+                                               (string= val "")))))
+        (save :submit :label "Save")))
+
+     (defun form-composition-demo (&optional form)
+       (let ((form (or form (get-form 'composition-form))))
+         (forms:with-form-renderer :who
+           (who:with-html-output (forms.who::*html*)
+             (:h1 (who:str "Forms composition"))
+             (:p (who:str "These are examples of subforms and the list field type"))
+             (forms::render-form-start form)
+             (:h2 (who:str "Subforms"))
+             (:p (who:str "This is an example of subform composition. main-member and secondary-member are subforms."))
+             (forms::render-field 'main-member form)
+             (forms::render-field 'secondary-member form)
+             (forms::render-field 'save form)
+             (:h2 (who:str "List field"))
+             (:p (who:str "This is an example of the list field. In this case, the list has elements of type string. To add an element to the list, fill in the input. To remove, empty the input."))
+             (forms::render-field 'todo form)
+             (forms::render-field 'save form)
+             (:h2 (who:str "List of subforms"))
+             (:p (who:str "This is the most complex example. This shows a list of subforms. Subforms are of type person. To add new persons, fill in their name. To remove, empty the name field."))
+             (forms::render-field 'members form)
+             (forms::render-field 'save form)
+             (forms::render-form-end form)))))
+
+     (hunchentoot:define-easy-handler (composition-demo :uri "/composition") ()
+       (render-demo-page :demo #'form-composition-demo
+                         :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                "test/demo/composition.lisp")
+                         :active-menu :composition))
+
+     (hunchentoot:define-easy-handler (composition-demo-post :uri "/composition-post") ()
+       (let ((form (forms:get-form 'composition-form)))
+         (forms:handle-request form)
+         (render-demo-page :demo (lambda ()
+                                   (form-composition-demo form))
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/composition.lisp")
+                           :active-menu :composition)))
+
 
 File: cl-forms.info,  Node: API,  Next: Index,  Prev: Usage,  Up: Top
 
@@ -579,51 +979,51 @@ Node: Installation1236
 Ref: installation1349
 Node: Usage1349
 Ref: usage1446
-Node: API2890
-Ref: api2976
-Node: CL-FORMS package3007
-Ref: CL-FORMS:*BASE64-ENCODE* variable3195
-Ref: CL-FORMS:DEFFORM-BUILDER macro3286
-Ref: CL-FORMS:WITH-FORM-RENDERER macro3676
-Ref: CL-FORMS:WITH-FORM-THEME macro3812
-Ref: CL-FORMS:WITH-FORM macro3946
-Ref: CL-FORMS:DEFFORM macro4056
-Ref: CL-FORMS:WITH-FORM-FIELDS macro5099
-Ref: CL-FORMS:WITH-FORM-TEMPLATE macro5342
-Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro5441
-Ref: CL-FORMS:FIELD-FORMATTER function5547
-Ref: CL-FORMS:FIELD-PARSER function5612
-Ref: CL-FORMS:FIELD-VALID-P function5674
-Ref: CL-FORMS:FIELD-READER function5760
-Ref: CL-FORMS:FIELD-WRITER function5813
-Ref: CL-FORMS:FORMAT-FIELD-VALUE function5866
-Ref: CL-FORMS:FIELD-VALUE function5969
-Ref: CL-FORMS:FIELD-ACCESSOR function6021
-Ref: CL-FORMS:FORM-ERRORS function6085
-Ref: CL-FORMS:GET-FORM function6167
-Ref: CL-FORMS:GET-FIELD function6369
-Ref: CL-FORMS:HANDLE-REQUEST function6443
-Ref: CL-FORMS:RENDER-FIELD-ERRORS function6726
-Ref: CL-FORMS:RENDER-FORM function6823
-Ref: CL-FORMS:RENDER-FORM-START function6896
-Ref: CL-FORMS:ADD-FORM-ERROR function6985
-Ref: CL-FORMS:RENDER-FORM-ERRORS function7104
-Ref: CL-FORMS:RENDER-FIELD-WIDGET function7194
-Ref: CL-FORMS:FILL-FORM-FROM-MODEL function7291
-Ref: CL-FORMS:VALIDATE-FORM function7380
-Ref: CL-FORMS:MAKE-FORMATTER function7718
-Ref: CL-FORMS:RENDER-FIELD-LABEL function7831
-Ref: CL-FORMS:ADD-FIELD function7927
-Ref: CL-FORMS:REMOVE-FIELD function7974
-Ref: CL-FORMS:GET-FIELD-VALUE function8024
-Ref: CL-FORMS:FORM-VALID-P function8114
-Ref: CL-FORMS:RENDER-FIELD function8158
-Ref: CL-FORMS:FILL-MODEL-FROM-FORM function8248
-Ref: CL-FORMS:SET-FIELD-VALUE function8356
-Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function8420
-Ref: CL-FORMS:RENDER-FORM-END function8545
-Ref: CL-FORMS:FORM class8628
-Ref: CL-FORMS:FORM-FIELD class11002
-Node: Index14780
+Node: API22757
+Ref: api22843
+Node: CL-FORMS package22874
+Ref: CL-FORMS:*BASE64-ENCODE* variable23062
+Ref: CL-FORMS:DEFFORM-BUILDER macro23153
+Ref: CL-FORMS:WITH-FORM-RENDERER macro23543
+Ref: CL-FORMS:WITH-FORM-THEME macro23679
+Ref: CL-FORMS:WITH-FORM macro23813
+Ref: CL-FORMS:DEFFORM macro23923
+Ref: CL-FORMS:WITH-FORM-FIELDS macro24966
+Ref: CL-FORMS:WITH-FORM-TEMPLATE macro25209
+Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro25308
+Ref: CL-FORMS:FIELD-FORMATTER function25414
+Ref: CL-FORMS:FIELD-PARSER function25479
+Ref: CL-FORMS:FIELD-VALID-P function25541
+Ref: CL-FORMS:FIELD-READER function25627
+Ref: CL-FORMS:FIELD-WRITER function25680
+Ref: CL-FORMS:FORMAT-FIELD-VALUE function25733
+Ref: CL-FORMS:FIELD-VALUE function25836
+Ref: CL-FORMS:FIELD-ACCESSOR function25888
+Ref: CL-FORMS:FORM-ERRORS function25952
+Ref: CL-FORMS:GET-FORM function26034
+Ref: CL-FORMS:GET-FIELD function26236
+Ref: CL-FORMS:HANDLE-REQUEST function26310
+Ref: CL-FORMS:RENDER-FIELD-ERRORS function26593
+Ref: CL-FORMS:RENDER-FORM function26690
+Ref: CL-FORMS:RENDER-FORM-START function26763
+Ref: CL-FORMS:ADD-FORM-ERROR function26852
+Ref: CL-FORMS:RENDER-FORM-ERRORS function26971
+Ref: CL-FORMS:RENDER-FIELD-WIDGET function27061
+Ref: CL-FORMS:FILL-FORM-FROM-MODEL function27158
+Ref: CL-FORMS:VALIDATE-FORM function27247
+Ref: CL-FORMS:MAKE-FORMATTER function27585
+Ref: CL-FORMS:RENDER-FIELD-LABEL function27698
+Ref: CL-FORMS:ADD-FIELD function27794
+Ref: CL-FORMS:REMOVE-FIELD function27841
+Ref: CL-FORMS:GET-FIELD-VALUE function27891
+Ref: CL-FORMS:FORM-VALID-P function27981
+Ref: CL-FORMS:RENDER-FIELD function28025
+Ref: CL-FORMS:FILL-MODEL-FROM-FORM function28115
+Ref: CL-FORMS:SET-FIELD-VALUE function28223
+Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function28287
+Ref: CL-FORMS:RENDER-FORM-END function28412
+Ref: CL-FORMS:FORM class28495
+Ref: CL-FORMS:FORM-FIELD class30869
+Node: Index34647
 
 End Tag Table

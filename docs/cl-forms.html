@@ -76,7 +76,14 @@ ul.no-bullet {list-style: none}
   <li><a id="toc-Usage-1" href="#Usage">3 Usage</a>
   <ul class="no-bullet">
     <li><a id="toc-Basics" href="#Basics">3.1 Basics</a></li>
-    <li><a id="toc-Demo" href="#Demo">3.2 Demo</a></li>
+    <li><a id="toc-Demo" href="#Demo">3.2 Demo</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Basic-example" href="#Basic-example">3.2.1 Basic example</a></li>
+      <li><a id="toc-Validation" href="#Validation">3.2.2 Validation</a></li>
+      <li><a id="toc-Client-validation" href="#Client-validation">3.2.3 Client validation</a></li>
+      <li><a id="toc-Models" href="#Models">3.2.4 Models</a></li>
+      <li><a id="toc-Composition" href="#Composition">3.2.5 Composition</a></li>
+    </ul></li>
   </ul></li>
   <li><a id="toc-API-1" href="#API">4 API</a>
   <ul class="no-bullet">
@@ -151,34 +158,35 @@ Next: <a href="#API" accesskey="n" rel="next">API</a>, Previous: <a href="#Insta
 
 <p>Use <a href="#CL_002dFORMS_003aDEFFORM-macro">DEFFORM</a> to define a form. Example:
 </p>
-<div class="example">
-<pre class="example">(defform fields-form (:action &quot;/fields-post&quot;)
-  ((name :string :value &quot;&quot;)
-   (ready :boolean :value t)
-   (sex :choice :choices (list &quot;Male&quot; &quot;Female&quot;) :value &quot;Male&quot;)
-   (submit :submit :label &quot;Create&quot;)))
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defform</span></i> fields-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/fields-post&quot;</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:value</span> <span class="string">&quot;&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">ready <span class="keyword">:boolean</span> <span class="keyword">:value</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span> <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
 <p>On your web handler, grab the form via &lsquo;get-form&lsquo;, select a renderer with &lsquo;with-form-renderer&lsquo;and then render the form with &lsquo;render-form&lsquo;:
 </p>
-<div class="example">
-<pre class="example">(let ((form (forms::get-form 'fields-form)))
-   (forms:with-form-renderer :who
-      (forms:render-form form))
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms::get-form 'fields-form</span>)</span></span>)</span></span>)</span>
+     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+        <span class="paren3">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span>
+  </span></span>
 </pre></div>
 
 <p>To handle the form, grab it via &lsquo;get-form&lsquo; and then call &lsquo;handle-request&lsquo; (you should probably also call &lsquo;validate-form&lsquo; after). 
 Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that binds the form field values; or &lsquo;with-form-fields&lsquo; that binds the form fields.
 </p>
-<div class="example">
-<pre class="example">(let ((form (forms:get-form 'fields-form)))
-    (forms::handle-request form)
-    (forms::with-form-field-values (name ready sex) form
-       (who:with-html-output (forms.who::*html*)
-          (:ul
-            (:li (who:fmt &quot;Name: ~A&quot; name))
-            (:li (who:fmt &quot;Ready: ~A&quot; ready))
-            (:li (who:fmt &quot;Sex: ~A&quot; sex))))))
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span></span>)</span></span>)</span>
+      <span class="paren2">(<span class="lisp-bg">forms::handle-request form</span>)</span>
+      <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-field-values</span></i> <span class="paren3">(<span class="lisp-bg">name ready sex</span>)</span> form
+         <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren4">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+            <span class="paren4">(<span class="lisp-bg"><span class="keyword">:ul</span>
+              <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> name</span>)</span></span>)</span>
+              <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Ready: ~A&quot;</span> ready</span>)</span></span>)</span>
+              <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
 <p>Plase have a look at the demo sources for more examples of how to use the library
@@ -187,9 +195,415 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
 
 <p>There&rsquo;s a demo included. To run:
 </p>
-<div class="example">
-<pre class="example">(require :cl-forms.demo)
-(forms.test:run-demo)
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">require <span class="keyword">:cl-forms.demo</span></span>)</span>
+  <span class="paren1">(<span class="lisp-bg">forms.test:run-demo</span>)</span>
+</pre></div>
+
+<span id="Basic-example"></span><h4 class="subsection">3.2.1 Basic example</h4>
+
+<p>Define a form. Render the form via CL-WHO backend, doing:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+     <span class="paren2">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span>
+</pre></div>
+
+<p>Then handle and validate the form.
+</p>
+<p>Source code:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> fields-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/fields-post&quot;</span>
+                                      <span class="keyword">:enctype</span> <span class="string">&quot;multipart/form-data&quot;</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:value</span> <span class="string">&quot;&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">ready <span class="keyword">:boolean</span> <span class="keyword">:value</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span> <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">avatar <span class="keyword">:file</span> <span class="keyword">:upload-handler</span> 'handle-file-upload</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">disabled <span class="keyword">:string</span> <span class="keyword">:disabled-p</span> t <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">readonly <span class="keyword">:string</span> <span class="keyword">:read-only-p</span> t <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">readonly-checkbox <span class="keyword">:boolean</span> <span class="keyword">:read-only-p</span> t <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">disabled-checkbox <span class="keyword">:boolean</span> <span class="keyword">:disabled-p</span> t <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> fields-demo <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><span class="keyword">:h1</span> <span class="paren4">(<span class="lisp-bg">who:str <span class="string">&quot;Fields example&quot;</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:container</span>
+            <span class="paren4">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:row</span>
+                  <span class="paren5">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:heading</span>
+                        <span class="paren6">(<span class="lisp-bg"><span class="keyword">:h3</span> <span class="paren1">(<span class="lisp-bg">who:str <span class="string">&quot;Simple form&quot;</span></span>)</span></span>)</span></span>)</span>
+                  <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms::get-form 'fields-form</span>)</span></span>)</span></span>)</span>
+                    <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+                      <span class="paren1">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span>
+            <span class="paren4">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:row</span>
+                  <span class="paren5">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:heading</span>
+                        <span class="paren6">(<span class="lisp-bg"><span class="keyword">:h3</span> <span class="paren1">(<span class="lisp-bg">who:str <span class="string">&quot;Choices&quot;</span></span>)</span></span>)</span></span>)</span>
+                  <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms::get-form 'choices-form</span>)</span></span>)</span></span>)</span>
+                    <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+                      <span class="paren1">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">fields-demo-handler <span class="keyword">:uri</span> <span class="string">&quot;/fields&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'fields-demo
+                      <span class="keyword">:source</span> <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                             <span class="string">&quot;test/demo/fields.lisp&quot;</span></span>)</span>
+                      <span class="keyword">:active-menu</span> <span class="keyword">:fields</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">fields-form-post
+                                    <span class="keyword">:uri</span> <span class="string">&quot;/fields-post&quot;</span>
+                                    <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">fields-post <span class="paren5">(<span class="lisp-bg"></span>)</span>
+             <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span></span>)</span></span>)</span>
+               <span class="paren6">(<span class="lisp-bg">forms::handle-request form</span>)</span>
+               <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-fields</span></i> <span class="paren1">(<span class="lisp-bg">name ready sex avatar</span>)</span> form
+                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                   <span class="paren2">(<span class="lisp-bg"><span class="keyword">:ul</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">forms::field-value name</span>)</span></span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Ready: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">forms::field-value ready</span>)</span></span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">forms::field-value sex</span>)</span></span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Avatar: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">forms::file-name avatar</span>)</span></span>)</span>
+                         <span class="paren4">(<span class="lisp-bg">when <span class="paren5">(<span class="lisp-bg">forms::file-name avatar</span>)</span>
+                           <span class="paren5">(<span class="lisp-bg">who:htm
+                            <span class="paren6">(<span class="lisp-bg"><span class="keyword">:img</span> <span class="keyword">:width</span> 200 <span class="keyword">:height</span> 200
+                                  <span class="keyword">:src</span> <span class="paren1">(<span class="lisp-bg">format nil <span class="string">&quot;/files?f=~A&quot;</span> <span class="paren2">(<span class="lisp-bg">forms::file-name avatar</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'fields-post
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                               <span class="string">&quot;test/demo/fields.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:fields</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="comment">;; Choices widget test
+  </span> 
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> choices-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/choices-post&quot;</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span>
+          <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span>
+          <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex2 <span class="keyword">:choice</span>
+           <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span>
+           <span class="keyword">:value</span> <span class="string">&quot;Female&quot;</span>
+           <span class="keyword">:expanded</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">choices <span class="keyword">:choice</span>
+              <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Foo&quot;</span> <span class="string">&quot;Bar&quot;</span></span>)</span>
+              <span class="keyword">:value</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Foo&quot;</span></span>)</span>
+              <span class="keyword">:multiple</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">choices2 <span class="keyword">:choice</span>
+               <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Foo&quot;</span> <span class="string">&quot;Bar&quot;</span></span>)</span>
+               <span class="keyword">:value</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Bar&quot;</span></span>)</span>
+               <span class="keyword">:multiple</span> t
+               <span class="keyword">:expanded</span>  t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Ok&quot;</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">choices-form-post <span class="keyword">:uri</span> <span class="string">&quot;/choices-post&quot;</span>
+                                                      <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">choices-post <span class="paren5">(<span class="lisp-bg"></span>)</span>
+             <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms:get-form 'choices-form</span>)</span></span>)</span></span>)</span>
+               <span class="paren6">(<span class="lisp-bg">forms::handle-request form</span>)</span>
+               <span class="paren6">(<span class="lisp-bg">forms::validate-form form</span>)</span>
+               <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-field-values</span></i> <span class="paren1">(<span class="lisp-bg">sex sex2 choices choices2</span>)</span> form
+                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                   <span class="paren2">(<span class="lisp-bg"><span class="keyword">:ul</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex2: ~A&quot;</span> sex2</span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Choices: ~A&quot;</span> choices</span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Choices2: ~A&quot;</span> choices2</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'choices-post
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                               <span class="string">&quot;test/demo/fields.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:fields</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="comment">;; File handling
+  </span> 
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defvar</span></i> <span class="special">*files*</span> nil</span>)</span>
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defvar</span></i> <span class="special">*files-path*</span> <span class="paren2">(<span class="lisp-bg">pathname <span class="string">&quot;/tmp/cl-forms/&quot;</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> handle-file-upload <span class="paren2">(<span class="lisp-bg">file-field</span>)</span>
+    <span class="comment">;; Store the file
+  </span>  <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">new-path <span class="paren5">(<span class="lisp-bg">merge-pathnames 
+                         <span class="paren6">(<span class="lisp-bg">forms::file-name file-field</span>)</span>
+                         <span class="special">*files-path*</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">rename-file <span class="paren4">(<span class="lisp-bg">forms::file-path file-field</span>)</span>
+                   <span class="paren4">(<span class="lisp-bg">ensure-directories-exist new-path</span>)</span></span>)</span>
+      <span class="comment">;; Save for handler
+  </span>    <span class="paren3">(<span class="lisp-bg">push <span class="paren4">(<span class="lisp-bg">cons <span class="paren5">(<span class="lisp-bg">forms::file-name file-field</span>)</span>
+                  <span class="paren5">(<span class="lisp-bg">list new-path <span class="paren6">(<span class="lisp-bg">forms::file-content-type file-field</span>)</span></span>)</span></span>)</span>
+            <span class="special">*files*</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> handle-uploaded-file <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">finfo <span class="paren5">(<span class="lisp-bg">cdr <span class="paren6">(<span class="lisp-bg">assoc <span class="paren1">(<span class="lisp-bg">hunchentoot:parameter <span class="string">&quot;f&quot;</span></span>)</span> <span class="special">*files*</span> <span class="keyword">:test</span> #'equalp</span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">hunchentoot:handle-static-file <span class="paren4">(<span class="lisp-bg">first finfo</span>)</span> <span class="paren4">(<span class="lisp-bg">second finfo</span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg">push 
+   <span class="paren2">(<span class="lisp-bg">hunchentoot:create-prefix-dispatcher <span class="string">&quot;/files&quot;</span> 'handle-uploaded-file</span>)</span>
+   <span class="special">hunchentoot:*dispatch-table*</span></span>)</span>
+</pre></div>
+
+<span id="Validation"></span><h4 class="subsection">3.2.2 Validation</h4>
+
+<p>Example of forms validation.
+</p>
+<p>Add Clavier constraints to the form. Then call VALIDATE-FORM after HANDLE-REQUEST.
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> validated-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/validation-post&quot;</span>
+                                         <span class="keyword">:client-validation</span> nil</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:value</span> <span class="string">&quot;&quot;</span> <span class="keyword">:constraints</span> <span class="paren4">(<span class="lisp-bg">list <span class="paren5">(<span class="lisp-bg">clavier:is-a-string</span>)</span>
+                                                <span class="paren5">(<span class="lisp-bg">clavier:not-blank</span>)</span>
+                                                <span class="paren5">(<span class="lisp-bg">clavier:len <span class="keyword">:max</span> 5</span>)</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">single <span class="keyword">:boolean</span> <span class="keyword">:value</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span> <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">age <span class="keyword">:integer</span> <span class="keyword">:constraints</span> <span class="paren4">(<span class="lisp-bg">list <span class="paren5">(<span class="lisp-bg">clavier:is-an-integer</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg">clavier:greater-than -1</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg">clavier:less-than 200</span>)</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">email <span class="keyword">:email</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">birth-date <span class="keyword">:date</span> <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> validation-demo <span class="paren2">(<span class="lisp-bg">&amp;optional form</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+      <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren4">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:h1</span> <span class="paren5">(<span class="lisp-bg">who:str <span class="string">&quot;Server side validation&quot;</span></span>)</span></span>)</span>
+        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren5">(<span class="lisp-bg">who:str <span class="string">&quot;This is a demo of server side validation. Submit the form and play with the values to see how it works. Also look at field constraints in source code tab.&quot;</span></span>)</span></span>)</span>
+        <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren5">(<span class="lisp-bg"><span class="paren6">(<span class="lisp-bg">form <span class="paren1">(<span class="lisp-bg">or form <span class="paren2">(<span class="lisp-bg">forms::get-form 'validated-form</span>)</span></span>)</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">validated-form-post <span class="keyword">:uri</span> <span class="string">&quot;/validation-post&quot;</span>
+                                                        <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+   
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">validation-post <span class="paren5">(<span class="lisp-bg"></span>)</span>
+             <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms:get-form 'validated-form</span>)</span></span>)</span></span>)</span>
+               <span class="paren6">(<span class="lisp-bg">forms::handle-request form</span>)</span>
+               <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">if</span></i> <span class="paren1">(<span class="lisp-bg">forms::validate-form form</span>)</span>
+                   <span class="comment">;; The form is valid
+  </span>                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name single sex age email birth-date</span>)</span> form
+                     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                       <span class="paren3">(<span class="lisp-bg"><span class="keyword">:ul</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> name</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Single: ~A&quot;</span> single</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Age: ~A&quot;</span> age</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Email: ~A&quot;</span> email</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Birth date: ~A&quot;</span> birth-date</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+                   <span class="comment">;; The form is not valid
+  </span>                 <span class="paren1">(<span class="lisp-bg">validation-demo form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'validation-post
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                               <span class="string">&quot;test/demo/validation.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:validation</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">validation-demo-handler <span class="keyword">:uri</span> <span class="string">&quot;/validation&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'validation-demo
+                      <span class="keyword">:source</span> <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                             <span class="string">&quot;test/demo/validation.lisp&quot;</span></span>)</span>
+                      <span class="keyword">:active-menu</span> <span class="keyword">:validation</span></span>)</span></span>)</span>
+</pre></div>
+
+<span id="Client-validation"></span><h4 class="subsection">3.2.3 Client validation</h4>
+
+<p>To validate in the client, just set <code>:client-validation</code> to <code>T</code>.
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> client-validated-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/client-validation-post&quot;</span>
+                                                <span class="keyword">:client-validation</span> t</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:value</span> <span class="string">&quot;&quot;</span> <span class="keyword">:constraints</span> <span class="paren4">(<span class="lisp-bg">list <span class="paren5">(<span class="lisp-bg">clavier:is-a-string</span>)</span>
+                                                <span class="paren5">(<span class="lisp-bg">clavier:not-blank</span>)</span>
+                                                <span class="paren5">(<span class="lisp-bg">clavier:len <span class="keyword">:max</span> 5</span>)</span></span>)</span>
+           <span class="keyword">:validation-triggers</span> '<span class="paren4">(<span class="lisp-bg"><span class="keyword">:focusin</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">single <span class="keyword">:boolean</span> <span class="keyword">:value</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span> <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">age <span class="keyword">:integer</span> <span class="keyword">:constraints</span> <span class="paren4">(<span class="lisp-bg">list <span class="paren5">(<span class="lisp-bg">clavier:is-an-integer</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg">clavier:greater-than -1</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg">clavier:less-than 200</span>)</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">email <span class="keyword">:email</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> client-validation <span class="paren2">(<span class="lisp-bg">&amp;optional form</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">form <span class="paren5">(<span class="lisp-bg">or form <span class="paren6">(<span class="lisp-bg">forms::get-form 'client-validated-form</span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+        <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren5">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:h1</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;Client side validation&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;This is an example of how client side validation works. Client side validation uses parsleyjs library for validating client side.&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;The interesting thing about the implementation is that validations are specified in the form definition, and are </span><span class="string">\&quot;</span><span class="string">compiled</span><span class="string">\&quot;</span><span class="string"> to rules in javascript. Also, this example uses the exactly the same constraints than the server side validation demo.&quot;</span></span>)</span></span>)</span>      
+          <span class="paren5">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">client-validation-handler
+                                    <span class="keyword">:uri</span> <span class="string">&quot;/client-validation&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'client-validation
+                      <span class="keyword">:source</span> <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                             <span class="string">&quot;test/demo/client-validation.lisp&quot;</span></span>)</span>
+                      <span class="keyword">:active-menu</span> <span class="keyword">:client-validation</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">client-validation-post <span class="keyword">:uri</span> <span class="string">&quot;/client-validation/post&quot;</span> <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">client-validation-post <span class="paren5">(<span class="lisp-bg"></span>)</span>
+             <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms:get-form 'client-validated-form</span>)</span></span>)</span></span>)</span>
+               <span class="paren6">(<span class="lisp-bg">forms::handle-request form</span>)</span>
+               <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">if</span></i> <span class="paren1">(<span class="lisp-bg">forms::validate-form form</span>)</span>
+                   <span class="comment">;; The form is valid
+  </span>                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name single sex age email</span>)</span> form
+                     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                       <span class="paren3">(<span class="lisp-bg"><span class="keyword">:ul</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> name</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Single: ~A&quot;</span> single</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Age: ~A&quot;</span> age</span>)</span></span>)</span>
+                        <span class="paren4">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren5">(<span class="lisp-bg">who:fmt <span class="string">&quot;Email: ~A&quot;</span> email</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+                   <span class="comment">;; The form is not valid
+  </span>                 <span class="paren1">(<span class="lisp-bg">client-validation form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'client-validation-post
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                               <span class="string">&quot;test/demo/client-validation.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:client-validation</span></span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<span id="Models"></span><h4 class="subsection">3.2.4 Models</h4>
+
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defclass</span></i> person <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:initarg</span> <span class="keyword">:name</span>
+           <span class="keyword">:accessor</span> person-name
+           <span class="keyword">:initform</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">single <span class="keyword">:initarg</span> <span class="keyword">:single</span>
+             <span class="keyword">:accessor</span> person-single
+             <span class="keyword">:initform</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:initarg</span> <span class="keyword">:sex</span>
+          <span class="keyword">:accessor</span> person-sex
+          <span class="keyword">:initform</span> <span class="keyword">:male</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform-builder</span></i> model-form <span class="paren2">(<span class="lisp-bg">person</span>)</span>
+    <span class="paren2">(<span class="lisp-bg">make-instance 'forms::form
+                   <span class="keyword">:name</span> 'model-form
+                   <span class="keyword">:model</span> person
+                   <span class="keyword">:action</span> <span class="string">&quot;/models-post&quot;</span>
+                   <span class="keyword">:fields</span> <span class="paren3">(<span class="lisp-bg">forms::make-form-fields
+                            `<span class="paren4">(<span class="lisp-bg"><span class="paren5">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:label</span> <span class="string">&quot;Name&quot;</span>
+                                            <span class="keyword">:accessor</span> person-name</span>)</span>
+                              <span class="paren5">(<span class="lisp-bg">single <span class="keyword">:boolean</span> <span class="keyword">:label</span> <span class="string">&quot;Single&quot;</span>
+                                               <span class="keyword">:accessor</span> person-single</span>)</span>
+                              <span class="paren5">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:label</span> <span class="string">&quot;Sex&quot;</span>
+                                           <span class="keyword">:choices</span> <span class="paren6">(<span class="lisp-bg"><span class="keyword">:male</span> <span class="keyword">:female</span></span>)</span>
+                                           <span class="keyword">:accessor</span> person-sex
+                                           <span class="keyword">:formatter</span> format-sex</span>)</span>
+                              <span class="paren5">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Update&quot;</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> format-sex <span class="paren2">(<span class="lisp-bg">sex stream</span>)</span>
+    <span class="paren2">(<span class="lisp-bg">write-string
+     <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">if</span></i> <span class="paren4">(<span class="lisp-bg">equalp sex <span class="keyword">:male</span></span>)</span> <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span>
+     stream</span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> models-demo <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><span class="keyword">:h1</span> <span class="paren4">(<span class="lisp-bg">who:str <span class="string">&quot;Form models&quot;</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="string">&quot;Forms can be attached to model objects. Model objects are CLOS instances from where form values are read and written to.&quot;</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="string">&quot;To work with models, forms are defined via defform-builder instead of defform. A form-builder is a function that takes the model objects and attaches it to the form. The form needs to define the accessors to access the model for each form field.&quot;</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="string">&quot;This is an example of a form attached to a person object. Please have a look at the source code to see how it is done.&quot;</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-model-form</span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> render-model-form <span class="paren2">(<span class="lisp-bg">&amp;optional form</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">form <span class="paren5">(<span class="lisp-bg">or form
+                    <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren1">(<span class="lisp-bg"><span class="paren2">(<span class="lisp-bg">person <span class="paren3">(<span class="lisp-bg">make-instance 'person
+                                                 <span class="keyword">:name</span> <span class="string">&quot;Foo&quot;</span>
+                                                 <span class="keyword">:single</span> t
+                                                 <span class="keyword">:sex</span> <span class="keyword">:male</span></span>)</span></span>)</span></span>)</span>
+                      <span class="paren1">(<span class="lisp-bg">forms::get-form 'model-form person</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+        <span class="paren4">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">model-form <span class="keyword">:uri</span> <span class="string">&quot;/models&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'models-demo
+                      <span class="keyword">:source</span> <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                             <span class="string">&quot;test/demo/models.lisp&quot;</span></span>)</span>
+                      <span class="keyword">:active-menu</span> <span class="keyword">:models</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">model-form-post <span class="keyword">:uri</span> <span class="string">&quot;/models-post&quot;</span>
+                                                    <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">model-post <span class="paren5">(<span class="lisp-bg"></span>)</span>
+             <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">person <span class="paren2">(<span class="lisp-bg">make-instance 'person</span>)</span></span>)</span></span>)</span>
+               <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren1">(<span class="lisp-bg"><span class="paren2">(<span class="lisp-bg">form <span class="paren3">(<span class="lisp-bg">forms:get-form 'model-form person</span>)</span></span>)</span></span>)</span>
+                 <span class="paren1">(<span class="lisp-bg">forms::handle-request form</span>)</span>
+                 <span class="paren1">(<span class="lisp-bg">forms::validate-form form</span>)</span>
+                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                   <span class="paren2">(<span class="lisp-bg"><span class="keyword">:ul</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">person-name person</span>)</span></span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Single: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">person-single person</span>)</span></span>)</span></span>)</span>
+                    <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">person-sex person</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'model-post
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                               <span class="string">&quot;test/demo/models.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:models</span></span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<span id="Composition"></span><h4 class="subsection">3.2.5 Composition</h4>
+
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> member-form <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:value</span> <span class="string">&quot;&quot;</span> <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">ready <span class="keyword">:boolean</span> <span class="keyword">:value</span> t <span class="keyword">:required-p</span> nil</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span> <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> composition-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/composition-post&quot;</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">
+     <span class="comment">;; Subforms
+  </span>   <span class="paren3">(<span class="lisp-bg">main-member <span class="keyword">:subform</span> <span class="keyword">:subform</span> 'member-form</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">secondary-member <span class="keyword">:subform</span> <span class="keyword">:subform</span> 'member-form</span>)</span>
+        <span class="comment">;; Simple list
+  </span>   <span class="paren3">(<span class="lisp-bg">todo <span class="keyword">:list</span> <span class="keyword">:type</span> '<span class="paren4">(<span class="lisp-bg"><span class="keyword">:string</span> <span class="keyword">:required-p</span> nil</span>)</span>
+           <span class="keyword">:empty-item-predicate</span> <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="lisp-bg">field</span>)</span>
+                                   <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">val <span class="paren2">(<span class="lisp-bg">forms:field-value field</span>)</span></span>)</span></span>)</span>
+                                     <span class="paren6">(<span class="lisp-bg">or <span class="paren1">(<span class="lisp-bg">null val</span>)</span>
+                                         <span class="paren1">(<span class="lisp-bg">string= val <span class="string">&quot;&quot;</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+    <span class="comment">;; Subform list
+  </span>   <span class="paren3">(<span class="lisp-bg">members <span class="keyword">:list</span> <span class="keyword">:type</span> '<span class="paren4">(<span class="lisp-bg"><span class="keyword">:subform</span> <span class="keyword">:subform</span> member-form</span>)</span>
+              <span class="keyword">:empty-item-predicate</span> <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="lisp-bg">field</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let*</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">subform <span class="paren2">(<span class="lisp-bg">forms:field-value field</span>)</span></span>)</span>
+                                             <span class="paren1">(<span class="lisp-bg">val <span class="paren2">(<span class="lisp-bg">forms:get-field-value subform 'name</span>)</span></span>)</span></span>)</span>
+                                        <span class="paren6">(<span class="lisp-bg">or <span class="paren1">(<span class="lisp-bg">null val</span>)</span>
+                                            <span class="paren1">(<span class="lisp-bg">string= val <span class="string">&quot;&quot;</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">save <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Save&quot;</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> form-composition-demo <span class="paren2">(<span class="lisp-bg">&amp;optional form</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">form <span class="paren5">(<span class="lisp-bg">or form <span class="paren6">(<span class="lisp-bg">get-form 'composition-form</span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+        <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren5">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:h1</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;Forms composition&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;These are examples of subforms and the list field type&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-form-start form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;Subforms&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;This is an example of subform composition. main-member and secondary-member are subforms.&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'main-member form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'secondary-member form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'save form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;List field&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;This is an example of the list field. In this case, the list has elements of type string. To add an element to the list, fill in the input. To remove, empty the input.&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'todo form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'save form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;List of subforms&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren6">(<span class="lisp-bg">who:str <span class="string">&quot;This is the most complex example. This shows a list of subforms. Subforms are of type person. To add new persons, fill in their name. To remove, empty the name field.&quot;</span></span>)</span></span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'members form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-field 'save form</span>)</span>
+          <span class="paren5">(<span class="lisp-bg">forms::render-form-end form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">composition-demo <span class="keyword">:uri</span> <span class="string">&quot;/composition&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'form-composition-demo
+                      <span class="keyword">:source</span> <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span> 
+                                                             <span class="string">&quot;test/demo/composition.lisp&quot;</span></span>)</span>
+                      <span class="keyword">:active-menu</span> <span class="keyword">:composition</span></span>)</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">composition-demo-post <span class="keyword">:uri</span> <span class="string">&quot;/composition-post&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">form <span class="paren5">(<span class="lisp-bg">forms:get-form 'composition-form</span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">forms:handle-request form</span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="lisp-bg"></span>)</span>
+                                <span class="paren5">(<span class="lisp-bg">form-composition-demo form</span>)</span></span>)</span>
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span> 
+                                                               <span class="string">&quot;test/demo/composition.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:composition</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
 <hr>
@@ -268,22 +682,21 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <p>ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
 FIELDS are the form field specs.
 </p>
-<div class="example">
-<pre class="example">(forms:defform client-validated-form (:action &quot;/client-validation-post&quot;
-                                              :client-validation t)
-  ((name :string :value &quot;&quot; :constraints (list (clavier:is-a-string)
-                                              (clavier:not-blank)
-                                              (clavier:len :max 5))
-         :validation-triggers '(:focusin))
-   (single :boolean :value t)
-   (sex :choice :choices (list &quot;Male&quot; &quot;Female&quot;) :value &quot;Male&quot;)
-   (age :integer :constraints (list (clavier:is-an-integer)
-                                    (clavier:greater-than -1)
-                                    (clavier:less-than 200)))
-   (email :email)
-   (submit :submit :label &quot;Create&quot;)))
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:defform</span></i> client-validated-form <span class="paren2">(<span class="lisp-bg"><span class="keyword">:action</span> <span class="string">&quot;/client-validation-post&quot;</span>
+                                                <span class="keyword">:client-validation</span> t</span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">name <span class="keyword">:string</span> <span class="keyword">:value</span> <span class="string">&quot;&quot;</span> <span class="keyword">:constraints</span> <span class="paren4">(<span class="lisp-bg">list <span class="paren5">(<span class="lisp-bg">clavier:is-a-string</span>)</span>
+                                                <span class="paren5">(<span class="lisp-bg">clavier:not-blank</span>)</span>
+                                                <span class="paren5">(<span class="lisp-bg">clavier:len <span class="keyword">:max</span> 5</span>)</span></span>)</span>
+           <span class="keyword">:validation-triggers</span> '<span class="paren4">(<span class="lisp-bg"><span class="keyword">:focusin</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">single <span class="keyword">:boolean</span> <span class="keyword">:value</span> t</span>)</span>
+     <span class="paren3">(<span class="lisp-bg">sex <span class="keyword">:choice</span> <span class="keyword">:choices</span> <span class="paren4">(<span class="lisp-bg">list <span class="string">&quot;Male&quot;</span> <span class="string">&quot;Female&quot;</span></span>)</span> <span class="keyword">:value</span> <span class="string">&quot;Male&quot;</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">age <span class="keyword">:integer</span> <span class="keyword">:constraints</span> <span class="paren4">(<span class="lisp-bg">list <span class="paren5">(<span class="lisp-bg">clavier:is-an-integer</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg">clavier:greater-than -1</span>)</span>
+                                      <span class="paren5">(<span class="lisp-bg">clavier:less-than 200</span>)</span></span>)</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">email <span class="keyword">:email</span></span>)</span>
+     <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
-
 </dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELDS"></span>
@@ -292,9 +705,9 @@ FIELDS are the form field specs.
 <dd>
 <p>Bind FIELDS to the form fields in FORM under BODY.
 </p>
-<div class="example">
-<pre class="example">(with-form-field-values (name single sex age email) form
-   (print (list name single sex age email)))
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name single sex age email</span>)</span> form
+     <span class="paren2">(<span class="lisp-bg">print <span class="paren3">(<span class="lisp-bg">list name single sex age email</span>)</span></span>)</span></span>)</span>
 </pre></div>
 </dd></dl>
 

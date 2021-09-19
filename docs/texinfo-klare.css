@@ -124,11 +124,11 @@ pre.verbatim{
 pre.example,
 pre.lisp,
 pre.verbatim {
-    background-color: #2D3743;
+    background-color: #F2F2F2;
     border-color: #000;
     border-style: solid;
     border-width: thin;
-    color: #E1E1E1;
+    color: black;
     font-size: smaller;
     padding: 1em;
 }

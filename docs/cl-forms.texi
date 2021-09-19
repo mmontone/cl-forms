@@ -77,26 +77,26 @@ Several form field types: String, boolean, integer, email, password fields. And 
 
 Use @clref{CL-FORMS, DEFFORM, macro} to define a form. Example:
 
-@example
+@lisp
 (defform fields-form (:action "/fields-post")
   ((name :string :value "")
    (ready :boolean :value t)
    (sex :choice :choices (list "Male" "Female") :value "Male")
    (submit :submit :label "Create")))
-@end example
+@end lisp
 
 On your web handler, grab the form via `get-form`, select a renderer with `with-form-renderer`and then render the form with `render-form`:
 
-@example
+@lisp
 (let ((form (forms::get-form 'fields-form)))
    (forms:with-form-renderer :who
       (forms:render-form form))
-@end example
+@end lisp
 
 To handle the form, grab it via `get-form` and then call `handle-request` (you should probably also call `validate-form` after). 
 Then bind form fields via either `with-form-field-values`, that binds the form field values; or `with-form-fields` that binds the form fields.
 
-@example
+@lisp
 (let ((form (forms:get-form 'fields-form)))
     (forms::handle-request form)
     (forms::with-form-field-values (name ready sex) form
@@ -105,7 +105,7 @@ Then bind form fields via either `with-form-field-values`, that binds the form f
             (:li (who:fmt "Name: ~A" name))
             (:li (who:fmt "Ready: ~A" ready))
             (:li (who:fmt "Sex: ~A" sex))))))
-@end example
+@end lisp
 
 Plase have a look at the demo sources for more examples of how to use the library
 
@@ -113,10 +113,57 @@ Plase have a look at the demo sources for more examples of how to use the librar
 
 There's a demo included. To run:
 
-@example
+@lisp
 (require :cl-forms.demo)
 (forms.test:run-demo)
-@end example
+@end lisp
+
+@subsection Basic example
+
+Define a form. Render the form via CL-WHO backend, doing:
+
+@lisp
+(forms:with-form-renderer :who
+   (forms:render-form form))
+@end lisp
+
+Then handle and validate the form.
+
+Source code:
+
+@lisp
+@include ../test/demo/fields.lisp
+@end lisp
+
+@subsection Validation
+
+Example of forms validation.
+
+Add Clavier constraints to the form. Then call VALIDATE-FORM after HANDLE-REQUEST.
+
+@lisp
+@include ../test/demo/validation.lisp
+@end lisp
+
+@subsection Client validation
+
+To validate in the client, just set @code{:client-validation} to @code{T}.
+
+@lisp
+@include ../test/demo/client-validation.lisp
+@end lisp
+
+@subsection Models
+
+@lisp
+@include ../test/demo/models.lisp
+@end lisp
+
+@subsection Composition
+
+@lisp
+@include ../test/demo/composition.lisp
+@end lisp
 
 @node API
 @chapter API
@@ -174,7 +221,7 @@ Define a form at top-level.
 ARGS are the arguments passed to FORM class via MAKE-INSTANCE.
 FIELDS are the form field specs.
 
-@example
+@lisp
 (forms:defform client-validated-form (:action "/client-validation-post"
                                               :client-validation t)
   ((name :string :value "" :constraints (list (clavier:is-a-string)
@@ -188,18 +235,17 @@ FIELDS are the form field specs.
                                     (clavier:less-than 200)))
    (email :email)
    (submit :submit :label "Create")))
-@end example
-
+@end lisp
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-FIELDS, (fields form &body body)}
 
 Bind FIELDS to the form fields in FORM under BODY.
 
-@example
+@lisp
 (with-form-field-values (name single sex age email) form
    (print (list name single sex age email)))
-@end example
+@end lisp
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-TEMPLATE, ((&optional form-var) form-name args &body body)}
