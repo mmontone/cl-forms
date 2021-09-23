@@ -13,7 +13,7 @@
    (submit :submit :label "Create")))
 
 (defun fields-demo ()
-  (who:with-html-output (forms.who::*html*)
+  (who:with-html-output (forms.who:*html*)
     (:h1 (who:str "Fields example"))
     (:div :class :container
           (:div :class :row
@@ -37,12 +37,13 @@
 
 (hunchentoot:define-easy-handler (fields-form-post
                                   :uri "/fields-post"
-                                  :default-request-type :post) ()
+                                  :default-request-type :post)
+    ()
   (flet ((fields-post ()
            (let ((form (forms:get-form 'fields-form)))
              (forms::handle-request form)
              (forms::with-form-fields (name ready sex avatar) form
-               (who:with-html-output (forms.who::*html*)
+               (who:with-html-output (forms.who:*html*)
                  (:ul
                   (:li (who:fmt "Name: ~A" (forms::field-value name)))
                   (:li (who:fmt "Ready: ~A" (forms::field-value ready)))
@@ -85,7 +86,7 @@
              (forms::handle-request form)
              (forms::validate-form form)
              (forms::with-form-field-values (sex sex2 choices choices2) form
-               (who:with-html-output (forms.who::*html*)
+               (who:with-html-output (forms.who:*html*)
                  (:ul
                   (:li (who:fmt "Sex: ~A" sex))
                   (:li (who:fmt "Sex2: ~A" sex2))

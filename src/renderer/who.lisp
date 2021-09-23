@@ -5,16 +5,24 @@
 
 (in-package :forms.who)
 
-(defvar *html* nil)
+(defvar *html* nil
+  "The stream where the form is rendered to, when using the who renderer.
+Make sure to bind this before rendering your form.
 
-(defmethod forms::call-with-form-renderer ((renderer (eql :who)) function)
-  (let ((forms::*form-renderer* renderer))
-    (funcall function)))
+Example:
+
+(who:with-html-output (forms.who:*html*)
+   (forms:render-form my-form))")
+
+(defmacro with-form-html-output (&body body)
+  `(who:with-html-output (*html* (or *html*
+				     (error "FORMS.WHO:*HTML* is unbound. Please bind it before rendering forms. See FORMS.WHO:*HTML* documentation.")))
+     ,@body))
 
 (defmethod forms::renderer-render-form ((renderer (eql :who))
                                         (theme forms::default-form-theme)
                                         form &rest args)
-  (with-html-output (*html*)
+  (with-form-html-output
     (apply #'forms::renderer-render-form-errors renderer theme form args)
     (:form :id (forms::form-id form)
            :action (forms::form-action form)
@@ -45,7 +53,7 @@
                                               (theme forms::default-form-theme)
                                               form &rest args)
   "Start form rendering"
-  (fmt:with-fmt (*html*)
+  (fmt:with-fmt ((or *html* (error "FORMS.WHO:*HTML* is unbound. Please bind it before rendering forms. See FORMS.WHO:*HTML* documentation.")))
     "<form id=\"" (forms::form-id form) "\""
     " action=\"" (forms::form-action form) "\""
     " method=\"" (forms::form-method form) "\""

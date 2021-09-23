@@ -1,7 +1,8 @@
 (in-package :forms.who)
 
 (defclass bootstrap-form-theme (forms::default-form-theme)
-  ())
+  ()
+  (:documentation "A Bootstrap form theme"))
 
 (export 'bootstrap-form-theme)
 

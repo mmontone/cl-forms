@@ -84,6 +84,7 @@ ul.no-bullet {list-style: none}
       <li><a id="toc-Models" href="#Models">3.2.4 Models</a></li>
       <li><a id="toc-Composition" href="#Composition">3.2.5 Composition</a></li>
       <li><a id="toc-Form-templates" href="#Form-templates">3.2.6 Form templates</a></li>
+      <li><a id="toc-Renderers" href="#Renderers">3.2.7 Renderers</a></li>
     </ul></li>
   </ul></li>
   <li><a id="toc-API-1" href="#API">4 API</a>
@@ -228,7 +229,7 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
      <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
    
   <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">defun</span></i> fields-demo <span class="paren2">(<span class="lisp-bg"></span>)</span>
-    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
       <span class="paren3">(<span class="lisp-bg"><span class="keyword">:h1</span> <span class="paren4">(<span class="lisp-bg">who:str <span class="string">&quot;Fields example&quot;</span></span>)</span></span>)</span>
       <span class="paren3">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:container</span>
             <span class="paren4">(<span class="lisp-bg"><span class="keyword">:div</span> <span class="keyword">:class</span> <span class="keyword">:row</span>
@@ -252,12 +253,13 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
    
   <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">fields-form-post
                                     <span class="keyword">:uri</span> <span class="string">&quot;/fields-post&quot;</span>
-                                    <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+                                    <span class="keyword">:default-request-type</span> <span class="keyword">:post</span></span>)</span>
+      <span class="paren2">(<span class="lisp-bg"></span>)</span>
     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">fields-post <span class="paren5">(<span class="lisp-bg"></span>)</span>
              <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="lisp-bg"><span class="paren1">(<span class="lisp-bg">form <span class="paren2">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span></span>)</span></span>)</span>
                <span class="paren6">(<span class="lisp-bg">forms::handle-request form</span>)</span>
                <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-fields</span></i> <span class="paren1">(<span class="lisp-bg">name ready sex avatar</span>)</span> form
-                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
                    <span class="paren2">(<span class="lisp-bg"><span class="keyword">:ul</span>
                     <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">forms::field-value name</span>)</span></span>)</span></span>)</span>
                     <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Ready: ~A&quot;</span> <span class="paren5">(<span class="lisp-bg">forms::field-value ready</span>)</span></span>)</span></span>)</span>
@@ -300,7 +302,7 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
                <span class="paren6">(<span class="lisp-bg">forms::handle-request form</span>)</span>
                <span class="paren6">(<span class="lisp-bg">forms::validate-form form</span>)</span>
                <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-field-values</span></i> <span class="paren1">(<span class="lisp-bg">sex sex2 choices choices2</span>)</span> form
-                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+                 <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
                    <span class="paren2">(<span class="lisp-bg"><span class="keyword">:ul</span>
                     <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span>
                     <span class="paren3">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren4">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex2: ~A&quot;</span> sex2</span>)</span></span>)</span>
@@ -691,6 +693,42 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
                       :active-menu :template)))
 </pre></div>
 
+<span id="Renderers"></span><h4 class="subsection">3.2.7 Renderers</h4>
+
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
+   
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">hunchentoot:define-easy-handler</span></i> <span class="paren2">(<span class="lisp-bg">demo-renderers <span class="keyword">:uri</span> <span class="string">&quot;/renderers&quot;</span></span>)</span> <span class="paren2">(<span class="lisp-bg"></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">render <span class="paren5">(<span class="lisp-bg"></span>)</span>
+             <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+  	     <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren1">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;CL-WHO automatic&quot;</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren2">(<span class="lisp-bg">who:str <span class="string">&quot;Render via CL-WHO and whole form with RENDER-FORM.&quot;</span></span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg">forms:render-form <span class="paren2">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;CL-WHO manual&quot;</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren2">(<span class="lisp-bg">who:str <span class="string">&quot;Render via CL-WHO and the individual rendering functions RENDER-FORM-START, RENDER-FORM-END, RENDER-FIELD, RENDER-FIELD-LABEL and RENDER-FIELD-WIDGET.&quot;</span></span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:with-form</span></i> <span class="paren2">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-form-start</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'name</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field-label 'ready</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field-widget 'ready</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'sex</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'avatar</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'disabled</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'readonly</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'readonly-checkbox</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'disabled-checkbox</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'submit</span>)</span>
+  		 <span class="paren2">(<span class="lisp-bg">forms:render-form-end</span>)</span></span>)</span>
+                 </span>)</span></span>)</span></span>)</span></span>)</span>
+      <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'render
+                        <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
+                                                               <span class="string">&quot;test/demo/renderers.lisp&quot;</span></span>)</span>
+                        <span class="keyword">:active-menu</span> <span class="keyword">:renderers</span></span>)</span></span>)</span></span>)</span>
+   
+   
+</pre></div>
+
 <hr>
 <span id="API"></span><div class="header">
 <p>
@@ -720,7 +758,7 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="CL_002dFORMS_003a_002aBASE64_002dENCODE_002a-variable"></span><dl>
 <dt id="index-_002aBASE64_002dENCODE_002a">CL-FORMS: <strong>*BASE64-ENCODE*</strong></dt>
 <dd>
-<p>If T, encode form parameters in base64
+<p>Whether to encode form parameters in base64 or not.
 </p></dd></dl>
 
 <span id="Macros"></span><h4 class="subheading">Macros</h4>
@@ -856,19 +894,26 @@ FIELDS are the form field specs.
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM-1">Function: <strong>CL-FORMS:RENDER-FORM</strong> <em>(&amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Top level function to render the web form FORM.
+*FORM-RENDERER* and *FORM-THEME* need to be bound.
+See: WITH-FORM-RENDERER, WITH-FORM-THEME
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aFILL_002dFORM_002dFROM_002dMODEL"></span>
 <span id="CL_002dFORMS_003aFILL_002dFORM_002dFROM_002dMODEL-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aFILL_002dFORM_002dFROM_002dMODEL-1">Function: <strong>CL-FORMS:FILL-FORM-FROM-MODEL</strong> <em>(form model)</em></dt>
 <dd>
-<p>Fill a FORM from a MODEL
+<p>Fill a FORM from a MODEL.
+Read MODEL using FORM accessors and set the FORM field values.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFIELD-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFIELD-1">Function: <strong>CL-FORMS:RENDER-FIELD</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Render form FIELD, both label and widget.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aREMOVE_002dFIELD"></span>
 <span id="CL_002dFORMS_003aREMOVE_002dFIELD-function"></span><dl>
@@ -893,7 +938,9 @@ FIELDS are the form field specs.
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dEND"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM_002dEND-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dEND-1">Function: <strong>CL-FORMS:RENDER-FORM-END</strong> <em>(&amp;optional (form *form*))</em></dt>
-</dl>
+<dd>
+<p>Render the end of the web form FORM.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aHANDLE_002dREQUEST"></span>
 <span id="CL_002dFORMS_003aHANDLE_002dREQUEST-function"></span><dl>
@@ -906,7 +953,7 @@ FIELDS are the form field specs.
 <span id="CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-1">Function: <strong>CL-FORMS:FILL-MODEL-FROM-FORM</strong> <em>(form model)</em></dt>
 <dd>
-<p>Set a MODEL&rsquo;s values from FORM field values
+<p>Set a MODEL&rsquo;s values from FORM field values.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aMAKE_002dFORMATTER"></span>
@@ -919,7 +966,9 @@ FIELDS are the form field specs.
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-1">Function: <strong>CL-FORMS:RENDER-FIELD-LABEL</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Render the label of FIELD.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aGET_002dFORM"></span>
 <span id="CL_002dFORMS_003aGET_002dFORM-function"></span><dl>
@@ -940,7 +989,9 @@ FIELDS are the form field specs.
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS-1">Function: <strong>CL-FORMS:RENDER-FIELD-ERRORS</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Render the validation errors associated with FIELD.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aSET_002dFIELD_002dVALUE"></span>
 <span id="CL_002dFORMS_003aSET_002dFIELD_002dVALUE-function"></span><dl>
@@ -958,12 +1009,17 @@ The list of errors is an association list with elements (&lt;field&gt; . &lt;fie
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dSTART"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM_002dSTART-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dSTART-1">Function: <strong>CL-FORMS:RENDER-FORM-START</strong> <em>(&amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Render only the beggining of the web form FORM.
+Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dWIDGET"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFIELD_002dWIDGET-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dWIDGET-1">Function: <strong>CL-FORMS:RENDER-FIELD-WIDGET</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Render FIELD widget.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aADD_002dFORM_002dERROR"></span>
 <span id="CL_002dFORMS_003aADD_002dFORM_002dERROR-function"></span><dl>
@@ -975,7 +1031,9 @@ The list of errors is an association list with elements (&lt;field&gt; . &lt;fie
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dERRORS"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM_002dERRORS-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dERRORS-1">Function: <strong>CL-FORMS:RENDER-FORM-ERRORS</strong> <em>(&amp;optional (form *form*) &amp;rest args)</em></dt>
-</dl>
+<dd>
+<p>Render a section for displaying form validation errors.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aADD_002dFIELD"></span>
 <span id="CL_002dFORMS_003aADD_002dFIELD-function"></span><dl>

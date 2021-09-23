@@ -177,6 +177,12 @@ Form templates is an alternative way of defining and rendering forms. Instead of
 @verbatiminclude ../test/demo/form-templates.lisp
 @end lisp
 
+@subsection Renderers
+
+@lisp
+@include ../test/demo/renderers.lisp
+@end lisp
+
 @node API
 @chapter API
 @anchor{api}

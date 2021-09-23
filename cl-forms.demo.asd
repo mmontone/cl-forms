@@ -6,6 +6,8 @@
   :depends-on (#:cl-forms
                #:cl-forms.who
                #:cl-forms.who.bootstrap
+	       #:djula
+	       #:cl-forms.djula
                #:cl-forms.test
                #:hunchentoot
                #:cl-who

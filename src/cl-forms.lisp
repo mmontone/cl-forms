@@ -1,10 +1,12 @@
 (in-package #:cl-forms)
 
-(defvar *form-renderer* nil "The current form renderer.")
+(defvar *form-renderer* nil "The current form renderer.
+Bind using WITH-FORM-RENDERER.")
 (defvar *default-form-renderer* :who
-  "The default form renderer.")
-(defvar *form* nil "The current form")
-(defvar *base64-encode* nil "If T, encode form parameters in base64")
+  "The default form renderer.
+The default renderer is CL-WHO.")
+(defvar *form* nil "The current form.")
+(defvar *base64-encode* nil "Whether to encode form parameters in base64 or not.")
 (defvar *field-required-message* nil
   "The default message to displayed when a field is required.")
 
@@ -395,7 +397,8 @@ See: DEFFORM-BUILDER macro."
       (setf (slot-value field 'value) value)))
 
 (defun fill-form-from-model (form model)
-  "Fill a FORM from a MODEL"
+  "Fill a FORM from a MODEL.
+Read MODEL using FORM accessors and set the FORM field values."
   (loop for field in (mapcar 'cdr (forms::form-fields form))
         when (forms:field-reader field)
           do (setf (forms:field-value field)
@@ -403,7 +406,7 @@ See: DEFFORM-BUILDER macro."
   form)
 
 (defun fill-model-from-form (form model)
-  "Set a MODEL's values from FORM field values"
+  "Set a MODEL's values from FORM field values."
   (loop for field in (mapcar 'cdr (forms::form-fields form))
         when (forms:field-writer field)
           do (funcall (forms:field-writer field)
@@ -416,7 +419,7 @@ See: DEFFORM-BUILDER macro."
           :accessor validator-field
           :documentation "The validator field"))
   (:metaclass closer-mop:funcallable-standard-class)
-  (:documentation "Generic field validator. Needs a field to be initialized"))
+  (:documentation "Generic field validator. Needs a field to be initialized."))
 
 (defun empty-value-p (val)
   (or (null val)
@@ -509,25 +512,39 @@ The list of errors is an association list with elements (<field> . <field errors
               (form-errors form)))))
 
 (defun render-form (&optional (form *form*) &rest args)
-  (apply #'renderer-render-form *form-renderer* *form-theme* form args))
+  "Top level function to render the web form FORM.
+*FORM-RENDERER* and *FORM-THEME* need to be bound.
+See: WITH-FORM-RENDERER, WITH-FORM-THEME"
+  (apply #'renderer-render-form
+	 (or *form-renderer* (error "Form renderer is unbound. See *FORM-RENDERER* and WITH-FORM-RENDERER."))
+	 *form-theme* form args))
 
 (defun render-form-start (&optional (form *form*) &rest args)
-  (apply #'renderer-render-form-start *form-renderer* *form-theme* form args))
+  "Render only the beggining of the web form FORM.
+Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
+  (apply #'renderer-render-form-start
+	 (or *form-renderer*
+	     (error "Form renderer is unbound. See *FORM-RENDERER* and WITH-FORM-RENDERER."))
+	 *form-theme* form args))
 
 (defun render-form-end (&optional (form *form*))
+  "Render the end of the web form FORM."
   (renderer-render-form-end *form-renderer* *form-theme* form))
 
 (defun render-form-errors (&optional (form *form*) &rest args)
+  "Render a section for displaying form validation errors."
   (when (member :list (display-errors form))
     (apply #'renderer-render-form-errors *form-renderer* *form-theme* form args)))
 
 (defun render-field (field &optional (form *form*) &rest args)
+  "Render form FIELD, both label and widget."
   (let ((field (if (symbolp field)
                    (get-field form field)
                    field)))
     (apply #'renderer-render-field *form-renderer* *form-theme* field form args)))
 
 (defun render-field-label (field &optional (form *form*) &rest args)
+  "Render the label of FIELD."
   (let ((field (if (symbolp field)
                    (get-field form field)
                    field)))
@@ -535,12 +552,14 @@ The list of errors is an association list with elements (<field> . <field errors
       (apply #'renderer-render-field-label *form-renderer* *form-theme* field form args))))
 
 (defun render-field-errors (field &optional (form *form*) &rest args)
+  "Render the validation errors associated with FIELD."
   (let ((field (if (symbolp field)
                    (get-field form field)
                    field)))
     (apply #'renderer-render-field-errors *form-renderer* *form-theme* field form args)))
 
 (defun render-field-widget (field &optional (form *form*) &rest args)
+  "Render FIELD widget."
   (let ((field (if (symbolp field)
                    (get-field form field)
                    field)))

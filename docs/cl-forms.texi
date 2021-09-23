@@ -177,6 +177,12 @@ Form templates is an alternative way of defining and rendering forms. Instead of
 @verbatiminclude ../test/demo/form-templates.lisp
 @end lisp
 
+@subsection Renderers
+
+@lisp
+@include ../test/demo/renderers.lisp
+@end lisp
+
 @node API
 @chapter API
 @anchor{api}
@@ -196,7 +202,7 @@ Form templates is an alternative way of defining and rendering forms. Instead of
 @subheading Variables
 @cldefvar {CL-FORMS, *BASE64-ENCODE*}
 
-If T, encode form parameters in base64
+Whether to encode form parameters in base64 or not.
 @endcldefvar
 
 @subheading Macros
@@ -319,17 +325,20 @@ FIELDS are the form field specs.
 @subheading Functions
 @cldefun {CL-FORMS, RENDER-FORM, (&optional (form *form*) &rest args)}
 
-
+Top level function to render the web form FORM.
+*FORM-RENDERER* and *FORM-THEME* need to be bound.
+See: WITH-FORM-RENDERER, WITH-FORM-THEME
 @endcldefun
 
 @cldefun {CL-FORMS, FILL-FORM-FROM-MODEL, (form model)}
 
-Fill a FORM from a MODEL
+Fill a FORM from a MODEL.
+Read MODEL using FORM accessors and set the FORM field values.
 @endcldefun
 
 @cldefun {CL-FORMS, RENDER-FIELD, (field &optional (form *form*) &rest args)}
 
-
+Render form FIELD, both label and widget.
 @endcldefun
 
 @cldefun {CL-FORMS, REMOVE-FIELD, (form field)}
@@ -354,7 +363,7 @@ Fill a FORM from a MODEL
 
 @cldefun {CL-FORMS, RENDER-FORM-END, (&optional (form *form*))}
 
-
+Render the end of the web form FORM.
 @endcldefun
 
 @cldefun {CL-FORMS, HANDLE-REQUEST, (&optional (form *form*) (request hunchentoot:*request*))}
@@ -364,7 +373,7 @@ Populates FORM from parameters in HTTP request. After this, the form field conta
 
 @cldefun {CL-FORMS, FILL-MODEL-FROM-FORM, (form model)}
 
-Set a MODEL's values from FORM field values
+Set a MODEL's values from FORM field values.
 @endcldefun
 
 @cldefun {CL-FORMS, MAKE-FORMATTER, (symbol)}
@@ -374,7 +383,7 @@ Create a field formatter. SYMBOL is the function to call.
 
 @cldefun {CL-FORMS, RENDER-FIELD-LABEL, (field &optional (form *form*) &rest args)}
 
-
+Render the label of FIELD.
 @endcldefun
 
 @cldefun {CL-FORMS, GET-FORM, (name &rest args)}
@@ -393,7 +402,7 @@ See: DEFFORM-BUILDER macro.
 
 @cldefun {CL-FORMS, RENDER-FIELD-ERRORS, (field &optional (form *form*) &rest args)}
 
-
+Render the validation errors associated with FIELD.
 @endcldefun
 
 @cldefun {CL-FORMS, SET-FIELD-VALUE, (form field-name value)}
@@ -409,12 +418,13 @@ The list of errors is an association list with elements (<field> . <field errors
 
 @cldefun {CL-FORMS, RENDER-FORM-START, (&optional (form *form*) &rest args)}
 
-
+Render only the beggining of the web form FORM.
+Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after.
 @endcldefun
 
 @cldefun {CL-FORMS, RENDER-FIELD-WIDGET, (field &optional (form *form*) &rest args)}
 
-
+Render FIELD widget.
 @endcldefun
 
 @cldefun {CL-FORMS, ADD-FORM-ERROR, (field error-msg &optional (form *form*))}
@@ -424,7 +434,7 @@ Add an error on FIELD
 
 @cldefun {CL-FORMS, RENDER-FORM-ERRORS, (&optional (form *form*) &rest args)}
 
-
+Render a section for displaying form validation errors.
 @endcldefun
 
 @cldefun {CL-FORMS, ADD-FIELD, (form field)}
