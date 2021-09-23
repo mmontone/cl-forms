@@ -83,6 +83,7 @@ ul.no-bullet {list-style: none}
       <li><a id="toc-Client-validation" href="#Client-validation">3.2.3 Client validation</a></li>
       <li><a id="toc-Models" href="#Models">3.2.4 Models</a></li>
       <li><a id="toc-Composition" href="#Composition">3.2.5 Composition</a></li>
+      <li><a id="toc-Form-templates" href="#Form-templates">3.2.6 Form templates</a></li>
     </ul></li>
   </ul></li>
   <li><a id="toc-API-1" href="#API">4 API</a>
@@ -340,7 +341,7 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
 
 <p>Example of forms validation.
 </p>
-<p>Add Clavier constraints to the form. Then call VALIDATE-FORM after HANDLE-REQUEST.
+<p>Add Clavier constraints to the form. Then call <a href="#CL_002dFORMS_003aVALIDATE_002dFORM-function">VALIDATE-FORM</a> after <a href="#CL_002dFORMS_003aHANDLE_002dREQUEST-function">HANDLE-REQUEST</a>.
 </p>
 <div class="lisp">
 <pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
@@ -459,6 +460,10 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
 
 <span id="Models"></span><h4 class="subsection">3.2.4 Models</h4>
 
+<p>Forms can be attached to model objects. Model objects are CLOS instances from where form values are read and written to.
+</p>
+<p>To work with models, forms are defined via defform-builder instead of defform. A form-builder is a function that takes the model objects and attaches it to the form. The form needs to define the accessors to access the model for each form field.
+</p>
 <div class="lisp">
 <pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
    
@@ -538,6 +543,8 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
 
 <span id="Composition"></span><h4 class="subsection">3.2.5 Composition</h4>
 
+<p>It is possible to compose forms using the <code>subform</code> field type:
+</p>
 <div class="lisp">
 <pre class="lisp">  <span class="paren1">(<span class="lisp-bg">in-package <span class="keyword">:forms.test</span></span>)</span>
    
@@ -602,6 +609,86 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
                         <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span> 
                                                                <span class="string">&quot;test/demo/composition.lisp&quot;</span></span>)</span>
                         <span class="keyword">:active-menu</span> <span class="keyword">:composition</span></span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<span id="Form-templates"></span><h4 class="subsection">3.2.6 Form templates</h4>
+
+<p>Form templates is an alternative way of defining and rendering forms. Instead of defining a form with defform and then specifiying a template and render it, forms templates allow to do all that at the same time.
+</p>
+<div class="lisp">
+<pre class="verbatim">(in-package :forms.test)
+
+(defun form-template-demo ()
+  (macrolet ((row (&amp;body body)
+               `(who:htm
+                 (:div :class &quot;row&quot;
+                       (who:htm
+                        ,@body))))
+             (col (&amp;body body)
+               `(who:htm
+                 (:div :class &quot;col-md-2&quot;
+                       (who:htm
+                        ,@body)))))
+    (forms:with-form-renderer :who
+      (who:with-html-output (forms.who::*html*)
+        (:div :class :container
+              (:div :class :row
+                    (:div :class :heading
+                          (:h1 (who:str &quot;Form templates&quot;)))
+                    (:p (who:str &quot;Form templates is an alternative way of defining and rendering forms. Instead of defining a form with defform and then specifiying a template and render it, forms templates allow to do all that at the same time.&quot;))
+                    (:p (who:str &quot;Form definition is embedded in rendering spec via with-form-template. See source for details.&quot;))                
+                    (:div :class :container
+                          (forms:with-form-template () template-form (:action &quot;/template-post&quot;)
+                            (row
+                             (:h3 (who:str &quot;General&quot;))
+                             (col (form-field firstname :string :value &quot;&quot;))
+                             (col (form-field lastname :string :value &quot;&quot;)))
+                            (form-field active :boolean :value t)
+                            (row
+                             (:h3 (who:str &quot;Address&quot;))
+                             (form-field address :string :value &quot;&quot;))
+                            (row
+                             (:h3 (who:str &quot;Other&quot;))
+                             (form-field choices :choice
+                                         :choices (list &quot;Foo&quot; &quot;Bar&quot;)
+                                         :value (list &quot;Foo&quot;)
+                                         :multiple t)
+                             (form-field choices2 :choice
+                                         :choices (list &quot;Foo&quot; &quot;Bar&quot;)
+                                         :value (list &quot;Bar&quot;)
+                                         :multiple t
+                                         :expanded  t))
+                            (row
+                             (form-field submit :submit :label &quot;Create&quot;))))))))))
+
+(hunchentoot:define-easy-handler (template-demo-handler :uri &quot;/template&quot;) ()
+  (render-demo-page :demo #'form-template-demo
+                    :source (asdf:system-relative-pathname :cl-forms.demo
+                                                           &quot;test/demo/form-templates.lisp&quot;)
+                    :active-menu :template))
+
+(hunchentoot:define-easy-handler (template-form-post
+                                  :uri &quot;/template-post&quot;
+                                  :default-request-type :post) ()
+  (flet ((fields-post ()
+           (let ((form (forms:get-form 'template-form)))
+             (forms::handle-request form)
+             (if (forms::validate-form form)
+                 (forms::with-form-field-values (firstname lastname active address
+                                                           choices choices2) form
+                   (who:with-html-output (forms.who::*html*)
+                     (:ul
+                      (:li (who:fmt &quot;Firstname: ~A&quot; firstname))
+                      (:li (who:fmt &quot;Lastname: ~A&quot; lastname))
+                      (:li (who:fmt &quot;Active: ~A&quot; active))
+                      (:li (who:fmt &quot;Address: ~A&quot; address))
+                      (:li (who:fmt &quot;Choices: ~A&quot; choices))
+                      (:li (who:fmt &quot;Choices2: ~A&quot; choices2)))))
+                 &quot;Form is not valid&quot;))))
+    (render-demo-page :demo #'fields-post
+                      :source (asdf:system-relative-pathname :cl-forms.demo
+                                                             &quot;test/demo/form-templates.lisp&quot;)
+                      :active-menu :template)))
 </pre></div>
 
 <hr>

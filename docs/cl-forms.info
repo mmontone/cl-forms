@@ -243,8 +243,9 @@ Define a form.  Render the form via CL-WHO backend, doing:
 
 Example of forms validation.
 
-   Add Clavier constraints to the form.  Then call VALIDATE-FORM after
-HANDLE-REQUEST.
+   Add Clavier constraints to the form.  Then call *note VALIDATE-FORM:
+CL-FORMS:VALIDATE-FORM function. after *note HANDLE-REQUEST:
+CL-FORMS:HANDLE-REQUEST function.
 
      (in-package :forms.test)
 
@@ -361,6 +362,14 @@ To validate in the client, just set ':client-validation' to 'T'.
 3.2.4 Models
 ------------
 
+Forms can be attached to model objects.  Model objects are CLOS
+instances from where form values are read and written to.
+
+   To work with models, forms are defined via defform-builder instead of
+defform.  A form-builder is a function that takes the model objects and
+attaches it to the form.  The form needs to define the accessors to
+access the model for each form field.
+
      (in-package :forms.test)
 
      (defclass person ()
@@ -439,6 +448,8 @@ To validate in the client, just set ':client-validation' to 'T'.
 3.2.5 Composition
 -----------------
 
+It is possible to compose forms using the 'subform' field type:
+
      (in-package :forms.test)
 
      (forms:defform member-form ()
@@ -502,6 +513,87 @@ To validate in the client, just set ':client-validation' to 'T'.
                            :source (asdf:system-relative-pathname :cl-forms.demo
                                                                   "test/demo/composition.lisp")
                            :active-menu :composition)))
+
+3.2.6 Form templates
+--------------------
+
+Form templates is an alternative way of defining and rendering forms.
+Instead of defining a form with defform and then specifiying a template
+and render it, forms templates allow to do all that at the same time.
+
+     (in-package :forms.test)
+     
+     (defun form-template-demo ()
+       (macrolet ((row (&body body)
+                    `(who:htm
+                      (:div :class "row"
+                            (who:htm
+                             ,@body))))
+                  (col (&body body)
+                    `(who:htm
+                      (:div :class "col-md-2"
+                            (who:htm
+                             ,@body)))))
+         (forms:with-form-renderer :who
+           (who:with-html-output (forms.who::*html*)
+             (:div :class :container
+                   (:div :class :row
+                         (:div :class :heading
+                               (:h1 (who:str "Form templates")))
+                         (:p (who:str "Form templates is an alternative way of defining and rendering forms. Instead of defining a form with defform and then specifiying a template and render it, forms templates allow to do all that at the same time."))
+                         (:p (who:str "Form definition is embedded in rendering spec via with-form-template. See source for details."))                
+                         (:div :class :container
+                               (forms:with-form-template () template-form (:action "/template-post")
+                                 (row
+                                  (:h3 (who:str "General"))
+                                  (col (form-field firstname :string :value ""))
+                                  (col (form-field lastname :string :value "")))
+                                 (form-field active :boolean :value t)
+                                 (row
+                                  (:h3 (who:str "Address"))
+                                  (form-field address :string :value ""))
+                                 (row
+                                  (:h3 (who:str "Other"))
+                                  (form-field choices :choice
+                                              :choices (list "Foo" "Bar")
+                                              :value (list "Foo")
+                                              :multiple t)
+                                  (form-field choices2 :choice
+                                              :choices (list "Foo" "Bar")
+                                              :value (list "Bar")
+                                              :multiple t
+                                              :expanded  t))
+                                 (row
+                                  (form-field submit :submit :label "Create"))))))))))
+     
+     (hunchentoot:define-easy-handler (template-demo-handler :uri "/template") ()
+       (render-demo-page :demo #'form-template-demo
+                         :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                "test/demo/form-templates.lisp")
+                         :active-menu :template))
+     
+     (hunchentoot:define-easy-handler (template-form-post
+                                       :uri "/template-post"
+                                       :default-request-type :post) ()
+       (flet ((fields-post ()
+                (let ((form (forms:get-form 'template-form)))
+                  (forms::handle-request form)
+                  (if (forms::validate-form form)
+                      (forms::with-form-field-values (firstname lastname active address
+                                                                choices choices2) form
+                        (who:with-html-output (forms.who::*html*)
+                          (:ul
+                           (:li (who:fmt "Firstname: ~A" firstname))
+                           (:li (who:fmt "Lastname: ~A" lastname))
+                           (:li (who:fmt "Active: ~A" active))
+                           (:li (who:fmt "Address: ~A" address))
+                           (:li (who:fmt "Choices: ~A" choices))
+                           (:li (who:fmt "Choices2: ~A" choices2)))))
+                      "Form is not valid"))))
+         (render-demo-page :demo #'fields-post
+                           :source (asdf:system-relative-pathname :cl-forms.demo
+                                                                  "test/demo/form-templates.lisp")
+                           :active-menu :template)))
 
 
 File: cl-forms.info,  Node: API,  Next: Index,  Prev: Usage,  Up: Top
@@ -1176,66 +1268,66 @@ Node: Installation1172
 Ref: installation1285
 Node: Usage1285
 Ref: usage1382
-Node: API22693
-Ref: api22779
-Node: CL-FORMS package22810
-Ref: CL-FORMS:*BASE64-ENCODE* variable22998
-Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro23089
-Ref: CL-FORMS:WITH-FORM macro23158
-Ref: CL-FORMS:DEFFORM-BUILDER macro23268
-Ref: CL-FORMS:WITH-FORM-THEME macro23658
-Ref: CL-FORMS:WITH-FORM-FIELDS macro23792
-Ref: CL-FORMS:WITH-FORM-TEMPLATE macro24035
-Ref: CL-FORMS:WITH-FORM-RENDERER macro24134
-Ref: CL-FORMS:DEFFORM macro24270
-Ref: CL-FORMS:FIELD-ACCESSOR function25350
-Ref: CL-FORMS:FIELD-WRITER function25414
-Ref: CL-FORMS:FIELD-READER function25467
-Ref: CL-FORMS:FIELD-PARSER function25520
-Ref: CL-FORMS:FORM-ERRORS function25582
-Ref: CL-FORMS:FORMAT-FIELD-VALUE function25643
-Ref: CL-FORMS:FIELD-FORMATTER function25746
-Ref: CL-FORMS:FIELD-VALUE function25811
-Ref: CL-FORMS:FIELD-VALID-P function25863
-Ref: CL-FORMS:RENDER-FORM function25970
-Ref: CL-FORMS:FILL-FORM-FROM-MODEL function26043
-Ref: CL-FORMS:RENDER-FIELD function26132
-Ref: CL-FORMS:REMOVE-FIELD function26222
-Ref: CL-FORMS:FORM-VALID-P function26272
-Ref: CL-FORMS:GET-FIELD function26316
-Ref: CL-FORMS:GET-FIELD-VALUE function26390
-Ref: CL-FORMS:RENDER-FORM-END function26480
-Ref: CL-FORMS:HANDLE-REQUEST function26546
-Ref: CL-FORMS:FILL-MODEL-FROM-FORM function26829
-Ref: CL-FORMS:MAKE-FORMATTER function26937
-Ref: CL-FORMS:RENDER-FIELD-LABEL function27050
-Ref: CL-FORMS:GET-FORM function27146
-Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function27348
-Ref: CL-FORMS:RENDER-FIELD-ERRORS function27473
-Ref: CL-FORMS:SET-FIELD-VALUE function27570
-Ref: CL-FORMS:VALIDATE-FORM function27634
-Ref: CL-FORMS:RENDER-FORM-START function27972
-Ref: CL-FORMS:RENDER-FIELD-WIDGET function28061
-Ref: CL-FORMS:ADD-FORM-ERROR function28158
-Ref: CL-FORMS:RENDER-FORM-ERRORS function28277
-Ref: CL-FORMS:ADD-FIELD function28367
-Ref: CL-FORMS:INTEGER-FORM-FIELD class28431
-Ref: CL-FORMS:SUBFORM-FORM-FIELD class28587
-Ref: CL-FORMS:URL-FORM-FIELD class28759
-Ref: CL-FORMS:DATETIME-FORM-FIELD class28903
-Ref: CL-FORMS:PASSWORD-FORM-FIELD class29057
-Ref: CL-FORMS:EMAIL-FORM-FIELD class29215
-Ref: CL-FORMS:CHOICE-FORM-FIELD class29365
-Ref: CL-FORMS:FILE-FORM-FIELD class31952
-Ref: CL-FORMS:BOOLEAN-FORM-FIELD class32728
-Ref: CL-FORMS:DATE-FORM-FIELD class32877
-Ref: CL-FORMS:FORM-FIELD class33023
-Ref: CL-FORMS:SUBMIT-FORM-FIELD class36801
-Ref: CL-FORMS:HIDDEN-FORM-FIELD class36954
-Ref: CL-FORMS:STRING-FORM-FIELD class37105
-Ref: CL-FORMS:LIST-FORM-FIELD class37257
-Ref: CL-FORMS:FORM class38351
-Ref: CL-FORMS:TEXT-FORM-FIELD class40725
-Node: Index40909
+Node: API27804
+Ref: api27890
+Node: CL-FORMS package27921
+Ref: CL-FORMS:*BASE64-ENCODE* variable28109
+Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro28200
+Ref: CL-FORMS:WITH-FORM macro28269
+Ref: CL-FORMS:DEFFORM-BUILDER macro28379
+Ref: CL-FORMS:WITH-FORM-THEME macro28769
+Ref: CL-FORMS:WITH-FORM-FIELDS macro28903
+Ref: CL-FORMS:WITH-FORM-TEMPLATE macro29146
+Ref: CL-FORMS:WITH-FORM-RENDERER macro29245
+Ref: CL-FORMS:DEFFORM macro29381
+Ref: CL-FORMS:FIELD-ACCESSOR function30461
+Ref: CL-FORMS:FIELD-WRITER function30525
+Ref: CL-FORMS:FIELD-READER function30578
+Ref: CL-FORMS:FIELD-PARSER function30631
+Ref: CL-FORMS:FORM-ERRORS function30693
+Ref: CL-FORMS:FORMAT-FIELD-VALUE function30754
+Ref: CL-FORMS:FIELD-FORMATTER function30857
+Ref: CL-FORMS:FIELD-VALUE function30922
+Ref: CL-FORMS:FIELD-VALID-P function30974
+Ref: CL-FORMS:RENDER-FORM function31081
+Ref: CL-FORMS:FILL-FORM-FROM-MODEL function31154
+Ref: CL-FORMS:RENDER-FIELD function31243
+Ref: CL-FORMS:REMOVE-FIELD function31333
+Ref: CL-FORMS:FORM-VALID-P function31383
+Ref: CL-FORMS:GET-FIELD function31427
+Ref: CL-FORMS:GET-FIELD-VALUE function31501
+Ref: CL-FORMS:RENDER-FORM-END function31591
+Ref: CL-FORMS:HANDLE-REQUEST function31657
+Ref: CL-FORMS:FILL-MODEL-FROM-FORM function31940
+Ref: CL-FORMS:MAKE-FORMATTER function32048
+Ref: CL-FORMS:RENDER-FIELD-LABEL function32161
+Ref: CL-FORMS:GET-FORM function32257
+Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function32459
+Ref: CL-FORMS:RENDER-FIELD-ERRORS function32584
+Ref: CL-FORMS:SET-FIELD-VALUE function32681
+Ref: CL-FORMS:VALIDATE-FORM function32745
+Ref: CL-FORMS:RENDER-FORM-START function33083
+Ref: CL-FORMS:RENDER-FIELD-WIDGET function33172
+Ref: CL-FORMS:ADD-FORM-ERROR function33269
+Ref: CL-FORMS:RENDER-FORM-ERRORS function33388
+Ref: CL-FORMS:ADD-FIELD function33478
+Ref: CL-FORMS:INTEGER-FORM-FIELD class33542
+Ref: CL-FORMS:SUBFORM-FORM-FIELD class33698
+Ref: CL-FORMS:URL-FORM-FIELD class33870
+Ref: CL-FORMS:DATETIME-FORM-FIELD class34014
+Ref: CL-FORMS:PASSWORD-FORM-FIELD class34168
+Ref: CL-FORMS:EMAIL-FORM-FIELD class34326
+Ref: CL-FORMS:CHOICE-FORM-FIELD class34476
+Ref: CL-FORMS:FILE-FORM-FIELD class37063
+Ref: CL-FORMS:BOOLEAN-FORM-FIELD class37839
+Ref: CL-FORMS:DATE-FORM-FIELD class37988
+Ref: CL-FORMS:FORM-FIELD class38134
+Ref: CL-FORMS:SUBMIT-FORM-FIELD class41912
+Ref: CL-FORMS:HIDDEN-FORM-FIELD class42065
+Ref: CL-FORMS:STRING-FORM-FIELD class42216
+Ref: CL-FORMS:LIST-FORM-FIELD class42368
+Ref: CL-FORMS:FORM class43462
+Ref: CL-FORMS:TEXT-FORM-FIELD class45836
+Node: Index46020
 
 End Tag Table

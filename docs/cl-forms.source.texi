@@ -137,7 +137,7 @@ Source code:
 
 Example of forms validation.
 
-Add Clavier constraints to the form. Then call VALIDATE-FORM after HANDLE-REQUEST.
+Add Clavier constraints to the form. Then call @clref{CL-FORMS, VALIDATE-FORM, function} after @clref{CL-FORMS, HANDLE-REQUEST, function}.
 
 @lisp
 @include ../test/demo/validation.lisp
@@ -153,14 +153,28 @@ To validate in the client, just set @code{:client-validation} to @code{T}.
 
 @subsection Models
 
+Forms can be attached to model objects. Model objects are CLOS instances from where form values are read and written to.
+
+To work with models, forms are defined via defform-builder instead of defform. A form-builder is a function that takes the model objects and attaches it to the form. The form needs to define the accessors to access the model for each form field.
+
 @lisp
 @include ../test/demo/models.lisp
 @end lisp
 
 @subsection Composition
 
+It is possible to compose forms using the @code{subform} field type:
+
 @lisp
 @include ../test/demo/composition.lisp
+@end lisp
+
+@subsection Form templates
+
+Form templates is an alternative way of defining and rendering forms. Instead of defining a form with defform and then specifiying a template and render it, forms templates allow to do all that at the same time.
+
+@lisp
+@verbatiminclude ../test/demo/form-templates.lisp
 @end lisp
 
 @node API
