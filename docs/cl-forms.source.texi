@@ -83,7 +83,7 @@ Use @clref{CL-FORMS, DEFFORM, macro} to define a form. Example:
    (submit :submit :label "Create")))
 @end lisp
 
-On your web handler, grab the form via `get-form`, select a renderer with `with-form-renderer`and then render the form with `render-form`:
+On your web handler, grab the form via @clref{CL-FORMS,GET-FORM,function}, select a renderer with `with-form-renderer`and then render the form with @clref{CL-FORMS,RENDER-FORM,function}:
 
 @lisp
 (let ((form (forms::get-form 'fields-form)))
@@ -91,8 +91,8 @@ On your web handler, grab the form via `get-form`, select a renderer with `with-
       (forms:render-form form))
 @end lisp
 
-To handle the form, grab it via `get-form` and then call `handle-request` (you should probably also call `validate-form` after). 
-Then bind form fields via either `with-form-field-values`, that binds the form field values; or `with-form-fields` that binds the form fields.
+To handle the form, grab it via @clref{CL-FORMS,GET-FORM,function} and then call @clref{CL-FORMS,HANDLE-REQUEST,function} (you should probably also call @clref{CL-FORMS,VALIDATE-FORM,function} after). 
+Then bind form fields via either @clref{CL-FORMS,WITH-FORM-FIELD-VALUES,macro}, that binds the form field values; or @clref{CL-FORMS,WITH-FORM-FIELDS,macro} that binds the form fields.
 
 @lisp
 (let ((form (forms:get-form 'fields-form)))
@@ -105,7 +105,7 @@ Then bind form fields via either `with-form-field-values`, that binds the form f
             (:li (who:fmt "Sex: ~A" sex))))))
 @end lisp
 
-Plase have a look at the demo sources for more examples of how to use the library
+Please have a look at the demo sources for more examples of how to use the library
 
 @section Demo
 
@@ -181,6 +181,54 @@ Form templates is an alternative way of defining and rendering forms. Instead of
 
 @lisp
 @include ../test/demo/renderers.lisp
+@end lisp
+
+@node Form rendering
+@section Form rendering
+
+A form can be rendered via different renderers and themes.
+There are implemented renderers for CL-WHO and Djula.
+The only theme at the moment is a Bootstrap theme that runs under CL-WHO.
+
+To be able to render a form a form renderer needs to be bound first. Renderers are bound using @clref{CL-FORMS,WITH-FORM-RENDERER,macro} macro.
+
+Similarly, to use a theme other than the default one, it needs to be bound using @clref{CL-FORMS,WITH-FORM-THEME,macro}.
+
+@subsection Form rendering functions
+
+Forms are renderer using @clref{CL-FORMS,RENDER-FORM,function} to render the whole form all at once, or via @clref{CL-FORMS,RENDER-FORM-START,function},@clref{CL-FORMS,RENDER-FORM-END,function},@clref{CL-FORMS,RENDER-FIELD,function},@clref{CL-FORMS,RENDER-FIELD-LABEL,function},@clref{CL-FORMS,RENDER-FIELD-WIDGET,function}, to only render specific parts of a form and have more control.
+
+@node CL-WHO renderer
+@subsection CL-WHO renderer
+
+The CL-WHO renderer uses CL-WHO library for rendering forms.
+
+Needs @code{cl-forms.who} ASDF system loaded.
+
+To render a form using CL-WHO bind the renderer via @clref{CL-FORMS,WITH-FORM-RENDERER, macro}, bind @code{FORMS.WHO:*HTML*} variable, and then render the form:
+
+@lisp
+(let ((form (forms::get-form 'fields-form)))
+   (who:with-html-output (forms.who:*html*)
+      (forms:with-form-renderer :who
+         (forms:render-form form))))
+@end lisp
+
+@node Bootstrap theme
+@subsection Bootstrap theme
+
+There's a Bootstrap theme implemented for CL-WHO renderer.
+
+Needs @code{cl-forms.who.bootstrap} ASDF system loaded.
+
+Select the theme via @clref{CL-FORMS,WITH-FORM-THEME,macro}:
+
+@lisp
+(let ((form (forms::get-form 'bs-fields-form)))
+    (forms:with-form-theme 'forms.who::bootstrap-form-theme
+      (forms:with-form-renderer :who
+        (who:with-html-output (forms.who::*html*)
+           (forms:render-form form)))))
 @end lisp
 
 @node API

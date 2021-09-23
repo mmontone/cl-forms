@@ -122,17 +122,29 @@ See: DEFFORM-BUILDER macro."
     (apply form-builder args)))
 
 (defmacro with-form-fields (fields form &body body)
-  "Bind FIELDS to the form fields in FORM under BODY.
+  "Bind FIELDS to the form fields in FORM.
+
+Example:
 
 @lisp
-(with-form-field-values (name single sex age email) form
-   (print (list name single sex age email)))
-@end lisp"
+(with-form-fields (name) form
+   (print (field-value name)))
+@end lisp
+
+Also see: WITH-FORM-FIELD-VALUES "
   `(let ,(loop for field in fields
                collect `(,field (get-field ,form ',field)))
      ,@body))
 
 (defmacro with-form-field-values (fields form &body body)
+  "Bind the value of FIELDS in FORM.
+
+Example:
+
+@lisp
+(with-form-field-values (name) form
+   (print name))
+@end lisp"
   `(let ,(loop for field in fields
                collect `(,field (field-value (get-field ,form ',field))))
      ,@body))
@@ -648,6 +660,7 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
                 (%collect-replace-fields part collect-field)))))
 
 (defmacro with-form-template ((&optional form-var) form-name args &body body)
+  "Define a FORM named FORM-NAME and render it at the same time."
   (multiple-value-bind (new-body fields) (collect-replace-fields body)
     (let ((form-bind (or form-var (gensym "FORM"))))
       `(progn

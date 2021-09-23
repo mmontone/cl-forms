@@ -86,6 +86,12 @@ ul.no-bullet {list-style: none}
       <li><a id="toc-Form-templates" href="#Form-templates">3.2.6 Form templates</a></li>
       <li><a id="toc-Renderers" href="#Renderers">3.2.7 Renderers</a></li>
     </ul></li>
+    <li><a id="toc-Form-rendering-1" href="#Form-rendering">3.3 Form rendering</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Form-rendering-functions" href="#Form-rendering-functions">3.3.1 Form rendering functions</a></li>
+      <li><a id="toc-CL_002dWHO-renderer-1" href="#CL_002dWHO-renderer">3.3.2 CL-WHO renderer</a></li>
+      <li><a id="toc-Bootstrap-theme-1" href="#Bootstrap-theme">3.3.3 Bootstrap theme</a></li>
+    </ul></li>
   </ul></li>
   <li><a id="toc-API-1" href="#API">4 API</a>
   <ul class="no-bullet">
@@ -154,6 +160,11 @@ Next: <a href="#API" accesskey="n" rel="next">API</a>, Previous: <a href="#Insta
 </div>
 <span id="Usage-1"></span><h2 class="chapter">3 Usage</h2>
 <span id="usage"></span>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Form-rendering" accesskey="1">Form rendering</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
 <span id="Basics"></span><h3 class="section">3.1 Basics</h3>
 
 <p>Use <a href="#CL_002dFORMS_003aDEFFORM-macro">DEFFORM</a> to define a form. Example:
@@ -166,7 +177,7 @@ Next: <a href="#API" accesskey="n" rel="next">API</a>, Previous: <a href="#Insta
      <span class="paren3">(<span class="lisp-bg">submit <span class="keyword">:submit</span> <span class="keyword">:label</span> <span class="string">&quot;Create&quot;</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
-<p>On your web handler, grab the form via &lsquo;get-form&lsquo;, select a renderer with &lsquo;with-form-renderer&lsquo;and then render the form with &lsquo;render-form&lsquo;:
+<p>On your web handler, grab the form via <a href="#CL_002dFORMS_003aGET_002dFORM-function">GET-FORM</a>, select a renderer with &lsquo;with-form-renderer&lsquo;and then render the form with <a href="#CL_002dFORMS_003aRENDER_002dFORM-function">RENDER-FORM</a>:
 </p>
 <div class="lisp">
 <pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms::get-form 'fields-form</span>)</span></span>)</span></span>)</span>
@@ -175,8 +186,8 @@ Next: <a href="#API" accesskey="n" rel="next">API</a>, Previous: <a href="#Insta
   </span></span>
 </pre></div>
 
-<p>To handle the form, grab it via &lsquo;get-form&lsquo; and then call &lsquo;handle-request&lsquo; (you should probably also call &lsquo;validate-form&lsquo; after). 
-Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that binds the form field values; or &lsquo;with-form-fields&lsquo; that binds the form fields.
+<p>To handle the form, grab it via <a href="#CL_002dFORMS_003aGET_002dFORM-function">GET-FORM</a> and then call <a href="#CL_002dFORMS_003aHANDLE_002dREQUEST-function">HANDLE-REQUEST</a> (you should probably also call <a href="#CL_002dFORMS_003aVALIDATE_002dFORM-function">VALIDATE-FORM</a> after). 
+Then bind form fields via either <a href="#CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-macro">WITH-FORM-FIELD-VALUES</a>, that binds the form field values; or <a href="#CL_002dFORMS_003aWITH_002dFORM_002dFIELDS-macro">WITH-FORM-FIELDS</a> that binds the form fields.
 </p>
 <div class="lisp">
 <pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span></span>)</span></span>)</span>
@@ -189,7 +200,7 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
               <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
-<p>Plase have a look at the demo sources for more examples of how to use the library
+<p>Please have a look at the demo sources for more examples of how to use the library
 </p>
 <span id="Demo"></span><h3 class="section">3.2 Demo</h3>
 
@@ -730,6 +741,73 @@ Then bind form fields via either &lsquo;with-form-field-values&lsquo;, that bind
 </pre></div>
 
 <hr>
+<span id="Form-rendering"></span><div class="header">
+<p>
+Up: <a href="#Usage" accesskey="u" rel="up">Usage</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Form-rendering-1"></span><h3 class="section">3.3 Form rendering</h3>
+
+<p>A form can be rendered via different renderers and themes.
+There are implemented renderers for CL-WHO and Djula.
+The only theme at the moment is a Bootstrap theme that runs under CL-WHO.
+</p>
+<p>To be able to render a form a form renderer needs to be bound first. Renderers are bound using <a href="#CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-macro">WITH-FORM-RENDERER</a> macro.
+</p>
+<p>Similarly, to use a theme other than the default one, it needs to be bound using <a href="#CL_002dFORMS_003aWITH_002dFORM_002dTHEME-macro">WITH-FORM-THEME</a>.
+</p>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#CL_002dWHO-renderer" accesskey="1">CL-WHO renderer</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Bootstrap-theme" accesskey="2">Bootstrap theme</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
+<span id="Form-rendering-functions"></span><h4 class="subsection">3.3.1 Form rendering functions</h4>
+
+<p>Forms are renderer using <a href="#CL_002dFORMS_003aRENDER_002dFORM-function">RENDER-FORM</a> to render the whole form all at once, or via <a href="#CL_002dFORMS_003aRENDER_002dFORM_002dSTART-function">RENDER-FORM-START</a>,<a href="#CL_002dFORMS_003aRENDER_002dFORM_002dEND-function">RENDER-FORM-END</a>,<a href="#CL_002dFORMS_003aRENDER_002dFIELD-function">RENDER-FIELD</a>,<a href="#CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-function">RENDER-FIELD-LABEL</a>,<a href="#CL_002dFORMS_003aRENDER_002dFIELD_002dWIDGET-function">RENDER-FIELD-WIDGET</a>, to only render specific parts of a form and have more control.
+</p>
+<hr>
+<span id="CL_002dWHO-renderer"></span><div class="header">
+<p>
+Next: <a href="#Bootstrap-theme" accesskey="n" rel="next">Bootstrap theme</a>, Up: <a href="#Form-rendering" accesskey="u" rel="up">Form rendering</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="CL_002dWHO-renderer-1"></span><h4 class="subsection">3.3.2 CL-WHO renderer</h4>
+
+<p>The CL-WHO renderer uses CL-WHO library for rendering forms.
+</p>
+<p>Needs <code>cl-forms.who</code> ASDF system loaded.
+</p>
+<p>To render a form using CL-WHO bind the renderer via <a href="#CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-macro">WITH-FORM-RENDERER</a>, bind <code>FORMS.WHO:*HTML*</code> variable, and then render the form:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms::get-form 'fields-form</span>)</span></span>)</span></span>)</span>
+     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren3">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
+        <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+           <span class="paren4">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<hr>
+<span id="Bootstrap-theme"></span><div class="header">
+<p>
+Previous: <a href="#CL_002dWHO-renderer" accesskey="p" rel="prev">CL-WHO renderer</a>, Up: <a href="#Form-rendering" accesskey="u" rel="up">Form rendering</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Bootstrap-theme-1"></span><h4 class="subsection">3.3.3 Bootstrap theme</h4>
+
+<p>There&rsquo;s a Bootstrap theme implemented for CL-WHO renderer.
+</p>
+<p>Needs <code>cl-forms.who.bootstrap</code> ASDF system loaded.
+</p>
+<p>Select the theme via <a href="#CL_002dFORMS_003aWITH_002dFORM_002dTHEME-macro">WITH-FORM-THEME</a>:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms::get-form 'bs-fields-form</span>)</span></span>)</span></span>)</span>
+      <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-theme</span></i> 'forms.who::bootstrap-form-theme
+        <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+          <span class="paren4">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren5">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+             <span class="paren5">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<hr>
 <span id="API"></span><div class="header">
 <p>
 Next: <a href="#Index" accesskey="n" rel="next">Index</a>, Previous: <a href="#Usage" accesskey="p" rel="prev">Usage</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
@@ -765,7 +843,16 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-1">Macro: <strong>CL-FORMS:WITH-FORM-FIELD-VALUES</strong> <em>(fields form &amp;body body)</em></dt>
-</dl>
+<dd>
+<p>Bind the value of FIELDS in FORM.
+</p>
+<p>Example:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name</span>)</span> form
+     <span class="paren2">(<span class="lisp-bg">print name</span>)</span></span>)</span>
+</pre></div>
+</dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM-macro"></span><dl>
@@ -798,18 +885,24 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dFIELDS-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELDS-1">Macro: <strong>CL-FORMS:WITH-FORM-FIELDS</strong> <em>(fields form &amp;body body)</em></dt>
 <dd>
-<p>Bind FIELDS to the form fields in FORM under BODY.
+<p>Bind FIELDS to the form fields in FORM.
+</p>
+<p>Example:
 </p>
 <div class="lisp">
-<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name single sex age email</span>)</span> form
-     <span class="paren2">(<span class="lisp-bg">print <span class="paren3">(<span class="lisp-bg">list name single sex age email</span>)</span></span>)</span></span>)</span>
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-form-fields</span></i> <span class="paren2">(<span class="lisp-bg">name</span>)</span> form
+     <span class="paren2">(<span class="lisp-bg">print <span class="paren3">(<span class="lisp-bg">field-value name</span>)</span></span>)</span></span>)</span>
 </pre></div>
-</dd></dl>
+
+<p>Also see: WITH-FORM-FIELD-VALUES 
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-1">Macro: <strong>CL-FORMS:WITH-FORM-TEMPLATE</strong> <em>((&amp;optional form-var) form-name args &amp;body body)</em></dt>
-</dl>
+<dd>
+<p>Define a FORM named FORM-NAME and render it at the same time.
+</p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-macro"></span><dl>
