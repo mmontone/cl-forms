@@ -90,7 +90,7 @@ Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form
     `(setf (get ',form-name :form)
            (lambda ,args
              (let ((,form (progn ,@body)))
-	       (check-type ,form forms:form)
+               (check-type ,form forms:form)
                (setf (form-name ,form) ',form-name)
                ,form)))))
 
@@ -375,7 +375,7 @@ See: DEFFORM-BUILDER macro."
 (defmethod field-writer ((field form-field))
   (or (slot-value field 'writer)
       (and (field-accessor field)
-           (fdefinition `(setf ,(field-accessor field)))))) 
+           (fdefinition `(setf ,(field-accessor field))))))
 
 (defmethod field-value ((field form-field))
   (if (and (field-reader field) (form-model (field-form field)))
@@ -436,7 +436,7 @@ See: DEFFORM-BUILDER macro."
                                (field-name form-field))))))
     ((and (not (field-required-p form-field))
           (empty-value-p (field-value form-field)))
-          (values t nil))
+     (values t nil))
     (t (call-next-method))))
 
 (defmethod validate-form-field ((form-field form-field))
