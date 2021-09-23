@@ -11,8 +11,7 @@
     (error "File not found: ~A" path))
   path)
 
-(defparameter *demo-acceptor*
-  (make-instance 'hunchentoot:easy-acceptor :port 9090))
+(defparameter *demo-acceptor* nil)
 
 (defun define-static-resource (uri relative-path)
   (push
@@ -46,7 +45,7 @@
 
 
 (defun run-demo ()
-  (hunchentoot:start *demo-acceptor*))
+  (hunchentoot:start (setf *demo-acceptor* (make-instance 'hunchentoot:easy-acceptor :port 0))))
 
 (defun stop-demo ()
   (hunchentoot:stop *demo-acceptor*))
