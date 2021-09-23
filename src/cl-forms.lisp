@@ -90,7 +90,7 @@ Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form
     `(setf (get ',form-name :form)
            (lambda ,args
              (let ((,form (progn ,@body)))
-	       (check-type ,form 'forms:form)
+	       (check-type ,form forms:form)
                (setf (form-name ,form) ',form-name)
                ,form)))))
 
