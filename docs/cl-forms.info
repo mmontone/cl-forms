@@ -614,10 +614,10 @@ and render it, forms templates allow to do all that at the same time.
        (flet ((render ()
                 (forms:with-form-renderer :who
      	     (who:with-html-output (forms.who:*html*)
-     	       (:h2 "CL-WHO automatic")
+     	       (:h2 "CL-WHO")
      	       (:p (who:str "Render via CL-WHO and whole form with RENDER-FORM."))
      	       (forms:render-form (forms:get-form 'fields-form))
-     	       (:h2 "CL-WHO manual")
+     	       (:h2 "CL-WHO render by part")
      	       (:p (who:str "Render via CL-WHO and the individual rendering functions RENDER-FORM-START, RENDER-FORM-END, RENDER-FIELD, RENDER-FIELD-LABEL and RENDER-FIELD-WIDGET."))
      	       (forms:with-form (forms:get-form 'fields-form)
      		 (forms:render-form-start)
@@ -632,6 +632,12 @@ and render it, forms templates allow to do all that at the same time.
      		 (forms:render-field 'disabled-checkbox)
      		 (forms:render-field 'submit)
      		 (forms:render-form-end))
+     	       (:h2 "Djula")
+     	       (:p (who:str "Render a form with a Djula template."))
+     	       (who:str (djula:render-template* (asdf:system-relative-pathname :cl-forms.demo "test/demo/djula-form.html") nil :form (get-form 'fields-form)))
+     	       (:h2 "Djula by part")
+     	       (:p (who:str "Render a form with a Djula template, by parts."))
+     	       (who:str (djula:render-template* (asdf:system-relative-pathname :cl-forms.demo "test/demo/djula-form-parts.html") nil :form (get-form 'fields-form)))
                     ))))
          (render-demo-page :demo #'render
                            :source (asdf:system-relative-pathname :cl-forms.demo
@@ -661,6 +667,7 @@ bound using *note WITH-FORM-THEME: CL-FORMS:WITH-FORM-THEME macro.
 
 * CL-WHO renderer::
 * Bootstrap theme::
+* Djula::
 
 3.3.1 Form rendering functions
 ------------------------------
@@ -694,7 +701,7 @@ WITH-FORM-RENDERER: CL-FORMS:WITH-FORM-RENDERER macro, bind
               (forms:render-form form))))
 
 
-File: cl-forms.info,  Node: Bootstrap theme,  Prev: CL-WHO renderer,  Up: Form rendering
+File: cl-forms.info,  Node: Bootstrap theme,  Next: Djula,  Prev: CL-WHO renderer,  Up: Form rendering
 
 3.3.3 Bootstrap theme
 ---------------------
@@ -711,6 +718,55 @@ macro.:
            (forms:with-form-renderer :who
              (who:with-html-output (forms.who::*html*)
                 (forms:render-form form)))))
+
+
+File: cl-forms.info,  Node: Djula,  Prev: Bootstrap theme,  Up: Form rendering
+
+3.3.4 Djula
+-----------
+
+CL-FORMS integrates with Djula template system.
+
+   Needs 'cl-forms.djula' ASDF system loaded.
+
+   Djula tags:
+   * '{% form form %}'.  Renders a whole form.
+   * '{% form-start form %}'.  Renders the form start part.
+   * '{% form-end form %}'.  Renders the form end part.
+   * '{% form-row form field-name %}'.  Renders the row with label and
+     widget for the form field.
+   * '{% form-field-label form field-name %}'.  Renders the form field
+     label.
+   * '{% form-field-widget form field-name %}'.  Renders the form field
+     widget.
+
+   Make sure to '{% set-package %}' at the beggining of your Djula
+template to the package where the form lives.  Otherwise, Djula wont' be
+able to find form fields by name.
+
+   Examples:
+
+   A Djula template that renders a whole form:
+
+{% form form %}
+
+   A Djula template that renders a form by parts:
+
+{% set-package forms.test %}
+
+{% form-start form %}
+{% form-row form name %}
+{% form-row form ready %}
+<div>
+  {% form-field-label form sex %}
+  {% form-field-widget form sex %}
+</div>
+{% form-row form avatar %}
+{% form-row form disabled %}
+{% form-row form disabled-checkbox %}
+{% form-row form readonly-checkbox %}
+{% form-row form submit %}
+{% form-end form %}
 
 
 File: cl-forms.info,  Node: API,  Next: Index,  Prev: Usage,  Up: Top
@@ -1418,69 +1474,70 @@ Node: Installation1172
 Ref: installation1285
 Node: Usage1285
 Ref: usage1382
-Node: Form rendering29590
-Node: CL-WHO renderer30779
-Node: Bootstrap theme31384
-Node: API31978
-Ref: api32064
-Node: CL-FORMS package32095
-Ref: CL-FORMS:*BASE64-ENCODE* variable32283
-Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro32387
-Ref: CL-FORMS:WITH-FORM macro32585
-Ref: CL-FORMS:DEFFORM-BUILDER macro32695
-Ref: CL-FORMS:WITH-FORM-THEME macro33085
-Ref: CL-FORMS:WITH-FORM-FIELDS macro33219
-Ref: CL-FORMS:WITH-FORM-TEMPLATE macro33464
-Ref: CL-FORMS:WITH-FORM-RENDERER macro33631
-Ref: CL-FORMS:DEFFORM macro33767
-Ref: CL-FORMS:FIELD-ACCESSOR function34847
-Ref: CL-FORMS:FIELD-WRITER function34911
-Ref: CL-FORMS:FIELD-READER function34964
-Ref: CL-FORMS:FIELD-PARSER function35017
-Ref: CL-FORMS:FORM-ERRORS function35079
-Ref: CL-FORMS:FORMAT-FIELD-VALUE function35140
-Ref: CL-FORMS:FIELD-FORMATTER function35243
-Ref: CL-FORMS:FIELD-VALUE function35308
-Ref: CL-FORMS:FIELD-VALID-P function35360
-Ref: CL-FORMS:RENDER-FORM function35467
-Ref: CL-FORMS:FILL-FORM-FROM-MODEL function35697
-Ref: CL-FORMS:RENDER-FIELD function35855
-Ref: CL-FORMS:REMOVE-FIELD function35993
-Ref: CL-FORMS:FORM-VALID-P function36043
-Ref: CL-FORMS:GET-FIELD function36087
-Ref: CL-FORMS:GET-FIELD-VALUE function36161
-Ref: CL-FORMS:RENDER-FORM-END function36251
-Ref: CL-FORMS:HANDLE-REQUEST function36360
-Ref: CL-FORMS:FILL-MODEL-FROM-FORM function36643
-Ref: CL-FORMS:MAKE-FORMATTER function36752
-Ref: CL-FORMS:RENDER-FIELD-LABEL function36865
-Ref: CL-FORMS:GET-FORM function36994
-Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function37196
-Ref: CL-FORMS:RENDER-FIELD-ERRORS function37321
-Ref: CL-FORMS:SET-FIELD-VALUE function37476
-Ref: CL-FORMS:VALIDATE-FORM function37540
-Ref: CL-FORMS:RENDER-FORM-START function37878
-Ref: CL-FORMS:RENDER-FIELD-WIDGET function38085
-Ref: CL-FORMS:ADD-FORM-ERROR function38209
-Ref: CL-FORMS:RENDER-FORM-ERRORS function38328
-Ref: CL-FORMS:ADD-FIELD function38480
-Ref: CL-FORMS:INTEGER-FORM-FIELD class38544
-Ref: CL-FORMS:SUBFORM-FORM-FIELD class38700
-Ref: CL-FORMS:URL-FORM-FIELD class38872
-Ref: CL-FORMS:DATETIME-FORM-FIELD class39016
-Ref: CL-FORMS:PASSWORD-FORM-FIELD class39170
-Ref: CL-FORMS:EMAIL-FORM-FIELD class39328
-Ref: CL-FORMS:CHOICE-FORM-FIELD class39478
-Ref: CL-FORMS:FILE-FORM-FIELD class42065
-Ref: CL-FORMS:BOOLEAN-FORM-FIELD class42841
-Ref: CL-FORMS:DATE-FORM-FIELD class42990
-Ref: CL-FORMS:FORM-FIELD class43136
-Ref: CL-FORMS:SUBMIT-FORM-FIELD class46914
-Ref: CL-FORMS:HIDDEN-FORM-FIELD class47067
-Ref: CL-FORMS:STRING-FORM-FIELD class47218
-Ref: CL-FORMS:LIST-FORM-FIELD class47370
-Ref: CL-FORMS:FORM class48464
-Ref: CL-FORMS:TEXT-FORM-FIELD class50838
-Node: Index51022
+Node: Form rendering30114
+Node: CL-WHO renderer31313
+Node: Bootstrap theme31918
+Node: Djula32526
+Node: API33849
+Ref: api33935
+Node: CL-FORMS package33966
+Ref: CL-FORMS:*BASE64-ENCODE* variable34154
+Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro34258
+Ref: CL-FORMS:WITH-FORM macro34456
+Ref: CL-FORMS:DEFFORM-BUILDER macro34566
+Ref: CL-FORMS:WITH-FORM-THEME macro34956
+Ref: CL-FORMS:WITH-FORM-FIELDS macro35090
+Ref: CL-FORMS:WITH-FORM-TEMPLATE macro35335
+Ref: CL-FORMS:WITH-FORM-RENDERER macro35502
+Ref: CL-FORMS:DEFFORM macro35638
+Ref: CL-FORMS:FIELD-ACCESSOR function36718
+Ref: CL-FORMS:FIELD-WRITER function36782
+Ref: CL-FORMS:FIELD-READER function36835
+Ref: CL-FORMS:FIELD-PARSER function36888
+Ref: CL-FORMS:FORM-ERRORS function36950
+Ref: CL-FORMS:FORMAT-FIELD-VALUE function37011
+Ref: CL-FORMS:FIELD-FORMATTER function37114
+Ref: CL-FORMS:FIELD-VALUE function37179
+Ref: CL-FORMS:FIELD-VALID-P function37231
+Ref: CL-FORMS:RENDER-FORM function37338
+Ref: CL-FORMS:FILL-FORM-FROM-MODEL function37568
+Ref: CL-FORMS:RENDER-FIELD function37726
+Ref: CL-FORMS:REMOVE-FIELD function37864
+Ref: CL-FORMS:FORM-VALID-P function37914
+Ref: CL-FORMS:GET-FIELD function37958
+Ref: CL-FORMS:GET-FIELD-VALUE function38032
+Ref: CL-FORMS:RENDER-FORM-END function38122
+Ref: CL-FORMS:HANDLE-REQUEST function38231
+Ref: CL-FORMS:FILL-MODEL-FROM-FORM function38514
+Ref: CL-FORMS:MAKE-FORMATTER function38623
+Ref: CL-FORMS:RENDER-FIELD-LABEL function38736
+Ref: CL-FORMS:GET-FORM function38865
+Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function39067
+Ref: CL-FORMS:RENDER-FIELD-ERRORS function39192
+Ref: CL-FORMS:SET-FIELD-VALUE function39347
+Ref: CL-FORMS:VALIDATE-FORM function39411
+Ref: CL-FORMS:RENDER-FORM-START function39749
+Ref: CL-FORMS:RENDER-FIELD-WIDGET function39956
+Ref: CL-FORMS:ADD-FORM-ERROR function40080
+Ref: CL-FORMS:RENDER-FORM-ERRORS function40199
+Ref: CL-FORMS:ADD-FIELD function40351
+Ref: CL-FORMS:INTEGER-FORM-FIELD class40415
+Ref: CL-FORMS:SUBFORM-FORM-FIELD class40571
+Ref: CL-FORMS:URL-FORM-FIELD class40743
+Ref: CL-FORMS:DATETIME-FORM-FIELD class40887
+Ref: CL-FORMS:PASSWORD-FORM-FIELD class41041
+Ref: CL-FORMS:EMAIL-FORM-FIELD class41199
+Ref: CL-FORMS:CHOICE-FORM-FIELD class41349
+Ref: CL-FORMS:FILE-FORM-FIELD class43936
+Ref: CL-FORMS:BOOLEAN-FORM-FIELD class44712
+Ref: CL-FORMS:DATE-FORM-FIELD class44861
+Ref: CL-FORMS:FORM-FIELD class45007
+Ref: CL-FORMS:SUBMIT-FORM-FIELD class48785
+Ref: CL-FORMS:HIDDEN-FORM-FIELD class48938
+Ref: CL-FORMS:STRING-FORM-FIELD class49089
+Ref: CL-FORMS:LIST-FORM-FIELD class49241
+Ref: CL-FORMS:FORM class50335
+Ref: CL-FORMS:TEXT-FORM-FIELD class52709
+Node: Index52893
 
 End Tag Table

@@ -153,7 +153,7 @@ Example:
   (or
    (cdr (assoc field-name (form-fields form)))
    (when error-p
-     (error "Field ~A not found in ~A" field-name form))))
+     (error "Field ~S not found in ~A" field-name form))))
 
 (defun get-field-value (form field-name &optional (error-p t))
   (declare (ignorable error-p))
@@ -346,7 +346,7 @@ Example:
 
 (defmethod print-object ((field form-field) stream)
   (print-unreadable-object (field stream :type t :identity t)
-    (format stream "~A value: ~A"
+    (format stream "~S value: ~A"
             (field-name field)
             (field-value field))))
 

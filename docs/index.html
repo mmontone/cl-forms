@@ -91,6 +91,7 @@ ul.no-bullet {list-style: none}
       <li><a id="toc-Form-rendering-functions" href="#Form-rendering-functions">3.3.1 Form rendering functions</a></li>
       <li><a id="toc-CL_002dWHO-renderer-1" href="#CL_002dWHO-renderer">3.3.2 CL-WHO renderer</a></li>
       <li><a id="toc-Bootstrap-theme-1" href="#Bootstrap-theme">3.3.3 Bootstrap theme</a></li>
+      <li><a id="toc-Djula-1" href="#Djula">3.3.4 Djula</a></li>
     </ul></li>
   </ul></li>
   <li><a id="toc-API-1" href="#API">4 API</a>
@@ -713,10 +714,10 @@ Then bind form fields via either <a href="#CL_002dFORMS_003aWITH_002dFORM_002dFI
     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">flet</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">render <span class="paren5">(<span class="lisp-bg"></span>)</span>
              <span class="paren5">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
   	     <span class="paren6">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren1">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
-  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;CL-WHO automatic&quot;</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;CL-WHO&quot;</span></span>)</span>
   	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren2">(<span class="lisp-bg">who:str <span class="string">&quot;Render via CL-WHO and whole form with RENDER-FORM.&quot;</span></span>)</span></span>)</span>
   	       <span class="paren1">(<span class="lisp-bg">forms:render-form <span class="paren2">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span></span>)</span>
-  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;CL-WHO manual&quot;</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;CL-WHO render by part&quot;</span></span>)</span>
   	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren2">(<span class="lisp-bg">who:str <span class="string">&quot;Render via CL-WHO and the individual rendering functions RENDER-FORM-START, RENDER-FORM-END, RENDER-FIELD, RENDER-FIELD-LABEL and RENDER-FIELD-WIDGET.&quot;</span></span>)</span></span>)</span>
   	       <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">forms:with-form</span></i> <span class="paren2">(<span class="lisp-bg">forms:get-form 'fields-form</span>)</span>
   		 <span class="paren2">(<span class="lisp-bg">forms:render-form-start</span>)</span>
@@ -731,6 +732,12 @@ Then bind form fields via either <a href="#CL_002dFORMS_003aWITH_002dFORM_002dFI
   		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'disabled-checkbox</span>)</span>
   		 <span class="paren2">(<span class="lisp-bg">forms:render-field 'submit</span>)</span>
   		 <span class="paren2">(<span class="lisp-bg">forms:render-form-end</span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;Djula&quot;</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren2">(<span class="lisp-bg">who:str <span class="string">&quot;Render a form with a Djula template.&quot;</span></span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg">who:str <span class="paren2">(<span class="lisp-bg">djula:render-template* <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span> <span class="string">&quot;test/demo/djula-form.html&quot;</span></span>)</span> nil <span class="keyword">:form</span> <span class="paren3">(<span class="lisp-bg">get-form 'fields-form</span>)</span></span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:h2</span> <span class="string">&quot;Djula by part&quot;</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg"><span class="keyword">:p</span> <span class="paren2">(<span class="lisp-bg">who:str <span class="string">&quot;Render a form with a Djula template, by parts.&quot;</span></span>)</span></span>)</span>
+  	       <span class="paren1">(<span class="lisp-bg">who:str <span class="paren2">(<span class="lisp-bg">djula:render-template* <span class="paren3">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span> <span class="string">&quot;test/demo/djula-form-parts.html&quot;</span></span>)</span> nil <span class="keyword">:form</span> <span class="paren3">(<span class="lisp-bg">get-form 'fields-form</span>)</span></span>)</span></span>)</span>
                  </span>)</span></span>)</span></span>)</span></span>)</span>
       <span class="paren3">(<span class="lisp-bg">render-demo-page <span class="keyword">:demo</span> #'render
                         <span class="keyword">:source</span> <span class="paren4">(<span class="lisp-bg">asdf:system-relative-pathname <span class="keyword">:cl-forms.demo</span>
@@ -759,6 +766,8 @@ The only theme at the moment is a Bootstrap theme that runs under CL-WHO.
 <tr><td align="left" valign="top">&bull; <a href="#CL_002dWHO-renderer" accesskey="1">CL-WHO renderer</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Bootstrap-theme" accesskey="2">Bootstrap theme</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Djula" accesskey="3">Djula</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
@@ -789,7 +798,7 @@ Next: <a href="#Bootstrap-theme" accesskey="n" rel="next">Bootstrap theme</a>, U
 <hr>
 <span id="Bootstrap-theme"></span><div class="header">
 <p>
-Previous: <a href="#CL_002dWHO-renderer" accesskey="p" rel="prev">CL-WHO renderer</a>, Up: <a href="#Form-rendering" accesskey="u" rel="up">Form rendering</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#Djula" accesskey="n" rel="next">Djula</a>, Previous: <a href="#CL_002dWHO-renderer" accesskey="p" rel="prev">CL-WHO renderer</a>, Up: <a href="#Form-rendering" accesskey="u" rel="up">Form rendering</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <span id="Bootstrap-theme-1"></span><h4 class="subsection">3.3.3 Bootstrap theme</h4>
 
@@ -807,6 +816,53 @@ Previous: <a href="#CL_002dWHO-renderer" accesskey="p" rel="prev">CL-WHO rendere
              <span class="paren5">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
+<hr>
+<span id="Djula"></span><div class="header">
+<p>
+Previous: <a href="#Bootstrap-theme" accesskey="p" rel="prev">Bootstrap theme</a>, Up: <a href="#Form-rendering" accesskey="u" rel="up">Form rendering</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Djula-1"></span><h4 class="subsection">3.3.4 Djula</h4>
+
+<p>CL-FORMS integrates with Djula template system.
+</p>
+<p>Needs <code>cl-forms.djula</code> ASDF system loaded.
+</p>
+<p>Djula tags:
+</p><ul>
+<li> <code>{% form form %}</code>. Renders a whole form.
+</li><li> <code>{% form-start form %}</code>. Renders the form start part.
+</li><li> <code>{% form-end form %}</code>. Renders the form end part.
+</li><li> <code>{% form-row form field-name %}</code>. Renders the row with label and widget for the form field.
+</li><li> <code>{% form-field-label form field-name %}</code>. Renders the form field label.
+</li><li> <code>{% form-field-widget form field-name %}</code>. Renders the form field widget.
+</li></ul>
+
+<p>Make sure to <code>{% set-package %}</code> at the beggining of your Djula template to the package where the form lives. Otherwise, Djula wont&rsquo; be able to find form fields by name.
+</p>
+<p>Examples:
+</p>
+<p>A Djula template that renders a whole form:
+</p>
+<pre class="verbatim">{% form form %}
+</pre>
+<p>A Djula template that renders a form by parts:
+</p>
+<pre class="verbatim">{% set-package forms.test %}
+
+{% form-start form %}
+{% form-row form name %}
+{% form-row form ready %}
+&lt;div&gt;
+  {% form-field-label form sex %}
+  {% form-field-widget form sex %}
+&lt;/div&gt;
+{% form-row form avatar %}
+{% form-row form disabled %}
+{% form-row form disabled-checkbox %}
+{% form-row form readonly-checkbox %}
+{% form-row form submit %}
+{% form-end form %}
+</pre>
 <hr>
 <span id="API"></span><div class="header">
 <p>

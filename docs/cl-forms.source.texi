@@ -231,6 +231,53 @@ Select the theme via @clref{CL-FORMS,WITH-FORM-THEME,macro}:
            (forms:render-form form)))))
 @end lisp
 
+@node Djula
+@subsection Djula
+
+CL-FORMS integrates with Djula template system.
+
+Needs @code{cl-forms.djula} ASDF system loaded.
+
+Djula tags:
+@itemize
+@item @code{@{% form form %@}}. Renders a whole form.
+@item @code{@{% form-start form %@}}. Renders the form start part.
+@item @code{@{% form-end form %@}}. Renders the form end part.
+@item @code{@{% form-row form field-name %@}}. Renders the row with label and widget for the form field.
+@item @code{@{% form-field-label form field-name %@}}. Renders the form field label.
+@item @code{@{% form-field-widget form field-name %@}}. Renders the form field widget.
+@end itemize
+
+Make sure to @code{@{% set-package %@}} at the beggining of your Djula template to the package where the form lives. Otherwise, Djula wont' be able to find form fields by name.
+
+Examples:
+
+A Djula template that renders a whole form:
+
+@verbatim
+{% form form %}
+@end verbatim
+
+A Djula template that renders a form by parts:
+
+@verbatim
+{% set-package forms.test %}
+
+{% form-start form %}
+{% form-row form name %}
+{% form-row form ready %}
+<div>
+  {% form-field-label form sex %}
+  {% form-field-widget form sex %}
+</div>
+{% form-row form avatar %}
+{% form-row form disabled %}
+{% form-row form disabled-checkbox %}
+{% form-row form readonly-checkbox %}
+{% form-row form submit %}
+{% form-end form %}
+@end verbatim
+
 @node API
 @chapter API
 @anchor{api}
