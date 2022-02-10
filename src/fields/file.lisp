@@ -27,7 +27,7 @@
 
 (defmethod field-read-from-request ((field file-form-field) form parameters)
   (let ((fvalue
-         (cdr (assoc (field-request-name field form) parameters :test #'string=))))
+          (cdr (assoc (field-request-name field form) parameters :test #'string=))))
     (if (and fvalue (listp fvalue))
         (destructuring-bind (path file-name content-type) fvalue
           (setf (file-path field) path)
@@ -36,7 +36,11 @@
           (when (upload-handler field)
             (funcall (upload-handler field) field)))
         ;; else
-        (setf (field-value field) fvalue))))
+        (progn
+          (warn "CL-FORMS: Could not read file field file: ~a." field)
+          (when (not (equalp (form-enctype form) "multipart/form-data"))
+            (warn "CL-FORMS: Encoding type in forms should be set to 'multipart/form-data' for file uploads."))
+          (setf (field-value field) fvalue)))))
 
 (defmethod make-form-field ((field-type (eql :file)) &rest args)
   (apply #'make-instance 'file-form-field args))
@@ -58,7 +62,7 @@
 
 (defmethod forms::field-read-from-request ((field stateful-file-field) form parameters)
   (let ((fvalue
-         (cdr (assoc (forms::field-request-name field form) parameters :test #'string=))))
+          (cdr (assoc (forms::field-request-name field form) parameters :test #'string=))))
     (if (and fvalue (listp fvalue))
         ;; A file was uploaded
         (destructuring-bind (path file-name content-type) fvalue
@@ -69,7 +73,7 @@
             (funcall (forms::upload-handler field) field)))
         ;; else, recover file info, if it is there
         (let ((file-info
-               (cdr (assoc (format nil "~A.info" (forms::field-request-name field form)) parameters :test #'string=))))
+                (cdr (assoc (format nil "~A.info" (forms::field-request-name field form)) parameters :test #'string=))))
           (when file-info
             (let ((finfo (read-from-string (base64:base64-string-to-string file-info))))
               (setf (forms::file-path field) (getf finfo :path)
