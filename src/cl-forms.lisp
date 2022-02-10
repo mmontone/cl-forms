@@ -636,8 +636,10 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
 
 (defmethod make-form-field (field-type &rest args)
   "Provide a good error message when a field cannot be built"
-  (declare (ignore args))
-  (error "Form field of type ~s not defined. Check that ~s is a correct field type." field-type field-type))
+  (if (and (symbolp field-type) (not (keywordp field-type)))
+      (apply #'make-instance field-type args)
+      ;; else
+      (error "Form field of type ~s not defined. Check that ~s is a correct field type." field-type field-type)))
 
 ;; Form templates
 
