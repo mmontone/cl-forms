@@ -39,8 +39,9 @@
         (progn
           (warn "CL-FORMS: Could not read file field file: ~a." field)
           (when (not (equalp (form-enctype form) "multipart/form-data"))
-            (warn "CL-FORMS: Encoding type in forms should be set to 'multipart/form-data' for file uploads."))
-          (setf (field-value field) fvalue)))))
+            (warn "CL-FORMS: Encoding type in forms should be set to 'multipart/form-data' for file uploads."))))
+    ;; Always set the field value
+    (setf (field-value field) fvalue)))
 
 (defmethod make-form-field ((field-type (eql :file)) &rest args)
   (apply #'make-instance 'file-form-field args))
