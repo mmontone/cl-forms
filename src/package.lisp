@@ -10,7 +10,7 @@
    :defform
    :defform-builder
    :find-form
-   :find-form
+   :get-form
    :get-field
    :get-field-value
    :set-field-value
