@@ -26,7 +26,7 @@
    (save :submit :label "Save")))
 
 (defun form-composition-demo (&optional form)
-  (let ((form (or form (get-form 'composition-form))))
+  (let ((form (or form (find-form 'composition-form))))
     (forms:with-form-renderer :who
       (who:with-html-output (forms.who::*html*)
         (:h1 (who:str "Forms composition"))
@@ -54,7 +54,7 @@
                     :active-menu :composition))
 
 (hunchentoot:define-easy-handler (composition-demo-post :uri "/composition-post") ()
-  (let ((form (forms:get-form 'composition-form)))
+  (let ((form (forms:find-form 'composition-form)))
     (forms:handle-request form)
     (render-demo-page :demo (lambda ()
                               (form-composition-demo form))

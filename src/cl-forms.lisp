@@ -87,7 +87,7 @@ BODY is expected to instantiate a FORM object using ARGS in some way.
 
 FORM-NAME is the symbol under which the FORM is registered.
 
-Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form."
+Use FIND-FORM with FORM-NAME and expected arguments to obtain the registered form."
   (alexandria:with-unique-names (form)
     `(setf (get ',form-name :form)
            (lambda ,args
@@ -672,7 +672,7 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
       `(progn
          (defform ,form-name ,args
            ,fields)
-         (let ((,form-bind (or ,form-var (get-form ',form-name))))
+         (let ((,form-bind (or ,form-var (find-form ',form-name))))
            (with-form ,form-bind
              (render-form-start)
              ,@new-body

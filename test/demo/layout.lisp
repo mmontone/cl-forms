@@ -23,7 +23,7 @@
                 (:div :class :heading
                       (:h1 (who:str "Custom layed-out form")))
                 (:p (who:str "This is a form with a custom layout:"))
-                (let ((form (forms::get-form 'layout-form)))
+                (let ((form (forms::find-form 'layout-form)))
                   (macrolet ((f (name)
                                `(forms:render-field ',name))
                              (row (&body body)
@@ -66,7 +66,7 @@
                                   :uri "/layout-post"
                                   :default-request-type :post) ()
   (flet ((fields-post ()
-           (let ((form (forms:get-form 'layout-form)))
+           (let ((form (forms:find-form 'layout-form)))
              (forms::handle-request form)
              (if (forms::validate-form form)
                  (forms::with-form-field-values (firstname lastname active address

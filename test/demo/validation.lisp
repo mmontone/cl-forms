@@ -19,14 +19,14 @@
     (who:with-html-output (forms.who::*html*)
       (:h1 (who:str "Server side validation"))
       (:p (who:str "This is a demo of server side validation. Submit the form and play with the values to see how it works. Also look at field constraints in source code tab."))
-      (let ((form (or form (forms::get-form 'validated-form))))
+      (let ((form (or form (forms::find-form 'validated-form))))
         (forms:render-form form)))))
 
 (hunchentoot:define-easy-handler (validated-form-post :uri "/validation-post"
                                                       :default-request-type :post) ()
 
   (flet ((validation-post ()
-           (let ((form (forms:get-form 'validated-form)))
+           (let ((form (forms:find-form 'validated-form)))
              (forms::handle-request form)
              (if (forms::validate-form form)
                  ;; The form is valid

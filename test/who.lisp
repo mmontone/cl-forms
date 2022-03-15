@@ -12,12 +12,12 @@
    (submit :submit :label "Create")))
 
 (hunchentoot:define-easy-handler (simple-form :uri "/simple-form") ()
-  (let ((form (forms::get-form 'simple-form)))
+  (let ((form (forms::find-form 'simple-form)))
     (forms:with-form-renderer :who
       (forms:render-form form))))
 
 (hunchentoot:define-easy-handler (simple-form-post :uri "/simple-form/post" :default-request-type :post) ()
-  (let ((form (forms:get-form 'simple-form)))
+  (let ((form (forms:find-form 'simple-form)))
     (forms::handle-request form)
     (forms::validate-form form)
     (forms::with-form-fields (name ready sex) form
@@ -62,14 +62,14 @@
                                :name "Foo"
                                :single t
                                :sex :male)))
-    (let ((form (forms::get-form 'model-form person)))
+    (let ((form (forms::find-form 'model-form person)))
       (forms:with-form-renderer :who
         (forms:render-form form)))))
 
 (hunchentoot:define-easy-handler (model-form-post :uri "/model-form/post"
                                                   :default-request-type :post) ()
   (let ((person (make-instance 'person)))
-    (let ((form (forms:get-form 'model-form person)))
+    (let ((form (forms:find-form 'model-form person)))
       (forms::handle-request form)
       (forms::validate-form form)
       (who:with-html-output-to-string (html)
@@ -100,12 +100,12 @@
    (submit :submit :label "Ok")))
 
 (hunchentoot:define-easy-handler (choices-form :uri "/choices-form") ()
-  (let ((form (forms::get-form 'choices-form)))
+  (let ((form (forms::find-form 'choices-form)))
     (forms:with-form-renderer :who
       (forms:render-form form))))
 
 (hunchentoot:define-easy-handler (choices-form-post :uri "/choices-form/post" :default-request-type :post) ()
-  (let ((form (forms:get-form 'choices-form)))
+  (let ((form (forms:find-form 'choices-form)))
     (forms::handle-request form)
     (forms::validate-form form)
     (forms::with-form-field-values (sex sex2 choices choices2) form
@@ -127,7 +127,7 @@
    (email :email)
    (submit :submit :label "Create")))
 
-(let ((form (forms:get-form 'validated-form)))
+(let ((form (forms:find-form 'validated-form)))
   (setf (forms::field-value (forms::get-field form 'name))
         "lala")
   (forms::validate-form form)
@@ -142,12 +142,12 @@
   (forms::form-errors form))
 
 (hunchentoot:define-easy-handler (validated-form :uri "/validated-form") ()
-  (let ((form (forms::get-form 'validated-form)))
+  (let ((form (forms::find-form 'validated-form)))
     (forms:with-form-renderer :who
       (forms:render-form form))))
 
 (hunchentoot:define-easy-handler (validated-form-post :uri "/validated-form/post" :default-request-type :post) ()
-  (let ((form (forms:get-form 'validated-form)))
+  (let ((form (forms:find-form 'validated-form)))
     (forms::handle-request form)
     (if (forms::validate-form form)
         ;; The form is valid
@@ -191,13 +191,13 @@
       (:body ,@body))))
 
 (hunchentoot:define-easy-handler (client-validation :uri "/client-validation") ()
-  (let ((form (forms::get-form 'client-validated-form)))
+  (let ((form (forms::find-form 'client-validated-form)))
     (forms:with-form-renderer :who
       (with-html-page
           (forms:render-form form)))))
 
 (hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
-  (let ((form (forms:get-form 'client-validated-form)))
+  (let ((form (forms:find-form 'client-validated-form)))
     (forms::handle-request form)
     (if (forms::validate-form form)
         ;; The form is valid

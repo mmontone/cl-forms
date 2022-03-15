@@ -120,7 +120,7 @@
    (subform2 :subform :subform 'subform2)))
 
 (test form-test-1 ()
-  (let* ((form (get-form 'test-form-1))
+  (let* ((form (find-form 'test-form-1))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "22")
@@ -130,7 +130,7 @@
     (with-form-field-values (foo bar) form
       (list foo bar)))
 
-  (let* ((form (get-form 'test-form-1))
+  (let* ((form (find-form 'test-form-1))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "bar")
@@ -138,7 +138,7 @@
     (handle-request form request)
     (is-false (validate-form form)))
 
-  (let* ((form (get-form 'test-form-1))
+  (let* ((form (find-form 'test-form-1))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "44")
@@ -146,7 +146,7 @@
     (handle-request form request)
     (is-false (validate-form form)))
 
-  (let* ((form (get-form 'test-form-1))
+  (let* ((form (find-form 'test-form-1))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "44")
@@ -158,7 +158,7 @@
   ((choice :string-choice :choices '("foo" "bar" "baz"))))
 
 (test string-choice-test
-  (let* ((form (get-form 'string-choice-test-form))
+  (let* ((form (find-form 'string-choice-test-form))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "44")
@@ -166,7 +166,7 @@
     (handle-request form request)
     (is-false (validate-form form)))
 
-  (let* ((form (get-form 'string-choice-test-form))
+  (let* ((form (find-form 'string-choice-test-form))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "44")

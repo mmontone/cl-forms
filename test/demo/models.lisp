@@ -46,7 +46,7 @@
                                                :name "Foo"
                                                :single t
                                                :sex :male)))
-                    (forms::get-form 'model-form person)))))
+                    (forms::find-form 'model-form person)))))
     (forms:with-form-renderer :who
       (forms:render-form form))))
 
@@ -60,7 +60,7 @@
                                                   :default-request-type :post) ()
   (flet ((model-post ()
            (let ((person (make-instance 'person)))
-             (let ((form (forms:get-form 'model-form person)))
+             (let ((form (forms:find-form 'model-form person)))
                (forms::handle-request form)
                (forms::validate-form form)
                (who:with-html-output (forms.who::*html*)

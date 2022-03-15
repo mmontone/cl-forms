@@ -27,19 +27,19 @@ Use `defform` to define a form. Example:
    (submit :submit :label "Create")))
 ```
 
-On your web handler, grab the form via `get-form`, select a renderer with `with-form-renderer`and then render the form with `render-form`:
+On your web handler, grab the form via `find-form`, select a renderer with `with-form-renderer`and then render the form with `render-form`:
 
 ```lisp
-(let ((form (forms::get-form 'fields-form)))
+(let ((form (forms::find-form 'fields-form)))
    (forms:with-form-renderer :who
       (forms:render-form form))
 ```
 
-To handle the form, grab it via `get-form` and then call `handle-request` (you should probably also call `validate-form` after). 
+To handle the form, grab it via `find-form` and then call `handle-request` (you should probably also call `validate-form` after). 
 Then bind form fields via either `with-form-field-values`, that binds the form field values; or `with-form-fields` that binds the form fields.
 
 ```lisp
-(let ((form (forms:get-form 'fields-form)))
+(let ((form (forms:find-form 'fields-form)))
     (forms::handle-request form)
     (forms::with-form-field-values (name ready sex) form
        (who:with-html-output (forms.who::*html*)

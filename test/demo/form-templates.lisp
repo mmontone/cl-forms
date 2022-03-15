@@ -53,7 +53,7 @@
                                   :uri "/template-post"
                                   :default-request-type :post) ()
   (flet ((fields-post ()
-           (let ((form (forms:get-form 'template-form)))
+           (let ((form (forms:find-form 'template-form)))
              (forms::handle-request form)
              (if (forms::validate-form form)
                  (forms::with-form-field-values (firstname lastname active address

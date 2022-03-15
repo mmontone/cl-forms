@@ -9,7 +9,7 @@
    :with-form-theme
    :defform
    :defform-builder
-   :get-form
+   :find-form
    :find-form
    :get-field
    :get-field-value

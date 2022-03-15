@@ -19,13 +19,13 @@
           (:div :class :row
                 (:div :class :heading
                       (:h3 (who:str "Simple form")))
-                (let ((form (forms::get-form 'fields-form)))
+                (let ((form (forms::find-form 'fields-form)))
                   (forms:with-form-renderer :who
                     (forms:render-form form))))
           (:div :class :row
                 (:div :class :heading
                       (:h3 (who:str "Choices")))
-                (let ((form (forms::get-form 'choices-form)))
+                (let ((form (forms::find-form 'choices-form)))
                   (forms:with-form-renderer :who
                     (forms:render-form form)))))))
 
@@ -40,7 +40,7 @@
                                   :default-request-type :post)
     ()
   (flet ((fields-post ()
-           (let ((form (forms:get-form 'fields-form)))
+           (let ((form (forms:find-form 'fields-form)))
              (forms::handle-request form)
              (forms::with-form-fields (name ready sex avatar) form
                (who:with-html-output (forms.who:*html*)
@@ -82,7 +82,7 @@
 (hunchentoot:define-easy-handler (choices-form-post :uri "/choices-post"
                                                     :default-request-type :post) ()
   (flet ((choices-post ()
-           (let ((form (forms:get-form 'choices-form)))
+           (let ((form (forms:find-form 'choices-form)))
              (forms::handle-request form)
              (forms::validate-form form)
              (forms::with-form-field-values (sex sex2 choices choices2) form

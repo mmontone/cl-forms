@@ -15,7 +15,7 @@
    (submit :submit :label "Create")))
 
 (defun client-validation (&optional form)
-  (let ((form (or form (forms::get-form 'client-validated-form))))
+  (let ((form (or form (forms::find-form 'client-validated-form))))
     (forms:with-form-renderer :who
       (who:with-html-output (forms.who::*html*)
         (:h1 (who:str "Client side validation"))
@@ -32,7 +32,7 @@
 
 (hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
   (flet ((client-validation-post ()
-           (let ((form (forms:get-form 'client-validated-form)))
+           (let ((form (forms:find-form 'client-validated-form)))
              (forms::handle-request form)
              (if (forms::validate-form form)
                  ;; The form is valid

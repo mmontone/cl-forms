@@ -7,7 +7,7 @@
    (submit :submit :label "Create")))
 
 (defun bootstrap-form-demo ()
-  (let ((form (forms::get-form 'bs-fields-form)))
+  (let ((form (forms::find-form 'bs-fields-form)))
     (forms:with-form-theme 'forms.who::bootstrap-form-theme
       (forms:with-form-renderer :who
         (who:with-html-output (forms.who::*html*)
@@ -29,7 +29,7 @@
                                   :uri "/bs-fields-post" 
                                   :default-request-type :post) ()
   (flet ((fields-post ()
-           (let ((form (forms:get-form 'bs-fields-form)))
+           (let ((form (forms:find-form 'bs-fields-form)))
              (forms::handle-request form)
              (forms::with-form-fields (name ready sex) form
                (who:with-html-output (forms.who::*html*)

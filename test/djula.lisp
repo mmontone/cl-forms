@@ -15,13 +15,13 @@
    (submit :submit :label "Create")))
 
 (hunchentoot:define-easy-handler (djula-simple-form :uri "/djula/simple-form") ()
-  (let ((form (forms::get-form 'djula-simple-form)))
+  (let ((form (forms::find-form 'djula-simple-form)))
     (djula:render-template* +simple-form+ nil :form form)))
 
 (hunchentoot:define-easy-handler (djula-simple-form-post
 				  :uri "/djula/simple-form/post"
 				  :default-request-type :post) ()
-  (let ((form (forms:get-form 'djula-simple-form)))
+  (let ((form (forms:find-form 'djula-simple-form)))
     (forms::handle-request form)
     (forms::validate-form form)
     (forms::with-form-fields (name ready sex) form
@@ -66,14 +66,14 @@
 			       :name "Foo"
 			       :single t
 			       :sex :male)))
-    (let ((form (forms::get-form 'model-form person)))
+    (let ((form (forms::find-form 'model-form person)))
       (forms:with-form-renderer :who
 	(forms:render-form form)))))
 
 (hunchentoot:define-easy-handler (model-form-post :uri "/model-form/post"
 						  :default-request-type :post) ()
   (let ((person (make-instance 'person)))
-    (let ((form (forms:get-form 'model-form person)))
+    (let ((form (forms:find-form 'model-form person)))
       (forms::handle-request form)
       (forms::validate-form form)
       (who:with-html-output-to-string (html)
