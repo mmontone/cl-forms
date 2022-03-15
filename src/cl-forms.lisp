@@ -216,7 +216,7 @@ Example:
                    :accessor display-errors
                    :documentation "A list containing the places where to display errors. Valid options are :list and :inline")
    (client-validation :initarg :client-validation
-                      :initform t
+                      :initform nil
                       :type boolean
                       :accessor client-validation
                       :documentation "When T, form client validation is enabled"))
