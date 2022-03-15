@@ -75,16 +75,16 @@ Use *note DEFFORM: CL-FORMS:DEFFORM macro. to define a form.  Example:
         (sex :choice :choices (list "Male" "Female") :value "Male")
         (submit :submit :label "Create")))
 
-   On your web handler, grab the form via *note GET-FORM:
-CL-FORMS:GET-FORM function, select a renderer with
+   On your web handler, grab the form via *note FIND-FORM:
+CL-FORMS:FIND-FORM function, select a renderer with
 'with-form-renderer'and then render the form with *note RENDER-FORM:
 CL-FORMS:RENDER-FORM function.:
 
-     (let ((form (forms::get-form 'fields-form)))
+     (let ((form (forms::find-form 'fields-form)))
         (forms:with-form-renderer :who
            (forms:render-form form))
 
-   To handle the form, grab it via *note GET-FORM: CL-FORMS:GET-FORM
+   To handle the form, grab it via *note FIND-FORM: CL-FORMS:FIND-FORM
 function. and then call *note HANDLE-REQUEST: CL-FORMS:HANDLE-REQUEST
 function. (you should probably also call *note VALIDATE-FORM:
 CL-FORMS:VALIDATE-FORM function. after).  Then bind form fields via
@@ -92,7 +92,7 @@ either *note WITH-FORM-FIELD-VALUES: CL-FORMS:WITH-FORM-FIELD-VALUES
 macro, that binds the form field values; or *note WITH-FORM-FIELDS:
 CL-FORMS:WITH-FORM-FIELDS macro. that binds the form fields.
 
-     (let ((form (forms:get-form 'fields-form)))
+     (let ((form (forms:find-form 'fields-form)))
          (forms::handle-request form)
          (forms::with-form-field-values (name ready sex) form
             (who:with-html-output (forms.who::*html*)
@@ -145,13 +145,13 @@ Define a form.  Render the form via CL-WHO backend, doing:
                (:div :class :row
                      (:div :class :heading
                            (:h3 (who:str "Simple form")))
-                     (let ((form (forms::get-form 'fields-form)))
+                     (let ((form (forms::find-form 'fields-form)))
                        (forms:with-form-renderer :who
                          (forms:render-form form))))
                (:div :class :row
                      (:div :class :heading
                            (:h3 (who:str "Choices")))
-                     (let ((form (forms::get-form 'choices-form)))
+                     (let ((form (forms::find-form 'choices-form)))
                        (forms:with-form-renderer :who
                          (forms:render-form form)))))))
 
@@ -166,7 +166,7 @@ Define a form.  Render the form via CL-WHO backend, doing:
                                        :default-request-type :post)
          ()
        (flet ((fields-post ()
-                (let ((form (forms:get-form 'fields-form)))
+                (let ((form (forms:find-form 'fields-form)))
                   (forms::handle-request form)
                   (forms::with-form-fields (name ready sex avatar) form
                     (who:with-html-output (forms.who:*html*)
@@ -208,7 +208,7 @@ Define a form.  Render the form via CL-WHO backend, doing:
      (hunchentoot:define-easy-handler (choices-form-post :uri "/choices-post"
                                                          :default-request-type :post) ()
        (flet ((choices-post ()
-                (let ((form (forms:get-form 'choices-form)))
+                (let ((form (forms:find-form 'choices-form)))
                   (forms::handle-request form)
                   (forms::validate-form form)
                   (forms::with-form-field-values (sex sex2 choices choices2) form
@@ -278,14 +278,14 @@ CL-FORMS:HANDLE-REQUEST function.
          (who:with-html-output (forms.who::*html*)
            (:h1 (who:str "Server side validation"))
            (:p (who:str "This is a demo of server side validation. Submit the form and play with the values to see how it works. Also look at field constraints in source code tab."))
-           (let ((form (or form (forms::get-form 'validated-form))))
+           (let ((form (or form (forms::find-form 'validated-form))))
              (forms:render-form form)))))
 
      (hunchentoot:define-easy-handler (validated-form-post :uri "/validation-post"
                                                            :default-request-type :post) ()
 
        (flet ((validation-post ()
-                (let ((form (forms:get-form 'validated-form)))
+                (let ((form (forms:find-form 'validated-form)))
                   (forms::handle-request form)
                   (if (forms::validate-form form)
                       ;; The form is valid
@@ -333,7 +333,7 @@ To validate in the client, just set ':client-validation' to 'T'.
         (submit :submit :label "Create")))
 
      (defun client-validation (&optional form)
-       (let ((form (or form (forms::get-form 'client-validated-form))))
+       (let ((form (or form (forms::find-form 'client-validated-form))))
          (forms:with-form-renderer :who
            (who:with-html-output (forms.who::*html*)
              (:h1 (who:str "Client side validation"))
@@ -350,7 +350,7 @@ To validate in the client, just set ':client-validation' to 'T'.
 
      (hunchentoot:define-easy-handler (client-validation-post :uri "/client-validation/post" :default-request-type :post) ()
        (flet ((client-validation-post ()
-                (let ((form (forms:get-form 'client-validated-form)))
+                (let ((form (forms:find-form 'client-validated-form)))
                   (forms::handle-request form)
                   (if (forms::validate-form form)
                       ;; The form is valid
@@ -428,7 +428,7 @@ access the model for each form field.
                                                     :name "Foo"
                                                     :single t
                                                     :sex :male)))
-                         (forms::get-form 'model-form person)))))
+                         (forms::find-form 'model-form person)))))
          (forms:with-form-renderer :who
            (forms:render-form form))))
 
@@ -442,7 +442,7 @@ access the model for each form field.
                                                        :default-request-type :post) ()
        (flet ((model-post ()
                 (let ((person (make-instance 'person)))
-                  (let ((form (forms:get-form 'model-form person)))
+                  (let ((form (forms:find-form 'model-form person)))
                     (forms::handle-request form)
                     (forms::validate-form form)
                     (who:with-html-output (forms.who::*html*)
@@ -488,7 +488,7 @@ It is possible to compose forms using the 'subform' field type:
         (save :submit :label "Save")))
 
      (defun form-composition-demo (&optional form)
-       (let ((form (or form (get-form 'composition-form))))
+       (let ((form (or form (find-form 'composition-form))))
          (forms:with-form-renderer :who
            (who:with-html-output (forms.who::*html*)
              (:h1 (who:str "Forms composition"))
@@ -516,7 +516,7 @@ It is possible to compose forms using the 'subform' field type:
                          :active-menu :composition))
 
      (hunchentoot:define-easy-handler (composition-demo-post :uri "/composition-post") ()
-       (let ((form (forms:get-form 'composition-form)))
+       (let ((form (forms:find-form 'composition-form)))
          (forms:handle-request form)
          (render-demo-page :demo (lambda ()
                                    (form-composition-demo form))
@@ -586,7 +586,7 @@ and render it, forms templates allow to do all that at the same time.
                                        :uri "/template-post"
                                        :default-request-type :post) ()
        (flet ((fields-post ()
-                (let ((form (forms:get-form 'template-form)))
+                (let ((form (forms:find-form 'template-form)))
                   (forms::handle-request form)
                   (if (forms::validate-form form)
                       (forms::with-form-field-values (firstname lastname active address
@@ -616,10 +616,10 @@ and render it, forms templates allow to do all that at the same time.
      	     (who:with-html-output (forms.who:*html*)
      	       (:h2 "CL-WHO")
      	       (:p (who:str "Render via CL-WHO and whole form with RENDER-FORM."))
-     	       (forms:render-form (forms:get-form 'fields-form))
+     	       (forms:render-form (forms:find-form 'fields-form))
      	       (:h2 "CL-WHO render by part")
      	       (:p (who:str "Render via CL-WHO and the individual rendering functions RENDER-FORM-START, RENDER-FORM-END, RENDER-FIELD, RENDER-FIELD-LABEL and RENDER-FIELD-WIDGET."))
-     	       (forms:with-form (forms:get-form 'fields-form)
+     	       (forms:with-form (forms:find-form 'fields-form)
      		 (forms:render-form-start)
      		 (forms:render-field 'name)
      		 (forms:render-field-label 'ready)
@@ -634,10 +634,10 @@ and render it, forms templates allow to do all that at the same time.
      		 (forms:render-form-end))
      	       (:h2 "Djula")
      	       (:p (who:str "Render a form with a Djula template."))
-     	       (who:str (djula:render-template* (asdf:system-relative-pathname :cl-forms.demo "test/demo/djula-form.html") nil :form (get-form 'fields-form)))
+     	       (who:str (djula:render-template* (asdf:system-relative-pathname :cl-forms.demo "test/demo/djula-form.html") nil :form (find-form 'fields-form)))
      	       (:h2 "Djula by part")
      	       (:p (who:str "Render a form with a Djula template, by parts."))
-     	       (who:str (djula:render-template* (asdf:system-relative-pathname :cl-forms.demo "test/demo/djula-form-parts.html") nil :form (get-form 'fields-form)))
+     	       (who:str (djula:render-template* (asdf:system-relative-pathname :cl-forms.demo "test/demo/djula-form-parts.html") nil :form (find-form 'fields-form)))
                     ))))
          (render-demo-page :demo #'render
                            :source (asdf:system-relative-pathname :cl-forms.demo
@@ -695,7 +695,7 @@ The CL-WHO renderer uses CL-WHO library for rendering forms.
 WITH-FORM-RENDERER: CL-FORMS:WITH-FORM-RENDERER macro, bind
 'FORMS.WHO:*HTML*' variable, and then render the form:
 
-     (let ((form (forms::get-form 'fields-form)))
+     (let ((form (forms::find-form 'fields-form)))
         (who:with-html-output (forms.who:*html*)
            (forms:with-form-renderer :who
               (forms:render-form form))))
@@ -713,7 +713,7 @@ There's a Bootstrap theme implemented for CL-WHO renderer.
    Select the theme via *note WITH-FORM-THEME: CL-FORMS:WITH-FORM-THEME
 macro.:
 
-     (let ((form (forms::get-form 'bs-fields-form)))
+     (let ((form (forms::find-form 'bs-fields-form)))
          (forms:with-form-theme 'forms.who::bootstrap-form-theme
            (forms:with-form-renderer :who
              (who:with-html-output (forms.who::*html*)
@@ -822,7 +822,7 @@ Macros
 
      FORM-NAME is the symbol under which the FORM is registered.
 
-     Use GET-FORM with FORM-NAME and expected arguments to obtain the
+     Use FIND-FORM with FORM-NAME and expected arguments to obtain the
      registered form.
 
  -- Macro: CL-FORMS:WITH-FORM-THEME (form-theme &body body)
@@ -907,6 +907,15 @@ Functions
      Fill a FORM from a MODEL. Read MODEL using FORM accessors and set
      the FORM field values.
 
+ -- Function: CL-FORMS:FIND-FORM (name &rest args)
+
+     Get the form named NAME.
+
+     ARGS is the list of arguments to pass to a possible form builder
+     function.
+
+     See: DEFFORM-BUILDER macro.
+
  -- Function: CL-FORMS:RENDER-FIELD (field &optional (form *form*) &rest
           args)
 
@@ -944,15 +953,6 @@ Functions
           &rest args)
 
      Render the label of FIELD.
-
- -- Function: CL-FORMS:GET-FORM (name &rest args)
-
-     Get the form named NAME.
-
-     ARGS is the list of arguments to pass to a possible form builder
-     function.
-
-     See: DEFFORM-BUILDER macro.
 
  -- Function: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING (form-field
           &optional (field-value (field-value form-field)))
@@ -1408,41 +1408,41 @@ File: cl-forms.info,  Node: Index,  Prev: API,  Up: Top
 * CL-FORMS:FIELD-WRITER <1>:             CL-FORMS package.    (line  97)
 * CL-FORMS:FILL-FORM-FROM-MODEL:         CL-FORMS package.    (line 124)
 * CL-FORMS:FILL-FORM-FROM-MODEL <1>:     CL-FORMS package.    (line 124)
-* CL-FORMS:FILL-MODEL-FROM-FORM:         CL-FORMS package.    (line 154)
-* CL-FORMS:FILL-MODEL-FROM-FORM <1>:     CL-FORMS package.    (line 154)
+* CL-FORMS:FILL-MODEL-FROM-FORM:         CL-FORMS package.    (line 163)
+* CL-FORMS:FILL-MODEL-FROM-FORM <1>:     CL-FORMS package.    (line 163)
+* CL-FORMS:FIND-FORM:                    CL-FORMS package.    (line 129)
+* CL-FORMS:FIND-FORM <1>:                CL-FORMS package.    (line 129)
 * CL-FORMS:FORM-ERRORS:                  CL-FORMS package.    (line 103)
 * CL-FORMS:FORM-ERRORS <1>:              CL-FORMS package.    (line 103)
-* CL-FORMS:FORM-VALID-P:                 CL-FORMS package.    (line 136)
-* CL-FORMS:FORM-VALID-P <1>:             CL-FORMS package.    (line 136)
+* CL-FORMS:FORM-VALID-P:                 CL-FORMS package.    (line 145)
+* CL-FORMS:FORM-VALID-P <1>:             CL-FORMS package.    (line 145)
 * CL-FORMS:FORMAT-FIELD-VALUE:           CL-FORMS package.    (line 105)
 * CL-FORMS:FORMAT-FIELD-VALUE <1>:       CL-FORMS package.    (line 105)
 * CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING: CL-FORMS package.    (line 176)
 * CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING <1>: CL-FORMS package.
                                                               (line 176)
-* CL-FORMS:GET-FIELD:                    CL-FORMS package.    (line 138)
-* CL-FORMS:GET-FIELD <1>:                CL-FORMS package.    (line 138)
-* CL-FORMS:GET-FIELD-VALUE:              CL-FORMS package.    (line 140)
-* CL-FORMS:GET-FIELD-VALUE <1>:          CL-FORMS package.    (line 140)
-* CL-FORMS:GET-FORM:                     CL-FORMS package.    (line 167)
-* CL-FORMS:GET-FORM <1>:                 CL-FORMS package.    (line 167)
-* CL-FORMS:HANDLE-REQUEST:               CL-FORMS package.    (line 147)
-* CL-FORMS:HANDLE-REQUEST <1>:           CL-FORMS package.    (line 147)
-* CL-FORMS:MAKE-FORMATTER:               CL-FORMS package.    (line 158)
-* CL-FORMS:MAKE-FORMATTER <1>:           CL-FORMS package.    (line 158)
-* CL-FORMS:REMOVE-FIELD:                 CL-FORMS package.    (line 134)
-* CL-FORMS:REMOVE-FIELD <1>:             CL-FORMS package.    (line 134)
-* CL-FORMS:RENDER-FIELD:                 CL-FORMS package.    (line 129)
-* CL-FORMS:RENDER-FIELD <1>:             CL-FORMS package.    (line 129)
+* CL-FORMS:GET-FIELD:                    CL-FORMS package.    (line 147)
+* CL-FORMS:GET-FIELD <1>:                CL-FORMS package.    (line 147)
+* CL-FORMS:GET-FIELD-VALUE:              CL-FORMS package.    (line 149)
+* CL-FORMS:GET-FIELD-VALUE <1>:          CL-FORMS package.    (line 149)
+* CL-FORMS:HANDLE-REQUEST:               CL-FORMS package.    (line 156)
+* CL-FORMS:HANDLE-REQUEST <1>:           CL-FORMS package.    (line 156)
+* CL-FORMS:MAKE-FORMATTER:               CL-FORMS package.    (line 167)
+* CL-FORMS:MAKE-FORMATTER <1>:           CL-FORMS package.    (line 167)
+* CL-FORMS:REMOVE-FIELD:                 CL-FORMS package.    (line 143)
+* CL-FORMS:REMOVE-FIELD <1>:             CL-FORMS package.    (line 143)
+* CL-FORMS:RENDER-FIELD:                 CL-FORMS package.    (line 138)
+* CL-FORMS:RENDER-FIELD <1>:             CL-FORMS package.    (line 138)
 * CL-FORMS:RENDER-FIELD-ERRORS:          CL-FORMS package.    (line 179)
 * CL-FORMS:RENDER-FIELD-ERRORS <1>:      CL-FORMS package.    (line 179)
-* CL-FORMS:RENDER-FIELD-LABEL:           CL-FORMS package.    (line 162)
-* CL-FORMS:RENDER-FIELD-LABEL <1>:       CL-FORMS package.    (line 162)
+* CL-FORMS:RENDER-FIELD-LABEL:           CL-FORMS package.    (line 171)
+* CL-FORMS:RENDER-FIELD-LABEL <1>:       CL-FORMS package.    (line 171)
 * CL-FORMS:RENDER-FIELD-WIDGET:          CL-FORMS package.    (line 199)
 * CL-FORMS:RENDER-FIELD-WIDGET <1>:      CL-FORMS package.    (line 199)
 * CL-FORMS:RENDER-FORM:                  CL-FORMS package.    (line 118)
 * CL-FORMS:RENDER-FORM <1>:              CL-FORMS package.    (line 118)
-* CL-FORMS:RENDER-FORM-END:              CL-FORMS package.    (line 143)
-* CL-FORMS:RENDER-FORM-END <1>:          CL-FORMS package.    (line 143)
+* CL-FORMS:RENDER-FORM-END:              CL-FORMS package.    (line 152)
+* CL-FORMS:RENDER-FORM-END <1>:          CL-FORMS package.    (line 152)
 * CL-FORMS:RENDER-FORM-ERRORS:           CL-FORMS package.    (line 209)
 * CL-FORMS:RENDER-FORM-ERRORS <1>:       CL-FORMS package.    (line 209)
 * CL-FORMS:RENDER-FORM-START:            CL-FORMS package.    (line 193)
@@ -1474,70 +1474,70 @@ Node: Installation1172
 Ref: installation1285
 Node: Usage1285
 Ref: usage1382
-Node: Form rendering30114
-Node: CL-WHO renderer31313
-Node: Bootstrap theme31918
-Node: Djula32526
-Node: API33849
-Ref: api33935
-Node: CL-FORMS package33966
-Ref: CL-FORMS:*BASE64-ENCODE* variable34154
-Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro34258
-Ref: CL-FORMS:WITH-FORM macro34456
-Ref: CL-FORMS:DEFFORM-BUILDER macro34566
-Ref: CL-FORMS:WITH-FORM-THEME macro34956
-Ref: CL-FORMS:WITH-FORM-FIELDS macro35090
-Ref: CL-FORMS:WITH-FORM-TEMPLATE macro35335
-Ref: CL-FORMS:WITH-FORM-RENDERER macro35502
-Ref: CL-FORMS:DEFFORM macro35638
-Ref: CL-FORMS:FIELD-ACCESSOR function36718
-Ref: CL-FORMS:FIELD-WRITER function36782
-Ref: CL-FORMS:FIELD-READER function36835
-Ref: CL-FORMS:FIELD-PARSER function36888
-Ref: CL-FORMS:FORM-ERRORS function36950
-Ref: CL-FORMS:FORMAT-FIELD-VALUE function37011
-Ref: CL-FORMS:FIELD-FORMATTER function37114
-Ref: CL-FORMS:FIELD-VALUE function37179
-Ref: CL-FORMS:FIELD-VALID-P function37231
-Ref: CL-FORMS:RENDER-FORM function37338
-Ref: CL-FORMS:FILL-FORM-FROM-MODEL function37568
-Ref: CL-FORMS:RENDER-FIELD function37726
-Ref: CL-FORMS:REMOVE-FIELD function37864
-Ref: CL-FORMS:FORM-VALID-P function37914
-Ref: CL-FORMS:GET-FIELD function37958
-Ref: CL-FORMS:GET-FIELD-VALUE function38032
-Ref: CL-FORMS:RENDER-FORM-END function38122
-Ref: CL-FORMS:HANDLE-REQUEST function38231
-Ref: CL-FORMS:FILL-MODEL-FROM-FORM function38514
-Ref: CL-FORMS:MAKE-FORMATTER function38623
-Ref: CL-FORMS:RENDER-FIELD-LABEL function38736
-Ref: CL-FORMS:GET-FORM function38865
-Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function39067
-Ref: CL-FORMS:RENDER-FIELD-ERRORS function39192
-Ref: CL-FORMS:SET-FIELD-VALUE function39347
-Ref: CL-FORMS:VALIDATE-FORM function39411
-Ref: CL-FORMS:RENDER-FORM-START function39749
-Ref: CL-FORMS:RENDER-FIELD-WIDGET function39956
-Ref: CL-FORMS:ADD-FORM-ERROR function40080
-Ref: CL-FORMS:RENDER-FORM-ERRORS function40199
-Ref: CL-FORMS:ADD-FIELD function40351
-Ref: CL-FORMS:INTEGER-FORM-FIELD class40415
-Ref: CL-FORMS:SUBFORM-FORM-FIELD class40571
-Ref: CL-FORMS:URL-FORM-FIELD class40743
-Ref: CL-FORMS:DATETIME-FORM-FIELD class40887
-Ref: CL-FORMS:PASSWORD-FORM-FIELD class41041
-Ref: CL-FORMS:EMAIL-FORM-FIELD class41199
-Ref: CL-FORMS:CHOICE-FORM-FIELD class41349
-Ref: CL-FORMS:FILE-FORM-FIELD class43936
-Ref: CL-FORMS:BOOLEAN-FORM-FIELD class44712
-Ref: CL-FORMS:DATE-FORM-FIELD class44861
-Ref: CL-FORMS:FORM-FIELD class45007
-Ref: CL-FORMS:SUBMIT-FORM-FIELD class48785
-Ref: CL-FORMS:HIDDEN-FORM-FIELD class48938
-Ref: CL-FORMS:STRING-FORM-FIELD class49089
-Ref: CL-FORMS:LIST-FORM-FIELD class49241
-Ref: CL-FORMS:FORM class50335
-Ref: CL-FORMS:TEXT-FORM-FIELD class52709
-Node: Index52893
+Node: Form rendering30137
+Node: CL-WHO renderer31336
+Node: Bootstrap theme31942
+Node: Djula32551
+Node: API33874
+Ref: api33960
+Node: CL-FORMS package33991
+Ref: CL-FORMS:*BASE64-ENCODE* variable34179
+Ref: CL-FORMS:WITH-FORM-FIELD-VALUES macro34283
+Ref: CL-FORMS:WITH-FORM macro34481
+Ref: CL-FORMS:DEFFORM-BUILDER macro34591
+Ref: CL-FORMS:WITH-FORM-THEME macro34982
+Ref: CL-FORMS:WITH-FORM-FIELDS macro35116
+Ref: CL-FORMS:WITH-FORM-TEMPLATE macro35361
+Ref: CL-FORMS:WITH-FORM-RENDERER macro35528
+Ref: CL-FORMS:DEFFORM macro35664
+Ref: CL-FORMS:FIELD-ACCESSOR function36744
+Ref: CL-FORMS:FIELD-WRITER function36808
+Ref: CL-FORMS:FIELD-READER function36861
+Ref: CL-FORMS:FIELD-PARSER function36914
+Ref: CL-FORMS:FORM-ERRORS function36976
+Ref: CL-FORMS:FORMAT-FIELD-VALUE function37037
+Ref: CL-FORMS:FIELD-FORMATTER function37140
+Ref: CL-FORMS:FIELD-VALUE function37205
+Ref: CL-FORMS:FIELD-VALID-P function37257
+Ref: CL-FORMS:RENDER-FORM function37364
+Ref: CL-FORMS:FILL-FORM-FROM-MODEL function37594
+Ref: CL-FORMS:FIND-FORM function37752
+Ref: CL-FORMS:RENDER-FIELD function37955
+Ref: CL-FORMS:REMOVE-FIELD function38093
+Ref: CL-FORMS:FORM-VALID-P function38143
+Ref: CL-FORMS:GET-FIELD function38187
+Ref: CL-FORMS:GET-FIELD-VALUE function38261
+Ref: CL-FORMS:RENDER-FORM-END function38351
+Ref: CL-FORMS:HANDLE-REQUEST function38460
+Ref: CL-FORMS:FILL-MODEL-FROM-FORM function38743
+Ref: CL-FORMS:MAKE-FORMATTER function38852
+Ref: CL-FORMS:RENDER-FIELD-LABEL function38965
+Ref: CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING function39094
+Ref: CL-FORMS:RENDER-FIELD-ERRORS function39219
+Ref: CL-FORMS:SET-FIELD-VALUE function39374
+Ref: CL-FORMS:VALIDATE-FORM function39438
+Ref: CL-FORMS:RENDER-FORM-START function39776
+Ref: CL-FORMS:RENDER-FIELD-WIDGET function39983
+Ref: CL-FORMS:ADD-FORM-ERROR function40107
+Ref: CL-FORMS:RENDER-FORM-ERRORS function40226
+Ref: CL-FORMS:ADD-FIELD function40378
+Ref: CL-FORMS:INTEGER-FORM-FIELD class40442
+Ref: CL-FORMS:SUBFORM-FORM-FIELD class40598
+Ref: CL-FORMS:URL-FORM-FIELD class40770
+Ref: CL-FORMS:DATETIME-FORM-FIELD class40914
+Ref: CL-FORMS:PASSWORD-FORM-FIELD class41068
+Ref: CL-FORMS:EMAIL-FORM-FIELD class41226
+Ref: CL-FORMS:CHOICE-FORM-FIELD class41376
+Ref: CL-FORMS:FILE-FORM-FIELD class43963
+Ref: CL-FORMS:BOOLEAN-FORM-FIELD class44739
+Ref: CL-FORMS:DATE-FORM-FIELD class44888
+Ref: CL-FORMS:FORM-FIELD class45034
+Ref: CL-FORMS:SUBMIT-FORM-FIELD class48812
+Ref: CL-FORMS:HIDDEN-FORM-FIELD class48965
+Ref: CL-FORMS:STRING-FORM-FIELD class49116
+Ref: CL-FORMS:LIST-FORM-FIELD class49268
+Ref: CL-FORMS:FORM class50362
+Ref: CL-FORMS:TEXT-FORM-FIELD class52736
+Node: Index52920
 
 End Tag Table

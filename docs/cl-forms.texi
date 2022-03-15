@@ -83,19 +83,19 @@ Use @clref{CL-FORMS, DEFFORM, macro} to define a form. Example:
    (submit :submit :label "Create")))
 @end lisp
 
-On your web handler, grab the form via @clref{CL-FORMS,GET-FORM,function}, select a renderer with `with-form-renderer`and then render the form with @clref{CL-FORMS,RENDER-FORM,function}:
+On your web handler, grab the form via @clref{CL-FORMS,FIND-FORM,function}, select a renderer with `with-form-renderer`and then render the form with @clref{CL-FORMS,RENDER-FORM,function}:
 
 @lisp
-(let ((form (forms::get-form 'fields-form)))
+(let ((form (forms::find-form 'fields-form)))
    (forms:with-form-renderer :who
       (forms:render-form form))
 @end lisp
 
-To handle the form, grab it via @clref{CL-FORMS,GET-FORM,function} and then call @clref{CL-FORMS,HANDLE-REQUEST,function} (you should probably also call @clref{CL-FORMS,VALIDATE-FORM,function} after). 
+To handle the form, grab it via @clref{CL-FORMS,FIND-FORM,function} and then call @clref{CL-FORMS,HANDLE-REQUEST,function} (you should probably also call @clref{CL-FORMS,VALIDATE-FORM,function} after). 
 Then bind form fields via either @clref{CL-FORMS,WITH-FORM-FIELD-VALUES,macro}, that binds the form field values; or @clref{CL-FORMS,WITH-FORM-FIELDS,macro} that binds the form fields.
 
 @lisp
-(let ((form (forms:get-form 'fields-form)))
+(let ((form (forms:find-form 'fields-form)))
     (forms::handle-request form)
     (forms::with-form-field-values (name ready sex) form
        (who:with-html-output (forms.who::*html*)
@@ -208,7 +208,7 @@ Needs @code{cl-forms.who} ASDF system loaded.
 To render a form using CL-WHO bind the renderer via @clref{CL-FORMS,WITH-FORM-RENDERER, macro}, bind @code{FORMS.WHO:*HTML*} variable, and then render the form:
 
 @lisp
-(let ((form (forms::get-form 'fields-form)))
+(let ((form (forms::find-form 'fields-form)))
    (who:with-html-output (forms.who:*html*)
       (forms:with-form-renderer :who
          (forms:render-form form))))
@@ -224,7 +224,7 @@ Needs @code{cl-forms.who.bootstrap} ASDF system loaded.
 Select the theme via @clref{CL-FORMS,WITH-FORM-THEME,macro}:
 
 @lisp
-(let ((form (forms::get-form 'bs-fields-form)))
+(let ((form (forms::find-form 'bs-fields-form)))
     (forms:with-form-theme 'forms.who::bootstrap-form-theme
       (forms:with-form-renderer :who
         (who:with-html-output (forms.who::*html*)
@@ -326,7 +326,7 @@ BODY is expected to instantiate a FORM object using ARGS in some way.
 
 FORM-NAME is the symbol under which the FORM is registered.
 
-Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form.
+Use FIND-FORM with FORM-NAME and expected arguments to obtain the registered form.
 @endcldefmacro
 
 @cldefmacro {CL-FORMS, WITH-FORM-THEME, (form-theme &body body)}
@@ -442,6 +442,15 @@ Fill a FORM from a MODEL.
 Read MODEL using FORM accessors and set the FORM field values.
 @endcldefun
 
+@cldefun {CL-FORMS, FIND-FORM, (name &rest args)}
+
+Get the form named NAME.
+
+ARGS is the list of arguments to pass to a possible form builder function.
+
+See: DEFFORM-BUILDER macro.
+@endcldefun
+
 @cldefun {CL-FORMS, RENDER-FIELD, (field &optional (form *form*) &rest args)}
 
 Render form FIELD, both label and widget.
@@ -490,15 +499,6 @@ Create a field formatter. SYMBOL is the function to call.
 @cldefun {CL-FORMS, RENDER-FIELD-LABEL, (field &optional (form *form*) &rest args)}
 
 Render the label of FIELD.
-@endcldefun
-
-@cldefun {CL-FORMS, GET-FORM, (name &rest args)}
-
-Get the form named NAME.
-
-ARGS is the list of arguments to pass to a possible form builder function.
-
-See: DEFFORM-BUILDER macro.
 @endcldefun
 
 @cldefun {CL-FORMS, FORMAT-FIELD-VALUE-TO-STRING, (form-field &optional (field-value (field-value form-field)))}
