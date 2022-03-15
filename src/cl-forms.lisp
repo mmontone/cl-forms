@@ -110,7 +110,7 @@ Use GET-FORM with FORM-NAME and expected arguments to obtain the registered form
           (cons field-name (apply #'make-form-field field-type
                                   :name field-name field-args)))))
 
-(defun get-form (name &rest args)
+(defun find-form (name &rest args)
   "Get the form named NAME.
 
 ARGS is the list of arguments to pass to a possible form builder function.
@@ -120,6 +120,10 @@ See: DEFFORM-BUILDER macro."
     (when (not form-builder)
       (error "Form not found: ~A" name))
     (apply form-builder args)))
+
+(defun get-form (&rest args)
+  (warn "FORMS:GET-FORM is deprecated. Use FORMS:FIND-FORM instead.")
+  (apply #'find-form args))
 
 (defmacro with-form-fields (fields form &body body)
   "Bind FIELDS to the form fields in FORM.
