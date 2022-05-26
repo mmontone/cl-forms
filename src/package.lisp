@@ -34,6 +34,7 @@
    :field-accessor
    :field-writer
    :field-reader
+   :field-label
    :add-field
    :remove-field
    :handle-request
