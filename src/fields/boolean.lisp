@@ -31,5 +31,8 @@
       (write-string "on" stream)
       (write-string "off" stream)))
 
+(defmethod make-form-field ((field-type (eql 'boolean)) &rest args)
+  (apply #'make-instance 'boolean-form-field args))
+
 (defmethod make-form-field ((field-type (eql :boolean)) &rest args)
   (apply #'make-instance 'boolean-form-field args))

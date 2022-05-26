@@ -22,5 +22,8 @@
           (and value
                (parse-integer value :junk-allowed t)))))
 
+(defmethod make-form-field ((field-type (eql 'integer)) &rest args)
+  (apply #'make-instance 'integer-form-field args))
+
 (defmethod make-form-field ((field-type (eql :integer)) &rest args)
   (apply #'make-instance 'integer-form-field args))
