@@ -4,6 +4,7 @@
   (:export
    :form
    :form-field
+   :form-fields
    :with-form
    :with-form-renderer
    :with-form-theme
