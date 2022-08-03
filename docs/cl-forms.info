@@ -54,6 +54,12 @@ File: cl-forms.info,  Node: Installation,  Next: Usage,  Prev: Intro,  Up: Top
 2 Installation
 **************
 
+With Quicklisp:
+
+    (ql:quickload "cl-forms")
+
+When you want to use a form renderer such as ':who' or ':djula', quickload the associated package: 'cl-forms.who', 'cl-forms.who.bootstrap', 'cl-forms.djula'.
+
 
 File: cl-forms.info,  Node: Usage,  Next: API,  Prev: Installation,  Up: Top
 
@@ -80,9 +86,16 @@ CL-FORMS:FIND-FORM function, select a renderer with
 'with-form-renderer'and then render the form with *note RENDER-FORM:
 CL-FORMS:RENDER-FORM function.:
 
-     (let ((form (forms::find-form 'fields-form)))
+     (let ((form (forms:find-form 'fields-form)))
         (forms:with-form-renderer :who
            (forms:render-form form))
+
+   To output HTML on the REPL, do:
+
+     (with-output-to-string (forms.who:*html*)
+        (let ((form (forms:find-form 'fields-form)))
+           (forms:with-form-renderer :who
+             (forms:render-form form))))
 
    To handle the form, grab it via *note FIND-FORM: CL-FORMS:FIND-FORM
 function. and then call *note HANDLE-REQUEST: CL-FORMS:HANDLE-REQUEST
