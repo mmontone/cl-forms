@@ -154,6 +154,15 @@ Next: <a href="#Usage" accesskey="n" rel="next">Usage</a>, Previous: <a href="#I
 </div>
 <span id="Installation-1"></span><h2 class="chapter">2 Installation</h2>
 <span id="installation"></span>
+
+<p>With Quicklisp:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">ql:quickload <span class="string">&quot;cl-forms&quot;</span></span>)</span>
+</pre></div>
+
+<p>When you want to use a form renderer such as <code>:who</code> or <code>:djula</code>, quickload the associated package: <code>cl-forms.who</code>, <code>cl-forms.who.bootstrap</code>, <code>cl-forms.djula</code>.
+</p>
 <hr>
 <span id="Usage"></span><div class="header">
 <p>
@@ -181,7 +190,7 @@ Next: <a href="#API" accesskey="n" rel="next">API</a>, Previous: <a href="#Insta
 <p>On your web handler, grab the form via <a href="#CL_002dFORMS_003aFIND_002dFORM-function">FIND-FORM</a>, select a renderer with &lsquo;with-form-renderer&lsquo;and then render the form with <a href="#CL_002dFORMS_003aRENDER_002dFORM-function">RENDER-FORM</a>:
 </p>
 <div class="lisp">
-<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms::find-form 'fields-form</span>)</span></span>)</span></span>)</span>
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms:find-form 'fields-form</span>)</span></span>)</span></span>)</span>
      <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
         <span class="paren3">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span>
   </span></span>
@@ -192,13 +201,22 @@ Then bind form fields via either <a href="#CL_002dFORMS_003aWITH_002dFORM_002dFI
 </p>
 <div class="lisp">
 <pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">form <span class="paren4">(<span class="lisp-bg">forms:find-form 'fields-form</span>)</span></span>)</span></span>)</span>
-      <span class="paren2">(<span class="lisp-bg">forms::handle-request form</span>)</span>
-      <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms::with-form-field-values</span></i> <span class="paren3">(<span class="lisp-bg">name ready sex</span>)</span> form
-         <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren4">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
-            <span class="paren4">(<span class="lisp-bg"><span class="keyword">:ul</span>
-              <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> name</span>)</span></span>)</span>
-              <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Ready: ~A&quot;</span> ready</span>)</span></span>)</span>
-              <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+        <span class="paren2">(<span class="lisp-bg">forms:handle-request form</span>)</span>
+        <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-field-values</span></i> <span class="paren3">(<span class="lisp-bg">name ready sex</span>)</span> form
+            <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">who:with-html-output</span></i> <span class="paren4">(<span class="lisp-bg"><span class="special">forms.who::*html*</span></span>)</span>
+               <span class="paren4">(<span class="lisp-bg"><span class="keyword">:ul</span>
+                 <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Name: ~A&quot;</span> name</span>)</span></span>)</span>
+                 <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Ready: ~A&quot;</span> ready</span>)</span></span>)</span>
+                 <span class="paren5">(<span class="lisp-bg"><span class="keyword">:li</span> <span class="paren6">(<span class="lisp-bg">who:fmt <span class="string">&quot;Sex: ~A&quot;</span> sex</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<p>To output HTML on the REPL, do:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-output-to-string</span></i> <span class="paren2">(<span class="lisp-bg"><span class="special">forms.who:*html*</span></span>)</span>
+     <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="lisp-bg"><span class="paren4">(<span class="lisp-bg">form <span class="paren5">(<span class="lisp-bg">forms:find-form 'fields-form</span>)</span></span>)</span></span>)</span>
+             <span class="paren3">(<span class="lisp-bg"><i><span class="symbol">forms:with-form-renderer</span></i> <span class="keyword">:who</span>
+                <span class="paren4">(<span class="lisp-bg">forms:render-form form</span>)</span></span>)</span></span>)</span></span>)</span>
 </pre></div>
 
 <p>Please have a look at the demo sources for more examples of how to use the library
@@ -896,27 +914,6 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 </p></dd></dl>
 
 <span id="Macros"></span><h4 class="subheading">Macros</h4>
-<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES"></span>
-<span id="CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-macro"></span><dl>
-<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-1">Macro: <strong>CL-FORMS:WITH-FORM-FIELD-VALUES</strong> <em>(fields form &amp;body body)</em></dt>
-<dd>
-<p>Bind the value of FIELDS in FORM.
-</p>
-<p>Example:
-</p>
-<div class="lisp">
-<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name</span>)</span> form
-     <span class="paren2">(<span class="lisp-bg">print name</span>)</span></span>)</span>
-</pre></div>
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aWITH_002dFORM"></span>
-<span id="CL_002dFORMS_003aWITH_002dFORM-macro"></span><dl>
-<dt id="index-CL_002dFORMS_003aWITH_002dFORM-1">Macro: <strong>CL-FORMS:WITH-FORM</strong> <em>(form &amp;body body)</em></dt>
-<dd>
-<p>Bind *FORM* to FORM and evaluate BODY in that context.
-</p></dd></dl>
-
 <span id="index-CL_002dFORMS_003aDEFFORM_002dBUILDER"></span>
 <span id="CL_002dFORMS_003aDEFFORM_002dBUILDER-macro"></span><dl>
 <dt id="index-CL_002dFORMS_003aDEFFORM_002dBUILDER-1">Macro: <strong>CL-FORMS:DEFFORM-BUILDER</strong> <em>(form-name args &amp;body body)</em></dt>
@@ -930,12 +927,19 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 <p>Use FIND-FORM with FORM-NAME and expected arguments to obtain the registered form.
 </p></dd></dl>
 
-<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTHEME"></span>
-<span id="CL_002dFORMS_003aWITH_002dFORM_002dTHEME-macro"></span><dl>
-<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dTHEME-1">Macro: <strong>CL-FORMS:WITH-FORM-THEME</strong> <em>(form-theme &amp;body body)</em></dt>
+<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES"></span>
+<span id="CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-macro"></span><dl>
+<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELD_002dVALUES-1">Macro: <strong>CL-FORMS:WITH-FORM-FIELD-VALUES</strong> <em>(fields form &amp;body body)</em></dt>
 <dd>
-<p>Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
-</p></dd></dl>
+<p>Bind the value of FIELDS in FORM.
+</p>
+<p>Example:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">with-form-field-values</span></i> <span class="paren2">(<span class="lisp-bg">name</span>)</span> form
+     <span class="paren2">(<span class="lisp-bg">print name</span>)</span></span>)</span>
+</pre></div>
+</dd></dl>
 
 <span id="index-CL_002dFORMS_003aWITH_002dFORM_002dFIELDS"></span>
 <span id="CL_002dFORMS_003aWITH_002dFORM_002dFIELDS-macro"></span><dl>
@@ -951,20 +955,6 @@ Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents
 </pre></div>
 
 <p>Also see: WITH-FORM-FIELD-VALUES 
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE"></span>
-<span id="CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-macro"></span><dl>
-<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-1">Macro: <strong>CL-FORMS:WITH-FORM-TEMPLATE</strong> <em>((&amp;optional form-var) form-name args &amp;body body)</em></dt>
-<dd>
-<p>Define a FORM named FORM-NAME and render it at the same time.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER"></span>
-<span id="CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-macro"></span><dl>
-<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-1">Macro: <strong>CL-FORMS:WITH-FORM-RENDERER</strong> <em>(renderer &amp;body body)</em></dt>
-<dd>
-<p>Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
 </p></dd></dl>
 
 <span id="index-CL_002dFORMS_003aDEFFORM"></span>
@@ -993,20 +983,63 @@ FIELDS are the form field specs.
 </pre></div>
 </dd></dl>
 
+<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE"></span>
+<span id="CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-macro"></span><dl>
+<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dTEMPLATE-1">Macro: <strong>CL-FORMS:WITH-FORM-TEMPLATE</strong> <em>((&amp;optional form-var) form-name args &amp;body body)</em></dt>
+<dd>
+<p>Define a FORM named FORM-NAME and render it at the same time.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dTHEME"></span>
+<span id="CL_002dFORMS_003aWITH_002dFORM_002dTHEME-macro"></span><dl>
+<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dTHEME-1">Macro: <strong>CL-FORMS:WITH-FORM-THEME</strong> <em>(form-theme &amp;body body)</em></dt>
+<dd>
+<p>Bind *FORM-THEME* to FORM-THEME and evaluate BODY in that context.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aWITH_002dFORM"></span>
+<span id="CL_002dFORMS_003aWITH_002dFORM-macro"></span><dl>
+<dt id="index-CL_002dFORMS_003aWITH_002dFORM-1">Macro: <strong>CL-FORMS:WITH-FORM</strong> <em>(form &amp;body body)</em></dt>
+<dd>
+<p>Bind *FORM* to FORM and evaluate BODY in that context.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER"></span>
+<span id="CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-macro"></span><dl>
+<dt id="index-CL_002dFORMS_003aWITH_002dFORM_002dRENDERER-1">Macro: <strong>CL-FORMS:WITH-FORM-RENDERER</strong> <em>(renderer &amp;body body)</em></dt>
+<dd>
+<p>Bind *FORM-RENDERER* to RENDERER and evaluate BODY in that context.
+</p></dd></dl>
+
 <span id="Generic-functions"></span><h4 class="subheading">Generic functions</h4>
+<span id="index-CL_002dFORMS_003aFIELD_002dREADER"></span>
+<span id="CL_002dFORMS_003aFIELD_002dREADER-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFIELD_002dREADER-1">Generic-Function: <strong>CL-FORMS:FIELD-READER</strong> <em>(field)</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aFIELD_002dVALID_002dP"></span>
+<span id="CL_002dFORMS_003aFIELD_002dVALID_002dP-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFIELD_002dVALID_002dP-1">Generic-Function: <strong>CL-FORMS:FIELD-VALID-P</strong> <em>(form-field &amp;optional (form))</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aFORM_002dFIELDS"></span>
+<span id="CL_002dFORMS_003aFORM_002dFIELDS-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFORM_002dFIELDS-1">Generic-Function: <strong>CL-FORMS:FORM-FIELDS</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
 <span id="index-CL_002dFORMS_003aFIELD_002dACCESSOR"></span>
 <span id="CL_002dFORMS_003aFIELD_002dACCESSOR-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aFIELD_002dACCESSOR-1">Generic-Function: <strong>CL-FORMS:FIELD-ACCESSOR</strong> <em>(sb-pcl::object)</em></dt>
 </dl>
 
+<span id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE"></span>
+<span id="CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE-1">Generic-Function: <strong>CL-FORMS:FORMAT-FIELD-VALUE</strong> <em>(form-field field-value &amp;optional stream)</em></dt>
+</dl>
+
 <span id="index-CL_002dFORMS_003aFIELD_002dWRITER"></span>
 <span id="CL_002dFORMS_003aFIELD_002dWRITER-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aFIELD_002dWRITER-1">Generic-Function: <strong>CL-FORMS:FIELD-WRITER</strong> <em>(field)</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aFIELD_002dREADER"></span>
-<span id="CL_002dFORMS_003aFIELD_002dREADER-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFIELD_002dREADER-1">Generic-Function: <strong>CL-FORMS:FIELD-READER</strong> <em>(field)</em></dt>
 </dl>
 
 <span id="index-CL_002dFORMS_003aFIELD_002dPARSER"></span>
@@ -1019,9 +1052,14 @@ FIELDS are the form field specs.
 <dt id="index-CL_002dFORMS_003aFORM_002dERRORS-1">Generic-Function: <strong>CL-FORMS:FORM-ERRORS</strong> <em>(sb-pcl::object)</em></dt>
 </dl>
 
-<span id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE"></span>
-<span id="CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE-1">Generic-Function: <strong>CL-FORMS:FORMAT-FIELD-VALUE</strong> <em>(form-field field-value &amp;optional stream)</em></dt>
+<span id="index-CL_002dFORMS_003aFIELD_002dVALUE"></span>
+<span id="CL_002dFORMS_003aFIELD_002dVALUE-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFIELD_002dVALUE-1">Generic-Function: <strong>CL-FORMS:FIELD-VALUE</strong> <em>(field)</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aFIELD_002dLABEL"></span>
+<span id="CL_002dFORMS_003aFIELD_002dLABEL-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFIELD_002dLABEL-1">Generic-Function: <strong>CL-FORMS:FIELD-LABEL</strong> <em>(sb-pcl::object)</em></dt>
 </dl>
 
 <span id="index-CL_002dFORMS_003aFIELD_002dFORMATTER"></span>
@@ -1029,17 +1067,74 @@ FIELDS are the form field specs.
 <dt id="index-CL_002dFORMS_003aFIELD_002dFORMATTER-1">Generic-Function: <strong>CL-FORMS:FIELD-FORMATTER</strong> <em>(sb-pcl::object)</em></dt>
 </dl>
 
-<span id="index-CL_002dFORMS_003aFIELD_002dVALUE"></span>
-<span id="CL_002dFORMS_003aFIELD_002dVALUE-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFIELD_002dVALUE-1">Generic-Function: <strong>CL-FORMS:FIELD-VALUE</strong> <em>(field)</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aFIELD_002dVALID_002dP"></span>
-<span id="CL_002dFORMS_003aFIELD_002dVALID_002dP-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFIELD_002dVALID_002dP-1">Generic-Function: <strong>CL-FORMS:FIELD-VALID-P</strong> <em>(form-field &amp;optional (form))</em></dt>
-</dl>
-
 <span id="Functions"></span><h4 class="subheading">Functions</h4>
+<span id="index-CL_002dFORMS_003aADD_002dFIELD"></span>
+<span id="CL_002dFORMS_003aADD_002dFIELD-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aADD_002dFIELD-1">Function: <strong>CL-FORMS:ADD-FIELD</strong> <em>(form field)</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dEND"></span>
+<span id="CL_002dFORMS_003aRENDER_002dFORM_002dEND-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dEND-1">Function: <strong>CL-FORMS:RENDER-FORM-END</strong> <em>(&amp;optional (form *form*))</em></dt>
+<dd>
+<p>Render the end of the web form FORM.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aGET_002dFORM"></span>
+<span id="CL_002dFORMS_003aGET_002dFORM-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aGET_002dFORM-1">Function: <strong>CL-FORMS:GET-FORM</strong> <em>(&amp;rest args)</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aSET_002dFIELD_002dVALUE"></span>
+<span id="CL_002dFORMS_003aSET_002dFIELD_002dVALUE-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aSET_002dFIELD_002dVALUE-1">Function: <strong>CL-FORMS:SET-FIELD-VALUE</strong> <em>(form field-name value)</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aHANDLE_002dREQUEST"></span>
+<span id="CL_002dFORMS_003aHANDLE_002dREQUEST-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aHANDLE_002dREQUEST-1">Function: <strong>CL-FORMS:HANDLE-REQUEST</strong> <em>(&amp;optional (form *form*) (request hunchentoot:*request*))</em></dt>
+<dd>
+<p>Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aVALIDATE_002dFORM"></span>
+<span id="CL_002dFORMS_003aVALIDATE_002dFORM-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aVALIDATE_002dFORM-1">Function: <strong>CL-FORMS:VALIDATE-FORM</strong> <em>(&amp;optional (form *form*))</em></dt>
+<dd>
+<p>Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
+The list of errors is an association list with elements (&lt;field&gt; . &lt;field errors strings list&gt;).
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aMAKE_002dFORMATTER"></span>
+<span id="CL_002dFORMS_003aMAKE_002dFORMATTER-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aMAKE_002dFORMATTER-1">Function: <strong>CL-FORMS:MAKE-FORMATTER</strong> <em>(symbol)</em></dt>
+<dd>
+<p>Create a field formatter. SYMBOL is the function to call.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE_002dTO_002dSTRING"></span>
+<span id="CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE_002dTO_002dSTRING-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE_002dTO_002dSTRING-1">Function: <strong>CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING</strong> <em>(form-field &amp;optional (field-value (field-value form-field)))</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aRENDER_002dFIELD"></span>
+<span id="CL_002dFORMS_003aRENDER_002dFIELD-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aRENDER_002dFIELD-1">Function: <strong>CL-FORMS:RENDER-FIELD</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
+<dd>
+<p>Render form FIELD, both label and widget.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aFIND_002dFORM"></span>
+<span id="CL_002dFORMS_003aFIND_002dFORM-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFIND_002dFORM-1">Function: <strong>CL-FORMS:FIND-FORM</strong> <em>(name &amp;rest args)</em></dt>
+<dd>
+<p>Get the form named NAME.
+</p>
+<p>ARGS is the list of arguments to pass to a possible form builder function.
+</p>
+<p>See: DEFFORM-BUILDER macro.
+</p></dd></dl>
+
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM-1">Function: <strong>CL-FORMS:RENDER-FORM</strong> <em>(&amp;optional (form *form*) &amp;rest args)</em></dt>
@@ -1057,104 +1152,6 @@ See: WITH-FORM-RENDERER, WITH-FORM-THEME
 Read MODEL using FORM accessors and set the FORM field values.
 </p></dd></dl>
 
-<span id="index-CL_002dFORMS_003aFIND_002dFORM"></span>
-<span id="CL_002dFORMS_003aFIND_002dFORM-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFIND_002dFORM-1">Function: <strong>CL-FORMS:FIND-FORM</strong> <em>(name &amp;rest args)</em></dt>
-<dd>
-<p>Get the form named NAME.
-</p>
-<p>ARGS is the list of arguments to pass to a possible form builder function.
-</p>
-<p>See: DEFFORM-BUILDER macro.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aRENDER_002dFIELD"></span>
-<span id="CL_002dFORMS_003aRENDER_002dFIELD-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aRENDER_002dFIELD-1">Function: <strong>CL-FORMS:RENDER-FIELD</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-<dd>
-<p>Render form FIELD, both label and widget.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aREMOVE_002dFIELD"></span>
-<span id="CL_002dFORMS_003aREMOVE_002dFIELD-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aREMOVE_002dFIELD-1">Function: <strong>CL-FORMS:REMOVE-FIELD</strong> <em>(form field)</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aFORM_002dVALID_002dP"></span>
-<span id="CL_002dFORMS_003aFORM_002dVALID_002dP-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFORM_002dVALID_002dP-1">Function: <strong>CL-FORMS:FORM-VALID-P</strong> <em>(form)</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aGET_002dFIELD"></span>
-<span id="CL_002dFORMS_003aGET_002dFIELD-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aGET_002dFIELD-1">Function: <strong>CL-FORMS:GET-FIELD</strong> <em>(form field-name &amp;optional (error-p t))</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aGET_002dFIELD_002dVALUE"></span>
-<span id="CL_002dFORMS_003aGET_002dFIELD_002dVALUE-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aGET_002dFIELD_002dVALUE-1">Function: <strong>CL-FORMS:GET-FIELD-VALUE</strong> <em>(form field-name &amp;optional (error-p t))</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dEND"></span>
-<span id="CL_002dFORMS_003aRENDER_002dFORM_002dEND-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dEND-1">Function: <strong>CL-FORMS:RENDER-FORM-END</strong> <em>(&amp;optional (form *form*))</em></dt>
-<dd>
-<p>Render the end of the web form FORM.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aHANDLE_002dREQUEST"></span>
-<span id="CL_002dFORMS_003aHANDLE_002dREQUEST-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aHANDLE_002dREQUEST-1">Function: <strong>CL-FORMS:HANDLE-REQUEST</strong> <em>(&amp;optional (form *form*) (request hunchentoot:*request*))</em></dt>
-<dd>
-<p>Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM"></span>
-<span id="CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-1">Function: <strong>CL-FORMS:FILL-MODEL-FROM-FORM</strong> <em>(form model)</em></dt>
-<dd>
-<p>Set a MODEL&rsquo;s values from FORM field values.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aMAKE_002dFORMATTER"></span>
-<span id="CL_002dFORMS_003aMAKE_002dFORMATTER-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aMAKE_002dFORMATTER-1">Function: <strong>CL-FORMS:MAKE-FORMATTER</strong> <em>(symbol)</em></dt>
-<dd>
-<p>Create a field formatter. SYMBOL is the function to call.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL"></span>
-<span id="CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-1">Function: <strong>CL-FORMS:RENDER-FIELD-LABEL</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-<dd>
-<p>Render the label of FIELD.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE_002dTO_002dSTRING"></span>
-<span id="CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE_002dTO_002dSTRING-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE_002dTO_002dSTRING-1">Function: <strong>CL-FORMS:FORMAT-FIELD-VALUE-TO-STRING</strong> <em>(form-field &amp;optional (field-value (field-value form-field)))</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS"></span>
-<span id="CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS-1">Function: <strong>CL-FORMS:RENDER-FIELD-ERRORS</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
-<dd>
-<p>Render the validation errors associated with FIELD.
-</p></dd></dl>
-
-<span id="index-CL_002dFORMS_003aSET_002dFIELD_002dVALUE"></span>
-<span id="CL_002dFORMS_003aSET_002dFIELD_002dVALUE-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aSET_002dFIELD_002dVALUE-1">Function: <strong>CL-FORMS:SET-FIELD-VALUE</strong> <em>(form field-name value)</em></dt>
-</dl>
-
-<span id="index-CL_002dFORMS_003aVALIDATE_002dFORM"></span>
-<span id="CL_002dFORMS_003aVALIDATE_002dFORM-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aVALIDATE_002dFORM-1">Function: <strong>CL-FORMS:VALIDATE-FORM</strong> <em>(&amp;optional (form *form*))</em></dt>
-<dd>
-<p>Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
-The list of errors is an association list with elements (&lt;field&gt; . &lt;field errors strings list&gt;).
-</p></dd></dl>
-
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dSTART"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM_002dSTART-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dSTART-1">Function: <strong>CL-FORMS:RENDER-FORM-START</strong> <em>(&amp;optional (form *form*) &amp;rest args)</em></dt>
@@ -1162,6 +1159,11 @@ The list of errors is an association list with elements (&lt;field&gt; . &lt;fie
 <p>Render only the beggining of the web form FORM.
 Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after.
 </p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aFORM_002dVALID_002dP"></span>
+<span id="CL_002dFORMS_003aFORM_002dVALID_002dP-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFORM_002dVALID_002dP-1">Function: <strong>CL-FORMS:FORM-VALID-P</strong> <em>(form)</em></dt>
+</dl>
 
 <span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dWIDGET"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFIELD_002dWIDGET-function"></span><dl>
@@ -1177,6 +1179,23 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after.
 <p>Add an error on FIELD
 </p></dd></dl>
 
+<span id="index-CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM"></span>
+<span id="CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aFILL_002dMODEL_002dFROM_002dFORM-1">Function: <strong>CL-FORMS:FILL-MODEL-FROM-FORM</strong> <em>(form model)</em></dt>
+<dd>
+<p>Set a MODEL&rsquo;s values from FORM field values.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aGET_002dFIELD_002dVALUE"></span>
+<span id="CL_002dFORMS_003aGET_002dFIELD_002dVALUE-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aGET_002dFIELD_002dVALUE-1">Function: <strong>CL-FORMS:GET-FIELD-VALUE</strong> <em>(form field-name &amp;optional (error-p t))</em></dt>
+</dl>
+
+<span id="index-CL_002dFORMS_003aGET_002dFIELD"></span>
+<span id="CL_002dFORMS_003aGET_002dFIELD-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aGET_002dFIELD-1">Function: <strong>CL-FORMS:GET-FIELD</strong> <em>(form field-name &amp;optional (error-p t))</em></dt>
+</dl>
+
 <span id="index-CL_002dFORMS_003aRENDER_002dFORM_002dERRORS"></span>
 <span id="CL_002dFORMS_003aRENDER_002dFORM_002dERRORS-function"></span><dl>
 <dt id="index-CL_002dFORMS_003aRENDER_002dFORM_002dERRORS-1">Function: <strong>CL-FORMS:RENDER-FORM-ERRORS</strong> <em>(&amp;optional (form *form*) &amp;rest args)</em></dt>
@@ -1184,39 +1203,63 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after.
 <p>Render a section for displaying form validation errors.
 </p></dd></dl>
 
-<span id="index-CL_002dFORMS_003aADD_002dFIELD"></span>
-<span id="CL_002dFORMS_003aADD_002dFIELD-function"></span><dl>
-<dt id="index-CL_002dFORMS_003aADD_002dFIELD-1">Function: <strong>CL-FORMS:ADD-FIELD</strong> <em>(form field)</em></dt>
+<span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS"></span>
+<span id="CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dERRORS-1">Function: <strong>CL-FORMS:RENDER-FIELD-ERRORS</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
+<dd>
+<p>Render the validation errors associated with FIELD.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL"></span>
+<span id="CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aRENDER_002dFIELD_002dLABEL-1">Function: <strong>CL-FORMS:RENDER-FIELD-LABEL</strong> <em>(field &amp;optional (form *form*) &amp;rest args)</em></dt>
+<dd>
+<p>Render the label of FIELD.
+</p></dd></dl>
+
+<span id="index-CL_002dFORMS_003aREMOVE_002dFIELD"></span>
+<span id="CL_002dFORMS_003aREMOVE_002dFIELD-function"></span><dl>
+<dt id="index-CL_002dFORMS_003aREMOVE_002dFIELD-1">Function: <strong>CL-FORMS:REMOVE-FIELD</strong> <em>(form field)</em></dt>
 </dl>
 
 <span id="Classes"></span><h4 class="subheading">Classes</h4>
-<span id="index-CL_002dFORMS_003aINTEGER_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aINTEGER_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aINTEGER_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:INTEGER-FORM-FIELD</strong></dt>
+<span id="index-CL_002dFORMS_003aPASSWORD_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aPASSWORD_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aPASSWORD_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:PASSWORD-FORM-FIELD</strong></dt>
 <dd>
-<p>An integer input field
+<p>A password input field
 </p>
-<p>Class precedence list: <code>integer-form-field, form-field, standard-object, t</code>
+<p>Class precedence list: <code>password-form-field, form-field, standard-object, t</code>
 </p>
 </dd></dl>
 
-<span id="index-CL_002dFORMS_003aSUBFORM_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aSUBFORM_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aSUBFORM_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:SUBFORM-FORM-FIELD</strong></dt>
+<span id="index-CL_002dFORMS_003aBOOLEAN_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aBOOLEAN_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aBOOLEAN_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:BOOLEAN-FORM-FIELD</strong></dt>
 <dd>
-<p>A field that contains a form (subform)
+<p>A boolean input
 </p>
-<p>Class precedence list: <code>subform-form-field, form-field, standard-object, t</code>
+<p>Class precedence list: <code>boolean-form-field, form-field, standard-object, t</code>
 </p>
 </dd></dl>
 
-<span id="index-CL_002dFORMS_003aURL_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aURL_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aURL_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:URL-FORM-FIELD</strong></dt>
+<span id="index-CL_002dFORMS_003aSTRING_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aSTRING_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aSTRING_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:STRING-FORM-FIELD</strong></dt>
 <dd>
-<p>An url input field
+<p>A string input field
 </p>
-<p>Class precedence list: <code>url-form-field, form-field, standard-object, t</code>
+<p>Class precedence list: <code>string-form-field, form-field, standard-object, t</code>
+</p>
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aDATE_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aDATE_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aDATE_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:DATE-FORM-FIELD</strong></dt>
+<dd>
+<p>A date input field
+</p>
+<p>Class precedence list: <code>date-form-field, form-field, standard-object, t</code>
 </p>
 </dd></dl>
 
@@ -1230,13 +1273,157 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after.
 </p>
 </dd></dl>
 
-<span id="index-CL_002dFORMS_003aPASSWORD_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aPASSWORD_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aPASSWORD_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:PASSWORD-FORM-FIELD</strong></dt>
+<span id="index-CL_002dFORMS_003aFORM"></span>
+<span id="CL_002dFORMS_003aFORM-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aFORM-1">Class: <strong>CL-FORMS:FORM</strong></dt>
 <dd>
-<p>A password input field
+<p>A form
 </p>
-<p>Class precedence list: <code>password-form-field, form-field, standard-object, t</code>
+<p>Class precedence list: <code>form, standard-object, t</code>
+</p>
+<p>Slots:
+</p><ul>
+<li> <code>id</code> &mdash; initarg: <code>:id<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-id</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-id)</span><!-- /@w --></code>
+
+<p>The form id</p></li><li> <code>name</code> &mdash; initarg: <code>:name<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-name</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-name)</span><!-- /@w --></code>
+
+<p>The form name</p></li><li> <code>action</code> &mdash; initarg: <code>:action<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-action</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-action)</span><!-- /@w --></code>
+
+<p>The form action</p></li><li> <code>method</code> &mdash; initarg: <code>:method<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-method</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-method)</span><!-- /@w --></code>
+
+<p>The form method</p></li><li> <code>enctype</code> &mdash; initarg: <code>:enctype<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-enctype</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-enctype)</span><!-- /@w --></code>
+
+<p>Form encoding type. i.e. Use multipart/form-data for file uploads</p></li><li> <code>fields</code> &mdash; initarg: <code>:fields<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:form-fields</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:form-fields)</span><!-- /@w --></code>
+
+<p>Form fields</p></li><li> <code>model</code> &mdash; initarg: <code>:model<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-model</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-model)</span><!-- /@w --></code>
+
+<p>The form model object</p></li><li> <code>csrf-protection</code> &mdash; initarg: <code><span class="nolinebreak">:csrf-protection</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-csrf-protection-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-csrf-protection-p)</span><!-- /@w --></code>
+
+<p>T when csrf protection is enabled</p></li><li> <code>csrf-field-name</code> &mdash; initarg: <code><span class="nolinebreak">:csrf-field-name</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-csrf-field-name</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-csrf-field-name)</span><!-- /@w --></code>
+
+<p>csrf field name</p></li><li> <code>errors</code> &mdash; reader: <code><span class="nolinebreak">cl-forms:form-errors</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:form-errors)</span><!-- /@w --></code>
+
+<p>Form errors after validation. An association list with elements (&lt;field&gt; . &lt;field errors strings list&gt;).</p></li><li> <code>display-errors</code> &mdash; initarg: <code><span class="nolinebreak">:display-errors</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::display-errors</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::display-errors)</span><!-- /@w --></code>
+
+<p>A list containing the places where to display errors. Valid options are :list and :inline</p></li><li> <code>client-validation</code> &mdash; initarg: <code><span class="nolinebreak">:client-validation</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::client-validation</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::client-validation)</span><!-- /@w --></code>
+
+<p>When T, form client validation is enabled</p></li></ul>
+
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aFORM_002dFIELD-1">Class: <strong>CL-FORMS:FORM-FIELD</strong></dt>
+<dd>
+<p>A form field
+</p>
+<p>Class precedence list: <code>form-field, standard-object, t</code>
+</p>
+<p>Slots:
+</p><ul>
+<li> <code>name</code> &mdash; initarg: <code>:name<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-name</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-name)</span><!-- /@w --></code>
+
+<p>The field name</p></li><li> <code>label</code> &mdash; initarg: <code>:label<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-label</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-label)</span><!-- /@w --></code>
+
+<p>The field label</p></li><li> <code>value</code> &mdash; initarg: <code>:value<!-- /@w --></code>
+
+<p>Field value</p></li><li> <code>default-value</code> &mdash; initarg: <code><span class="nolinebreak">:default-value</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-default-value</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-default-value)</span><!-- /@w --></code>
+
+<p>Value to use when the field value is nil</p></li><li> <code>placeholder</code> &mdash; initarg: <code>:placeholder<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-placeholder</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-placeholder)</span><!-- /@w --></code>
+
+<p>Field placeholder (text that appears when the field is empty)</p></li><li> <code>help-text</code> &mdash; initarg: <code><span class="nolinebreak">:help-text</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-help-text</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-help-text)</span><!-- /@w --></code>
+
+<p>Field help text</p></li><li> <code>parser</code> &mdash; initarg: <code>:parser<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-parser</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-parser)</span><!-- /@w --></code>
+
+<p>Custom field value parser</p></li><li> <code>formatter</code> &mdash; initarg: <code>:formatter<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-formatter</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-formatter)</span><!-- /@w --></code>
+
+<p>The field formatter. The function takes two arguments, a VALUE and STREAM to format it into.</p></li><li> <code>constraints</code> &mdash; initarg: <code>:constraints<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-constraints</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-constraints)</span><!-- /@w --></code>
+
+<p>A list of CLAVIER validators.</p></li><li> <code>required</code> &mdash; initarg: <code><span class="nolinebreak">:required-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-p)</span><!-- /@w --></code>
+
+<p>Whether the field is required</p></li><li> <code>required-message</code> &mdash; initarg: <code><span class="nolinebreak">:required-message</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-message</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-message)</span><!-- /@w --></code>
+
+<p>Message to display when field is required</p></li><li> <code>invalid-message</code> &mdash; initarg: <code><span class="nolinebreak">:invalid-message</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-invalid-message</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-invalid-message)</span><!-- /@w --></code>
+
+<p>Message to display when field is invalid</p></li><li> <code>read-only</code> &mdash; initarg: <code><span class="nolinebreak">:read-only-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-read-only-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-read-only-p)</span><!-- /@w --></code>
+
+<p>Whether the field is read only</p></li><li> <code>disabled</code> &mdash; initarg: <code><span class="nolinebreak">:disabled-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-disabled-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-disabled-p)</span><!-- /@w --></code>
+
+<p>Whether the field is disabled</p></li><li> <code>accessor</code> &mdash; initarg: <code>:accessor<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-accessor</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-accessor)</span><!-- /@w --></code>
+
+<p>The field accessor to the underlying model</p></li><li> <code>reader</code> &mdash; initarg: <code>:reader<!-- /@w --></code>
+
+<p>The function to use to read from the underlying model</p></li><li> <code>writer</code> &mdash; initarg: <code>:writer<!-- /@w --></code>
+
+<p>The function to use to write to underlying model</p></li><li> <code>trim</code> &mdash; initarg: <code><span class="nolinebreak">:trim-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-trim-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-trim-p)</span><!-- /@w --></code>
+
+<p>Trim the input</p></li><li> <code>validation-triggers</code> &mdash; initarg: <code><span class="nolinebreak">:validation-triggers</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-validation-triggers</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-validation-triggers)</span><!-- /@w --></code>
+
+<p>Client side validation triggers. A list of :change, :focus, :focusout, :focusin, etc</p></li><li> <code>form</code> &mdash; initarg: <code>:form<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-form</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-form)</span><!-- /@w --></code>
+
+<p>The form the field belongs to</p></li></ul>
+
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aTEXT_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aTEXT_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aTEXT_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:TEXT-FORM-FIELD</strong></dt>
+<dd>
+<p>A text field. Renders as a text area
+</p>
+<p>Class precedence list: <code>text-form-field, string-form-field, form-field, standard-object, t</code>
+</p>
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aLIST_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aLIST_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aLIST_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:LIST-FORM-FIELD</strong></dt>
+<dd>
+<p>A field that contains a list of elements (either other fields or subforms)
+</p>
+<p>Class precedence list: <code>list-form-field, form-field, standard-object, t</code>
+</p>
+<p>Slots:
+</p><ul>
+<li> <code>type</code> &mdash; initarg: <code>:type<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::list-field-type</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::list-field-type)</span><!-- /@w --></code>
+
+<p>The list elements type.</p></li><li> <code>empty-item-predicate</code> &mdash; initarg: <code><span class="nolinebreak">:empty-item-predicate</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::empty-item-predicate</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::empty-item-predicate)</span><!-- /@w --></code>
+
+<p>A predicate that tells when a list item is considered empty, and so it is removed from the list</p></li><li> <code>add-button</code> &mdash; initarg: <code><span class="nolinebreak">:add-button</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::add-button-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::add-button-p)</span><!-- /@w --></code>
+
+<p>Whether have a list &rsquo;ADD&rsquo; button or not</p></li><li> <code>remove-button</code> &mdash; initarg: <code><span class="nolinebreak">:remove-button</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::remove-button-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::remove-button-p)</span><!-- /@w --></code>
+
+<p>Whether add an item removal button or not</p></li></ul>
+
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aSUBFORM_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aSUBFORM_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aSUBFORM_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:SUBFORM-FORM-FIELD</strong></dt>
+<dd>
+<p>A field that contains a form (subform)
+</p>
+<p>Class precedence list: <code>subform-form-field, form-field, standard-object, t</code>
+</p>
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aHIDDEN_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aHIDDEN_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aHIDDEN_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:HIDDEN-FORM-FIELD</strong></dt>
+<dd>
+<p>A hidden form field
+</p>
+<p>Class precedence list: <code>hidden-form-field, form-field, standard-object, t</code>
+</p>
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aINTEGER_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aINTEGER_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aINTEGER_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:INTEGER-FORM-FIELD</strong></dt>
+<dd>
+<p>An integer input field
+</p>
+<p>Class precedence list: <code>integer-form-field, form-field, standard-object, t</code>
 </p>
 </dd></dl>
 
@@ -1281,6 +1468,26 @@ NOTE: the defaults of this field type are too complicated for just working with 
 
 </dd></dl>
 
+<span id="index-CL_002dFORMS_003aSUBMIT_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aSUBMIT_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aSUBMIT_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:SUBMIT-FORM-FIELD</strong></dt>
+<dd>
+<p>A submit input button
+</p>
+<p>Class precedence list: <code>submit-form-field, form-field, standard-object, t</code>
+</p>
+</dd></dl>
+
+<span id="index-CL_002dFORMS_003aURL_002dFORM_002dFIELD"></span>
+<span id="CL_002dFORMS_003aURL_002dFORM_002dFIELD-class"></span><dl>
+<dt id="index-CL_002dFORMS_003aURL_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:URL-FORM-FIELD</strong></dt>
+<dd>
+<p>An url input field
+</p>
+<p>Class precedence list: <code>url-form-field, form-field, standard-object, t</code>
+</p>
+</dd></dl>
+
 <span id="index-CL_002dFORMS_003aFILE_002dFORM_002dFIELD"></span>
 <span id="CL_002dFORMS_003aFILE_002dFORM_002dFIELD-class"></span><dl>
 <dt id="index-CL_002dFORMS_003aFILE_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:FILE-FORM-FIELD</strong></dt>
@@ -1299,180 +1506,6 @@ NOTE: the defaults of this field type are too complicated for just working with 
 
 <p>Files accepted. See https://www.w3schools.com/tags/att_input_accept.asp</p></li></ul>
 
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aBOOLEAN_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aBOOLEAN_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aBOOLEAN_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:BOOLEAN-FORM-FIELD</strong></dt>
-<dd>
-<p>A boolean input
-</p>
-<p>Class precedence list: <code>boolean-form-field, form-field, standard-object, t</code>
-</p>
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aDATE_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aDATE_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aDATE_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:DATE-FORM-FIELD</strong></dt>
-<dd>
-<p>A date input field
-</p>
-<p>Class precedence list: <code>date-form-field, form-field, standard-object, t</code>
-</p>
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aFORM_002dFIELD-1">Class: <strong>CL-FORMS:FORM-FIELD</strong></dt>
-<dd>
-<p>A form field
-</p>
-<p>Class precedence list: <code>form-field, standard-object, t</code>
-</p>
-<p>Slots:
-</p><ul>
-<li> <code>name</code> &mdash; initarg: <code>:name<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-name</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-name)</span><!-- /@w --></code>
-
-<p>The field name</p></li><li> <code>label</code> &mdash; initarg: <code>:label<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-label</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-label)</span><!-- /@w --></code>
-
-<p>The field label</p></li><li> <code>value</code> &mdash; initarg: <code>:value<!-- /@w --></code>
-
-<p>Field value</p></li><li> <code>default-value</code> &mdash; initarg: <code><span class="nolinebreak">:default-value</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-default-value</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-default-value)</span><!-- /@w --></code>
-
-<p>Value to use when the field value is nil</p></li><li> <code>placeholder</code> &mdash; initarg: <code>:placeholder<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-placeholder</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-placeholder)</span><!-- /@w --></code>
-
-<p>Field placeholder (text that appears when the field is empty)</p></li><li> <code>help-text</code> &mdash; initarg: <code><span class="nolinebreak">:help-text</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-help-text</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-help-text)</span><!-- /@w --></code>
-
-<p>Field help text</p></li><li> <code>parser</code> &mdash; initarg: <code>:parser<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-parser</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-parser)</span><!-- /@w --></code>
-
-<p>Custom field value parser</p></li><li> <code>formatter</code> &mdash; initarg: <code>:formatter<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-formatter</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-formatter)</span><!-- /@w --></code>
-
-<p>The field formatter. The function takes two arguments, a VALUE and STREAM to format it into.</p></li><li> <code>constraints</code> &mdash; initarg: <code>:constraints<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-constraints</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-constraints)</span><!-- /@w --></code>
-
-<p>A list of CLAVIER validators.</p></li><li> <code>required</code> &mdash; initarg: <code><span class="nolinebreak">:required-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-p)</span><!-- /@w --></code>
-
-<p>Whether the field is required</p></li><li> <code>required-message</code> &mdash; initarg: <code><span class="nolinebreak">:required-message</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-required-message</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-required-message)</span><!-- /@w --></code>
-
-<p>Message to display when field is required</p></li><li> <code>invalid-message</code> &mdash; initarg: <code><span class="nolinebreak">:invalid-message</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-invalid-message</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-invalid-message)</span><!-- /@w --></code>
-
-<p>Message to display when field is invalid</p></li><li> <code>read-only</code> &mdash; initarg: <code><span class="nolinebreak">:read-only-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-read-only-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-read-only-p)</span><!-- /@w --></code>
-
-<p>Whether the field is read only</p></li><li> <code>disabled</code> &mdash; initarg: <code><span class="nolinebreak">:disabled-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-disabled-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-disabled-p)</span><!-- /@w --></code>
-
-<p>Whether the field is disabled</p></li><li> <code>accessor</code> &mdash; initarg: <code>:accessor<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms:field-accessor</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:field-accessor)</span><!-- /@w --></code>
-
-<p>The field accessor to the underlying model</p></li><li> <code>reader</code> &mdash; initarg: <code>:reader<!-- /@w --></code>
-
-<p>The function to use to read from the underlying model</p></li><li> <code>writer</code> &mdash; initarg: <code>:writer<!-- /@w --></code>
-
-<p>The function to use to write to underlying model</p></li><li> <code>trim</code> &mdash; initarg: <code><span class="nolinebreak">:trim-p</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-trim-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-trim-p)</span><!-- /@w --></code>
-
-<p>Trim the input</p></li><li> <code>validation-triggers</code> &mdash; initarg: <code><span class="nolinebreak">:validation-triggers</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-validation-triggers</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-validation-triggers)</span><!-- /@w --></code>
-
-<p>Client side validation triggers. A list of :change, :focus, :focusout, :focusin, etc</p></li><li> <code>form</code> &mdash; initarg: <code>:form<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::field-form</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::field-form)</span><!-- /@w --></code>
-
-<p>The form the field belongs to</p></li></ul>
-
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aSUBMIT_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aSUBMIT_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aSUBMIT_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:SUBMIT-FORM-FIELD</strong></dt>
-<dd>
-<p>A submit input button
-</p>
-<p>Class precedence list: <code>submit-form-field, form-field, standard-object, t</code>
-</p>
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aHIDDEN_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aHIDDEN_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aHIDDEN_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:HIDDEN-FORM-FIELD</strong></dt>
-<dd>
-<p>A hidden form field
-</p>
-<p>Class precedence list: <code>hidden-form-field, form-field, standard-object, t</code>
-</p>
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aSTRING_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aSTRING_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aSTRING_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:STRING-FORM-FIELD</strong></dt>
-<dd>
-<p>A string input field
-</p>
-<p>Class precedence list: <code>string-form-field, form-field, standard-object, t</code>
-</p>
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aLIST_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aLIST_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aLIST_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:LIST-FORM-FIELD</strong></dt>
-<dd>
-<p>A field that contains a list of elements (either other fields or subforms)
-</p>
-<p>Class precedence list: <code>list-form-field, form-field, standard-object, t</code>
-</p>
-<p>Slots:
-</p><ul>
-<li> <code>type</code> &mdash; initarg: <code>:type<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::list-field-type</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::list-field-type)</span><!-- /@w --></code>
-
-<p>The list elements type.</p></li><li> <code>empty-item-predicate</code> &mdash; initarg: <code><span class="nolinebreak">:empty-item-predicate</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::empty-item-predicate</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::empty-item-predicate)</span><!-- /@w --></code>
-
-<p>A predicate that tells when a list item is considered empty, and so it is removed from the list</p></li><li> <code>add-button</code> &mdash; initarg: <code><span class="nolinebreak">:add-button</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::add-button-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::add-button-p)</span><!-- /@w --></code>
-
-<p>Whether have a list &rsquo;ADD&rsquo; button or not</p></li><li> <code>remove-button</code> &mdash; initarg: <code><span class="nolinebreak">:remove-button</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::remove-button-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::remove-button-p)</span><!-- /@w --></code>
-
-<p>Whether add an item removal button or not</p></li></ul>
-
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aFORM"></span>
-<span id="CL_002dFORMS_003aFORM-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aFORM-1">Class: <strong>CL-FORMS:FORM</strong></dt>
-<dd>
-<p>A form
-</p>
-<p>Class precedence list: <code>form, standard-object, t</code>
-</p>
-<p>Slots:
-</p><ul>
-<li> <code>id</code> &mdash; initarg: <code>:id<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-id</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-id)</span><!-- /@w --></code>
-
-<p>The form id</p></li><li> <code>name</code> &mdash; initarg: <code>:name<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-name</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-name)</span><!-- /@w --></code>
-
-<p>The form name</p></li><li> <code>action</code> &mdash; initarg: <code>:action<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-action</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-action)</span><!-- /@w --></code>
-
-<p>The form action</p></li><li> <code>method</code> &mdash; initarg: <code>:method<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-method</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-method)</span><!-- /@w --></code>
-
-<p>The form method</p></li><li> <code>enctype</code> &mdash; initarg: <code>:enctype<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-enctype</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-enctype)</span><!-- /@w --></code>
-
-<p>Form encoding type. i.e. Use multipart/form-data for file uploads</p></li><li> <code>fields</code> &mdash; initarg: <code>:fields<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-fields</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-fields)</span><!-- /@w --></code>
-
-<p>Form fields</p></li><li> <code>model</code> &mdash; initarg: <code>:model<!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-model</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-model)</span><!-- /@w --></code>
-
-<p>The form model object</p></li><li> <code>csrf-protection</code> &mdash; initarg: <code><span class="nolinebreak">:csrf-protection</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-csrf-protection-p</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-csrf-protection-p)</span><!-- /@w --></code>
-
-<p>T when csrf protection is enabled</p></li><li> <code>csrf-field-name</code> &mdash; initarg: <code><span class="nolinebreak">:csrf-field-name</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::form-csrf-field-name</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::form-csrf-field-name)</span><!-- /@w --></code>
-
-<p>csrf field name</p></li><li> <code>errors</code> &mdash; reader: <code><span class="nolinebreak">cl-forms:form-errors</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms:form-errors)</span><!-- /@w --></code>
-
-<p>Form errors after validation. An association list with elements (&lt;field&gt; . &lt;field errors strings list&gt;).</p></li><li> <code>display-errors</code> &mdash; initarg: <code><span class="nolinebreak">:display-errors</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::display-errors</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::display-errors)</span><!-- /@w --></code>
-
-<p>A list containing the places where to display errors. Valid options are :list and :inline</p></li><li> <code>client-validation</code> &mdash; initarg: <code><span class="nolinebreak">:client-validation</span><!-- /@w --></code>; reader: <code><span class="nolinebreak">cl-forms::client-validation</span><!-- /@w --></code>; writer: <code>(setf&nbsp;<span class="nolinebreak">cl-forms::client-validation)</span><!-- /@w --></code>
-
-<p>When T, form client validation is enabled</p></li></ul>
-
-</dd></dl>
-
-<span id="index-CL_002dFORMS_003aTEXT_002dFORM_002dFIELD"></span>
-<span id="CL_002dFORMS_003aTEXT_002dFORM_002dFIELD-class"></span><dl>
-<dt id="index-CL_002dFORMS_003aTEXT_002dFORM_002dFIELD-1">Class: <strong>CL-FORMS:TEXT-FORM-FIELD</strong></dt>
-<dd>
-<p>A text field. Renders as a text area
-</p>
-<p>Class precedence list: <code>text-form-field, string-form-field, form-field, standard-object, t</code>
-</p>
 </dd></dl>
 
 
@@ -1538,6 +1571,8 @@ Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" ac
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dACCESSOR-1"><code>CL-FORMS:FIELD-ACCESSOR</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dFORMATTER"><code>CL-FORMS:FIELD-FORMATTER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dFORMATTER-1"><code>CL-FORMS:FIELD-FORMATTER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dLABEL"><code>CL-FORMS:FIELD-LABEL</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dLABEL-1"><code>CL-FORMS:FIELD-LABEL</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dPARSER"><code>CL-FORMS:FIELD-PARSER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dPARSER-1"><code>CL-FORMS:FIELD-PARSER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIELD_002dREADER"><code>CL-FORMS:FIELD-READER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
@@ -1556,6 +1591,8 @@ Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" ac
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFIND_002dFORM-1"><code>CL-FORMS:FIND-FORM</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORM_002dERRORS"><code>CL-FORMS:FORM-ERRORS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORM_002dERRORS-1"><code>CL-FORMS:FORM-ERRORS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORM_002dFIELDS"><code>CL-FORMS:FORM-FIELDS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORM_002dFIELDS-1"><code>CL-FORMS:FORM-FIELDS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORM_002dVALID_002dP"><code>CL-FORMS:FORM-VALID-P</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORM_002dVALID_002dP-1"><code>CL-FORMS:FORM-VALID-P</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aFORMAT_002dFIELD_002dVALUE"><code>CL-FORMS:FORMAT-FIELD-VALUE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
@@ -1566,6 +1603,8 @@ Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" ac
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aGET_002dFIELD-1"><code>CL-FORMS:GET-FIELD</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aGET_002dFIELD_002dVALUE"><code>CL-FORMS:GET-FIELD-VALUE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aGET_002dFIELD_002dVALUE-1"><code>CL-FORMS:GET-FIELD-VALUE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aGET_002dFORM"><code>CL-FORMS:GET-FORM</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aGET_002dFORM-1"><code>CL-FORMS:GET-FORM</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aHANDLE_002dREQUEST"><code>CL-FORMS:HANDLE-REQUEST</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aHANDLE_002dREQUEST-1"><code>CL-FORMS:HANDLE-REQUEST</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-CL_002dFORMS_003aMAKE_002dFORMATTER"><code>CL-FORMS:MAKE-FORMATTER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#CL_002dFORMS-package">CL-FORMS package</a></td></tr>

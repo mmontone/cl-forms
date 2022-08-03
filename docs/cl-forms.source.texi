@@ -67,6 +67,15 @@ Several form field types: String, boolean, integer, email, password fields. And 
 @chapter Installation
 @anchor{installation}
 
+
+With Quicklisp:
+
+@lisp
+(ql:quickload "cl-forms")
+@end lisp
+
+When you want to use a form renderer such as @code{:who} or @code{:djula}, quickload the associated package: @code{cl-forms.who}, @code{cl-forms.who.bootstrap}, @code{cl-forms.djula}.
+
 @node Usage
 @chapter Usage
 @anchor{usage}
@@ -86,7 +95,7 @@ Use @clref{CL-FORMS, DEFFORM, macro} to define a form. Example:
 On your web handler, grab the form via @clref{CL-FORMS,FIND-FORM,function}, select a renderer with `with-form-renderer`and then render the form with @clref{CL-FORMS,RENDER-FORM,function}:
 
 @lisp
-(let ((form (forms::find-form 'fields-form)))
+(let ((form (forms:find-form 'fields-form)))
    (forms:with-form-renderer :who
       (forms:render-form form))
 @end lisp
@@ -96,13 +105,22 @@ Then bind form fields via either @clref{CL-FORMS,WITH-FORM-FIELD-VALUES,macro}, 
 
 @lisp
 (let ((form (forms:find-form 'fields-form)))
-    (forms::handle-request form)
-    (forms::with-form-field-values (name ready sex) form
-       (who:with-html-output (forms.who::*html*)
-          (:ul
-            (:li (who:fmt "Name: ~A" name))
-            (:li (who:fmt "Ready: ~A" ready))
-            (:li (who:fmt "Sex: ~A" sex))))))
+      (forms:handle-request form)
+      (forms:with-form-field-values (name ready sex) form
+          (who:with-html-output (forms.who::*html*)
+             (:ul
+               (:li (who:fmt "Name: ~A" name))
+               (:li (who:fmt "Ready: ~A" ready))
+               (:li (who:fmt "Sex: ~A" sex))))))
+@end lisp
+
+To output HTML on the REPL, do:
+
+@lisp
+(with-output-to-string (forms.who:*html*)
+   (let ((form (forms:find-form 'fields-form)))
+           (forms:with-form-renderer :who
+              (forms:render-form form))))
 @end lisp
 
 Please have a look at the demo sources for more examples of how to use the library
