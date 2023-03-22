@@ -13,7 +13,8 @@
                #:ironclad
                #:uuid
                #:clavier
-               #:fmt)
+               #:fmt
+	       #:str)
   :components ((:module :src
                         :components
                         ((:file "package")

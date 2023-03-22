@@ -260,7 +260,6 @@ Example:
          :documentation "The field name")
    (label :initarg :label
           :initform nil
-          :accessor field-label
           :type (or null string)
           :documentation "The field label")
    (value :initarg :value
@@ -353,6 +352,10 @@ Example:
     (format stream "~S value: ~A"
             (field-name field)
             (field-value field))))
+
+(defmethod field-label ((field form-field))
+  (or (slot-value field 'label)
+      (str:sentence-case (princ-to-string (field-name field)))))
 
 (defun add-field (form field)
   (setf (form-fields form)
