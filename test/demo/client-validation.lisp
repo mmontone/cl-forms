@@ -1,6 +1,6 @@
 (in-package :forms.test)
 
-(forms:defform client-validated-form (:action "/client-validation-post"
+(forms:defform client-validated-form (:action "/client-validation/post"
                                               :client-validation t)
   ((name :string :value "" :constraints (list (clavier:is-a-string)
                                               (clavier:not-blank)
