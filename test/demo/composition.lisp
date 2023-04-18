@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (forms:defform member-form ()
   ((name :string :value "" :required-p nil)

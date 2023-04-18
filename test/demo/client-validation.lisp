@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (forms:defform client-validated-form (:action "/client-validation/post"
                                               :client-validation t)

@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (forms:defform fields-form (:action "/fields-post"
                                     :enctype "multipart/form-data")

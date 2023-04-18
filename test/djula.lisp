@@ -1,7 +1,7 @@
-(defpackage :forms.test.djula
+(defpackage :cl-forms.test.djula
   (:use :cl :forms))
 
-(in-package :forms.test.djula)
+(in-package :cl-forms.test.djula)
 
 (defparameter +simple-form+
   (djula:compile-template*

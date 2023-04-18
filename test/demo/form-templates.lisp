@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (defun form-template-demo ()
   (macrolet ((row (&body body)

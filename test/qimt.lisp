@@ -1,7 +1,7 @@
-(defpackage :forms.test.qimt
+(defpackage :cl-forms.test.qimt
   (:use :cl :forms :qimt :html))
 
-(in-package :forms.test.qimt)
+(in-package :cl-forms.test.qimt)
 
 (defmacro with-html (&body body)
   (alexandria:with-unique-names (html)

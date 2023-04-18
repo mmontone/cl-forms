@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (forms:defform layout-form (:action "/layout-post")
   ((firstname :string :value "")

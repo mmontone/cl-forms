@@ -1,7 +1,7 @@
-(defpackage :forms.test.who
+(defpackage :cl-forms.test.who
   (:use :cl :forms))
 
-(in-package :forms.test.who)
+(in-package :cl-forms.test.who)
 
 (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port 2021))
 

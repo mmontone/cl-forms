@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (hunchentoot:define-easy-handler (tests-demo-handler :uri "/tests") ()
   (render-demo-page :demo #'tests-demo
@@ -7,7 +7,7 @@
                     :active-menu :tests))
 
 (defun tests-demo ()
-  (let ((test-results (forms.test:run-tests)))
+  (let ((test-results (cl-forms.test:run-tests)))
     (who:with-html-output (forms.who::*html*)
       (:div :class "panel-group" :id "accordion" :role "tablist"
             :aria-multiselectable"true"

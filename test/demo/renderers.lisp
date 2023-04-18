@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (hunchentoot:define-easy-handler (demo-renderers :uri "/renderers") ()
   (flet ((render ()

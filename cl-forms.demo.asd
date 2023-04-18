@@ -11,7 +11,8 @@
                #:cl-forms.test
                #:hunchentoot
                #:cl-who
-               #:cl-css)
+               #:cl-css
+	       #:trivial-open-browser)
   :components ((:module :test
                         :components
                         ((:file "package")

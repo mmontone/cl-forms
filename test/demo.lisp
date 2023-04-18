@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (defun file-string (path)
   (with-open-file (stream path)
@@ -44,8 +44,11 @@
     "test/static/bower_components/parsleyjs/dist/parsley.js")
 
 
-(defun run-demo ()
-  (hunchentoot:start (setf *demo-acceptor* (make-instance 'hunchentoot:easy-acceptor :port 0))))
+(defun run-demo (&key (open-browser t))
+  (hunchentoot:start (setf *demo-acceptor* (make-instance 'hunchentoot:easy-acceptor :port 0)))
+  (when open-browser
+    (trivial-open-browser:open-browser
+     (format nil "http://localhost:~a" (hunchentoot:acceptor-port *demo-acceptor*)))))
 
 (defun stop-demo ()
   (hunchentoot:stop *demo-acceptor*))

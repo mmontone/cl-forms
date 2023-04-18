@@ -1,4 +1,4 @@
-(in-package :forms.test)
+(in-package :cl-forms.test)
 
 (forms:defform bs-fields-form (:action "/bs-fields-post" :csrf-protection nil)
   ((name :string :value "")
