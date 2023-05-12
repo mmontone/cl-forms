@@ -10,4 +10,4 @@
                         ((:file "package")
                          (:file "test"))))
   :perform (asdf:test-op (o c)
-                         (uiop:symbol-call :forms.test :run-tests)))
+                         (uiop:symbol-call :cl-forms.test :run-tests)))
