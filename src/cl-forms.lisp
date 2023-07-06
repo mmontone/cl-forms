@@ -380,6 +380,7 @@ Example:
     (cons (string-downcase (string (field-name form-field))) path)))
 
 (defun field-request-name (form-field form)
+  (declare (ignorable form form-field))
   (fmt:fmt nil
            (:join "" (alexandria:flatten (reverse *field-path*)))))
 
