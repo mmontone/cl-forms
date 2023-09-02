@@ -17,7 +17,7 @@ index.html: cl-forms.texi
 	sbcl --eval '(require :hyperspec)' --load colorize-lisp-examples.lisp index.html
 
 cl-forms.texi:
-	sbcl --eval '(ql:quickload :cl-forms)' --eval '(ql:quickload :msgraph)' --eval '(ql:quickload :docweaver)' --eval '(docweaver:weave-file "cl-forms.source.texi" "cl-forms.texi" :docsystem :texinfo :escape-docstrings nil :parse-docstrings nil)' --quit
+	sbcl --eval '(ql:quickload :cl-forms)' --eval '(ql:quickload :docweaver)' --eval '(docweaver:weave-file "cl-forms.source.texi" "cl-forms.texi" :docsystem :texinfo :escape-docstrings nil :parse-docstrings nil)' --quit
 
 cl-forms-internals.info: cl-forms-internals.weaved.texi
 	makeinfo --no-validate cl-forms-internals.weaved.texi
