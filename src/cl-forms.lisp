@@ -716,7 +716,7 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
  (ftype (function (form) boolean) cl-forms:form-valid-p)
  (ftype (function (t) *) cl-forms:field-formatter)
  (ftype (function (form) list) form-errors)
- (ftype (function (symbol) form) get-form find-form)
+ (ftype (function (symbol &rest t) form) get-form find-form)
  (ftype (function (t &rest t) *) cl-forms:render-field-widget)
  (ftype (function (t) *) cl-forms:field-reader)
  (ftype (function (t) *) cl-forms:field-writer)
