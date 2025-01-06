@@ -9,7 +9,6 @@
      (uiop:subpathname *load-pathname* "README.md"))
   :depends-on (#:alexandria
                #:cl-ppcre
-               #:hunchentoot
                #:ironclad
                #:uuid
                #:clavier

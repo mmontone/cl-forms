@@ -238,7 +238,7 @@ Example:
         do
            (setf (field-form (cdr field)) form)))
 
-(defun post-parameters (&optional (request hunchentoot:*request*))
+(defun post-parameters (&optional (request (backend-request)))
   (let ((post-parameters (request-post-parameters request)))
     (if *base64-encode*
         (mapcar (lambda (param)
@@ -497,14 +497,6 @@ been validated via validate-form."
 (defmethod form-session-csrf-entry ((form form))
   (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
 
-(defmethod get-form-session-csrf-token ((form form))
-  (hunchentoot:session-value (form-session-csrf-entry form)))
-
-(defmethod set-form-session-csrf-token ((form form))
-  (hunchentoot:start-session)
-  (setf (hunchentoot:session-value (form-session-csrf-entry form))
-        (make-csrf-token form)))
-
 (defun validate-form (&optional (form *form*))
   "Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
 The list of errors is an association list with elements (<field> . <field errors strings list>)."
@@ -703,8 +695,6 @@ Populates FORM from parameters in HTTP request. After this, the form field conta
  (ftype (function (form-field) (or null symbol function)) field-parser)
  (ftype (function (form-field &optional t) (values simple-string &optional))
   cl-forms:format-field-value-to-string)
- (ftype (function (&optional form hunchentoot:request) (values null &optional))
-  cl-forms:handle-request)
  (ftype (function (form (or symbol form-field) &optional boolean) *) cl-forms:get-field-value)
  (ftype function cl-forms:render-form-start)
  (ftype (function (&optional t) *) cl-forms:render-form-end)

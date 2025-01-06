@@ -20,3 +20,11 @@
 
 (defmethod request-post-parameters ((request hunchentoot:request))
   (hunchentoot:post-parameters request))
+
+(defmethod get-form-session-csrf-token ((form form))
+  (hunchentoot:session-value (form-session-csrf-entry form)))
+
+(defmethod set-form-session-csrf-token ((form form))
+  (hunchentoot:start-session)
+  (setf (hunchentoot:session-value (form-session-csrf-entry form))
+        (make-csrf-token form)))
