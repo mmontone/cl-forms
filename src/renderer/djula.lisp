@@ -48,7 +48,7 @@
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
-      (let ((field-symbol (intern (string-upcase field-name) *djula-execute-package*)))
+      (let ((field-symbol (intern (string-upcase field-name) *template-package*)))
         (let ((field (forms::get-field form field-symbol)))
           (let ((forms::*form-renderer* :who)
                 (forms.who::*html* stream))
@@ -58,7 +58,7 @@
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
-      (let ((field-symbol (intern (string-upcase field-name) *djula-execute-package*)))
+      (let ((field-symbol (intern (string-upcase field-name) *template-package*)))
         (let ((field (forms::get-field form field-symbol)))
           (let ((forms::*form-renderer* :who)
                 (forms.who::*html* stream))
@@ -68,7 +68,7 @@
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
-      (let ((field-symbol (intern (string-upcase field-name) *djula-execute-package*)))
+      (let ((field-symbol (intern (string-upcase field-name) *template-package*)))
         (let ((field (forms::get-field form field-symbol)))
           (let ((forms::*form-renderer* :who)
                 (forms.who::*html* stream))
@@ -78,7 +78,7 @@
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
-      (let ((field-symbol (intern (string-upcase field-name) *djula-execute-package*)))
+      (let ((field-symbol (intern (string-upcase field-name) *template-package*)))
         (let ((field (forms::get-field form field-symbol)))
           (let ((forms::*form-renderer* :who)
                 (forms.who::*html* stream))
