@@ -6,7 +6,7 @@
 (in-package :cl-forms.ningle)
 
 (defmethod backend-request ()
-  nil)
+  ningle:*request*)
 
 (defun handle-request (&optional (form *form*) (request lack/request:request))
   ;; (when (form-csrf-protection-p form)
