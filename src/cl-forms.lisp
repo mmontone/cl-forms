@@ -238,7 +238,7 @@ Example:
         do
            (setf (field-form (cdr field)) form)))
 
-(defun post-parameters (&optional (request hunchentoot:*request*))
+(defun post-parameters (&optional (request (backend-request)))
   (let ((post-parameters (request-post-parameters request)))
     (if *base64-encode*
         (mapcar (lambda (param)
@@ -247,10 +247,10 @@ Example:
                 post-parameters)
         post-parameters)))
 
-(defmethod make-csrf-token ((form form))
-  (ironclad:byte-array-to-hex-string
-   (ironclad:ascii-string-to-byte-array
-    (princ-to-string (uuid:make-v4-uuid)))))
+;; csrf api
+
+(defgeneric set-form-session-csrf-token (form)
+  (:documentation "Set csrf token for FORM and return the token."))
 
 (defclass form-field ()
   ((name :initarg :name
@@ -497,14 +497,6 @@ been validated via validate-form."
 (defmethod form-session-csrf-entry ((form form))
   (alexandria:make-keyword (format nil "~A-CSRF-TOKEN" (form-name form))))
 
-(defmethod get-form-session-csrf-token ((form form))
-  (hunchentoot:session-value (form-session-csrf-entry form)))
-
-(defmethod set-form-session-csrf-token ((form form))
-  (hunchentoot:start-session)
-  (setf (hunchentoot:session-value (form-session-csrf-entry form))
-        (make-csrf-token form)))
-
 (defun validate-form (&optional (form *form*))
   "Validates a form. Usually called after HANDLE-REQUEST. Returns multiple values; first value is true if the form is valid; second value a list of errors.
 The list of errors is an association list with elements (<field> . <field errors strings list>)."
@@ -611,21 +603,20 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
   (let ((*field-path* (field-add-to-path field form *field-path*)))
     (call-next-method)))
 
-(defun handle-request (&optional (form *form*) (request hunchentoot:*request*))
+(defgeneric backend-request ()
+  (:documentation "Return current request object for backend"))
+
+(defgeneric backend-handle-request (form request)
+  (:documentation "Handle REQUEST for FORM.
+Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after."))
+
+;; Abstract away the HTTP request, so we can make cl-forms testable
+
+(defgeneric request-post-parameters (request))
+
+(defun handle-request (&optional (form *form*) (request (backend-request)))
   "Populates FORM from parameters in HTTP request. After this, the form field contains values, but they are not validated. To validate call VALIDATE-FORM after."
-  (when (form-csrf-protection-p form)
-    ;; Check the csrf token
-    (let ((session-token (get-form-session-csrf-token form)))
-      (when (or (not session-token)
-                (not (equalp session-token
-                             (hunchentoot:post-parameter (form-csrf-field-name form) request))))
-        ;; The form is not valid. Throw an error, but reset its CSRF token for next time
-        (set-form-session-csrf-token form)
-        (error "Invalid CSRF token"))))
-  (let ((post-parameters (post-parameters request)))
-    (loop for field in (form-fields form)
-          do (field-read-from-request (cdr field) form
-                                      post-parameters))))
+  (backend-handle-request form request))
 
 (defgeneric field-read-from-request (field form parameters))
 
@@ -704,8 +695,6 @@ Use RENDER-FIELD, RENDER-FIELD-LABEL, etc manually, after."
  (ftype (function (form-field) (or null symbol function)) field-parser)
  (ftype (function (form-field &optional t) (values simple-string &optional))
   cl-forms:format-field-value-to-string)
- (ftype (function (&optional form hunchentoot:request) (values null &optional))
-  cl-forms:handle-request)
  (ftype (function (form (or symbol form-field) &optional boolean) *) cl-forms:get-field-value)
  (ftype function cl-forms:render-form-start)
  (ftype (function (&optional t) *) cl-forms:render-form-end)
