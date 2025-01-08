@@ -7,7 +7,7 @@
   :long-description
   #.(uiop:read-file-string
      (uiop:subpathname *load-pathname* "README.md"))
-  :depends-on (#:hunchentoot #:cl-forms-core)
+  :depends-on (#:hunchentoot #:cl-forms.core)
   :components ((:module :src
                         :components
                         ((:file "hunchentoot"))))

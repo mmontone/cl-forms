@@ -6,7 +6,7 @@
   :depends-on (#:lack
                #:lack/middleware/csrf
                #:ningle
-               #:cl-forms-core)
+               #:cl-forms.core)
   :components ((:module :src
                         :components
                         ((:file "ningle")))))
