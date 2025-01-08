@@ -1,4 +1,4 @@
-(asdf:defsystem #:cl-forms-core
+(asdf:defsystem #:cl-forms.core
   :serial t
   :description "A web forms handling library"
   :author "Mariano Montone <marianomontone@gmail.com>"
