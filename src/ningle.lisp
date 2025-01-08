@@ -30,9 +30,7 @@
   (lack/request:request-body-parameters request))
 
 (defmethod get-form-session-csrf-token ((form form))
-  ;; (format t (forms::form-session-csrf-entry form))
-  ;; (hunchentoot:session-value (form-session-csrf-entry form)))
-  nil)
+  (lack/middleware/csrf:csrf-token ningle:*session*))
 
 (defmethod set-form-session-csrf-token ((form form))
   ;; (hunchentoot:start-session)
