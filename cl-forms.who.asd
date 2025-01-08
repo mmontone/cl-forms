@@ -3,7 +3,7 @@
   :description "CL-FORMS CL-WHO backend"
   :author "Mariano Montone"
   :license "MIT"
-  :depends-on (#:cl-forms
+  :depends-on (#:cl-forms.core
                #:cl-who)
   :components ((:module :renderer
                         :pathname "src/renderer/"

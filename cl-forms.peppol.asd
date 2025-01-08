@@ -3,7 +3,7 @@
   :description "Some extra form fields (country, currency, amount) using PEPPOL billing code lists"
   :author "Mariano Montone"
   :license "MIT"
-  :depends-on (#:cl-forms
+  :depends-on (#:cl-forms.core
                #:peppol)
   :components ((:module :src
                         :components

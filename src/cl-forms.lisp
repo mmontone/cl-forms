@@ -247,10 +247,10 @@ Example:
                 post-parameters)
         post-parameters)))
 
-(defmethod make-csrf-token ((form form))
-  (ironclad:byte-array-to-hex-string
-   (ironclad:ascii-string-to-byte-array
-    (princ-to-string (uuid:make-v4-uuid)))))
+;; csrf api
+
+(defgeneric set-form-session-csrf-token (form)
+  (:documentation "Set csrf token for FORM and return the token."))
 
 (defclass form-field ()
   ((name :initarg :name

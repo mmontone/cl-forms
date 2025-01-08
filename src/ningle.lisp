@@ -19,13 +19,13 @@
       (when (or (not session-token)
                 (not (equalp session-token (cdr (assoc (form-csrf-field-name form) (request-post-parameters request) :test #'string=)))))
         ;; The form is not valid. Throw an error, but reset its CSRF token for next time
-        (set-form-session-csrf-token form)
+        (forms::set-form-session-csrf-token form)
         (error "Invalid CSRF token"))))
 
   (let ((post-parameters (lack/request:request-body-parameters request)))
     (loop for field in (form-fields form)
           do (forms::field-read-from-request (cdr field) form
-                                      post-parameters))))
+                                             post-parameters))))
 
 (defmethod request-post-parameters ((request lack/request:request))
   (lack/request:request-body-parameters request))
@@ -33,6 +33,6 @@
 (defmethod get-form-session-csrf-token ((form form))
   (lack/middleware/csrf:csrf-token ningle:*session*))
 
-(defmethod set-form-session-csrf-token ((form form))
+(defmethod forms::set-form-session-csrf-token ((form form))
   (remhash lack/middleware/csrf::*csrf-session-key* ningle:*session*)
   (lack/middleware/csrf:csrf-token ningle:*session*))

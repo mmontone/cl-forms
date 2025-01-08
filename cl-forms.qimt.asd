@@ -3,7 +3,7 @@
   :description "Describe cl-forms here"
   :author "Mariano Montone"
   :license "MIT"
-  :depends-on (#:cl-forms
+  :depends-on (#:cl-forms.core
 	       #:qimt)
   :components ((:module :renderer
 			:pathname "src/renderer/"
