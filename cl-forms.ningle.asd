@@ -3,7 +3,9 @@
   :description "CL-FORMS ningle backend"
   :author "Neil Munro"
   :license "MIT"
-  :depends-on (#:ningle
+  :depends-on (#:lack
+               #:lack/middleware/csrf
+               #:ningle
                #:cl-forms-core)
   :components ((:module :src
                         :components
