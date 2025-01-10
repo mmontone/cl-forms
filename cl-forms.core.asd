@@ -13,7 +13,8 @@
                #:uuid
                #:clavier
                #:fmt
-	       #:str)
+	       #:str
+               #:cl-base64)
   :components ((:module :src
                         :components
                         ((:file "package")
