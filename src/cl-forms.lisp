@@ -340,6 +340,9 @@ Example:
                         :initform nil
                         :accessor field-validation-triggers
                         :documentation "Client side validation triggers. A list of :change, :focus, :focusout, :focusin, etc")
+   (html-name :initarg :html-name
+              :type string
+              :documentation "The name to use in HTML. Unbound by default. If unbound, a string representation of FIELD-NAME is used. See FIELD-REQUEST-NAME.")
    (form :initarg :form
          :initform nil
          :type (or null form)
@@ -373,11 +376,15 @@ Example:
 (defmethod field-render-label-p ((field form-field))
   t)
 
-(defvar *field-path* nil)
+(defvar *field-path* nil
+  "This is the path in a tree of forms (subform fields) used to calculate its request name.")
 
 (defgeneric field-add-to-path (form-field form &optional path)
   (:method (form-field form &optional (path *field-path*))
-    (cons (string-downcase (string (field-name form-field))) path)))
+    (let ((html-name (if (slot-boundp form-field 'html-name)
+                         (slot-value form-field 'html-name)
+                         (string-downcase (string (field-name form-field))))))
+      (cons html-name path))))
 
 (defun field-request-name (form-field form)
   (declare (ignorable form form-field))

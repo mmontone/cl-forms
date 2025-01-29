@@ -102,6 +102,7 @@
 (forms:defform test-form-1 ()
   ((foo :string :value "")
    (bar :integer :value 1)
+   (baz :string :value "" :html-name "bazz")
    (choice :choice :choices (list "foo" "bar" "baz")
 		   :test 'string=
 		   :hash-function 'identity
@@ -110,7 +111,8 @@
 
 (forms:defform subform1 ()
   ((foo :string :value "")
-   (bar :integer :value 1)))
+   (bar :integer :value 1)
+   (baz :string :value "" :html-name "bazz")))
 
 (forms:defform subform2 ()
   ((sex :choice :choices (list "Male" "Female") :value "Male")))
@@ -124,17 +126,20 @@
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "22")
-						    ("choice" . "")))))
+						    ("choice" . "")
+                                                    ("bazz" . "baz")))))
     (handle-request form request)
     (is-true (validate-form form))
-    (with-form-field-values (foo bar) form
-      (list foo bar)))
+    (with-form-field-values (foo bar baz) form
+      (is (equalp (list foo bar baz)
+                  (list "foo" 22 "baz")))))
 
   (let* ((form (find-form 'test-form-1))
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "bar")
-						    ("choice" . "")))))
+						    ("choice" . "")
+                                                    ("bazz" . "baz")))))
     (handle-request form request)
     (is-false (validate-form form)))
 
@@ -142,7 +147,8 @@
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "44")
-						    ("choice" . "badchoice")))))
+						    ("choice" . "badchoice")
+                                                    ("bazz" . "baz")))))
     (handle-request form request)
     (is-false (validate-form form)))
 
@@ -150,7 +156,8 @@
 	 (request (make-instance 'mock-request
 				 :post-parameters '(("foo" . "foo")
 						    ("bar" . "44")
-						    ("choice" . "foo")))))
+						    ("choice" . "foo")
+                                                    ("bazz" . "baz")))))
     (handle-request form request)
     (is-true (validate-form form))))
 
