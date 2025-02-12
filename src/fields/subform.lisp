@@ -13,7 +13,8 @@
 
 (defmethod subform-builder ((field subform-form-field))
   (or (field-subform-builder field)
-      (get (field-subform-name field) :form)))
+      (get (field-subform-name field) :form)
+      (error "Cannot build the subform in ~s" field)))
 
 (defmethod field-subform ((field subform-form-field))
   (funcall (subform-builder field)))
