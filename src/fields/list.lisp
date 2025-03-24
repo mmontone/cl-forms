@@ -24,13 +24,18 @@
   (:documentation "A field that contains a list of elements (either other fields or subforms)"))
 
 (defmethod make-form-field ((field-type (eql :list)) &rest args)
-  (let ((list-field-type (if (listp (getf args :type))
-                             (lambda ()
-                               (apply #'make-form-field
-                                      (first (getf args :type))
-                                      (append (list :name (getf args :name))
-                                              (rest (getf args :type)))))
-                             (getf args :type))))
+  (let ((list-field-type (etypecase (getf args :type)
+                           (list
+                            (lambda ()
+                              (apply #'make-form-field
+                                     (first (getf args :type))
+                                     (append (list :name (getf args :name))
+                                             (rest (getf args :type))))))
+                           (keyword (lambda ()
+                                      (make-form-field
+                                       (getf args :type)
+                                       :name (getf args :name))))
+                           (function (getf args :type)))))
     (apply #'make-instance 'list-form-field :type list-field-type args)))
 
 (defmethod field-read-from-request ((field list-form-field) form parameters)
