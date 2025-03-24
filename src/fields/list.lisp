@@ -36,30 +36,30 @@
 (defmethod field-read-from-request ((field list-form-field) form parameters)
   ;; First, create a regex to filter the list-field parameters. It's those with the format <field>[<index>]
   (let ((regex
-         (ppcre:create-scanner `(:sequence :start-anchor
-                                           ,(field-request-name field form)
-                                           "["
-                                           (:register (:greedy-repetition 1 nil :digit-class))
-                                           "]"))))
+          (ppcre:create-scanner `(:sequence :start-anchor
+                                            ,(field-request-name field form)
+                                            "["
+                                            (:register (:greedy-repetition 1 nil :digit-class))
+                                            "]"))))
     ;; Then, extract the indexes posted
     (let ((request-list-indexes
-           (remove-duplicates
-            (loop for param in parameters
-               when (ppcre:scan regex (car param))
-               collect (ppcre:register-groups-bind (index)
-                           (regex (car param))
-                         (when (stringp index)
-                           (parse-integer index)))))))
+            (remove-duplicates
+             (loop for param in parameters
+                   when (ppcre:scan regex (car param))
+                     collect (ppcre:register-groups-bind (index)
+                                 (regex (car param))
+                               (when (stringp index)
+                                 (parse-integer index)))))))
       ;; With the indexes posted, read the list items from the request parameters
       (let ((items
-             (mapcar (lambda (i)
-                       (let ((*field-path* (cons (list "[" i "].") *field-path*)))
-                         (let ((item-field (funcall (list-field-type field))))
-                           (field-read-from-request item-field
-                                                    form
-                                                    parameters)
-                           item-field)))
-                     request-list-indexes)))
+              (mapcar (lambda (i)
+                        (let* ((*field-path* (cons (list "[" i "].") *field-path*))
+                               (item-field (funcall (list-field-type field))))
+                          (field-read-from-request item-field
+                                                   form
+                                                   parameters)
+                          item-field))
+                      request-list-indexes)))
         ;; Remove items with remove-predicate. For example,
         (let ((items (if (empty-item-predicate field)
                          (remove-if (empty-item-predicate field)
