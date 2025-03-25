@@ -66,7 +66,7 @@
                           (field-read-from-request item-field
                                                    form
                                                    parameters)
-                          item-field))
+                          (field-value item-field)))
                       request-list-indexes)))
         ;; Remove items with remove-predicate. For example,
         (let ((items (if (empty-item-predicate field)
@@ -75,10 +75,3 @@
                          items)))
           ;; The value of a list field is a list of fields (the type of its list elements)
           (setf (field-value field) items))))))
-
-(defun list-field-values (list-field)
-  "Returns the actual values of a list field"
-  (mapcar #'field-value (slot-value list-field 'value)))
-
-(defmethod field-value ((field list-form-field))
-  (list-field-values field))

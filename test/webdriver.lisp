@@ -29,6 +29,12 @@
 
 (forms:find-form 'webdriver-test-form)
 
+(defun make-attachment (doc-name doc-type)
+  (let ((attachment (forms:find-form 'attachment-form)))
+    (forms:set-field-value attachment 'document-name doc-name)
+    (forms:set-field-value attachment 'document-type doc-type)
+    attachment))
+
 (hunchentoot:define-easy-handler (webdriver-test-handler :uri "/")
     ()
   (case (hunchentoot:request-method*)
@@ -43,10 +49,11 @@
            (forms:set-field-value form 'age 41)
            (forms:set-field-value form 'url "http://common-lisp.net")
            (forms:set-field-value form 'gender "Male")
-           (let ((attachment (forms:find-form 'attachment-form)))
-             (forms:set-field-value attachment 'document-name "foo.odt")
-             (forms:set-field-value attachment 'document-type "odt")
-             (forms:set-field-value form 'attachment attachment))           
+           (forms:set-field-value form 'attachment (make-attachment "foo.odt" "odt"))
+           (forms:set-field-value form 'attachments
+                                  (list (make-attachment "foo.odt" "odt")
+                                        (make-attachment "bar.pdf" "pdf")
+                                        (make-attachment "baz.txt" "txt")))
            (forms:with-form-renderer :who
              (let ((forms.who:*html* html))
                (forms:render-form form))))))))
@@ -89,5 +96,3 @@
       (equalp result "T"))))
 
 ;; (test)
-
-
