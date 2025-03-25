@@ -4,8 +4,12 @@
 (require :cl-forms.who)
 (require :cl-json)
 (require :access)
+(require :generic-cl)
 
 (defpackage :cl-forms.webdriver-test
+  (:local-nicknames
+   (:acc :access)
+   (:gcl :generic-cl))
   (:use :cl))
 
 (in-package :cl-forms.webdriver-test)
@@ -14,9 +18,22 @@
   (declare (ignore test key type skip-call?))
   (forms:get-field-value form field-name))
 
+(defmethod gcl:equalp ((f1 forms:form) (f2 forms:form))
+  (every (lambda (args)
+           (apply #'gcl:equalp args))
+         (mapcar #'list
+                 (forms:form-fields f1)
+                 (forms:form-fields f2))))
+
+(defmethod gcl:equalp ((f1 forms:form-field) (f2 forms:form-field))
+  (and (equalp (forms::field-name f1)
+               (forms::field-name f2))
+       (equalp (forms::field-value f1)
+               (forms::field-value f2))))
+
 (forms:defform attachment-form ()
   ((document-name :string)
-   (document-type :string-choice :choices '("pdf" "odt" "docx"))))
+   (document-type :string-choice :choices '("pdf" "odt" "docx" "txt"))))
 
 (forms:defform webdriver-test-form (:action "/" :method :post)
   ((name :string)
@@ -24,7 +41,9 @@
    (url :url)
    (gender :string-choice :choices '("Male" "Female"))
    (attachment :subform :subform 'attachment-form)
-   (attachments :list :type '(:subform :subform attachment-form))
+   (attachments :list :type '(:subform :subform attachment-form)
+                      :empty-item-predicate (lambda (attachment)
+                                              (str:emptyp (access:access attachment 'document-name))))
    (submit :submit)))
 
 (forms:find-form 'webdriver-test-form)
@@ -60,7 +79,7 @@
     (:post
      (let ((form (forms:find-form 'webdriver-test-form)))
        (forms:handle-request form)
-       (forms:with-form-field-values (name age gender url attachment) form
+       (forms:with-form-field-values (name age gender url attachment attachments) form
          (who:with-html-output-to-string (html)
            (:html
             (:head
@@ -72,7 +91,13 @@
                                            (equalp gender "Male")
                                            (equalp url "http://common-lisp.net")
                                            (equalp (forms:get-field-value attachment 'document-name) "foo.odt")
-                                           (equalp (forms:get-field-value attachment 'document-type) "odt"))))))))))
+                                           (equalp (forms:get-field-value attachment 'document-type) "odt")
+                                           (= (length attachments) 3)
+                                           (gcl:equalp attachments
+                                                       (list (make-attachment "foo.odt" "odt")
+                                                             (make-attachment "bar.pdf" "pdf")
+                                                             (make-attachment "baz.txt" "txt")))
+                                           )))))))))
     (t (hunchentoot:abort-request-handler))))
 
 (defvar *acceptor*)

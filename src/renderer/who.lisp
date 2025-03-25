@@ -464,15 +464,23 @@ Example:
   (loop for item in (forms::field-value field)
         for i from 0
         do
-           (let ((forms::*field-path* (cons (list "[" i "].") forms::*field-path*))
+           (let ((forms::*field-path* (cons (format nil "~a[~a]"
+                                                    (string-downcase
+                                                     (string (forms::field-name field)))
+                                                    i)
+                                            (rest forms::*field-path*)))
                  (field (funcall (forms::list-field-type field))))
              (setf (forms:field-value field) item)
              (forms::renderer-render-field-widget renderer theme field form))
         finally
            ;; Render a new entry
-           (let ((forms::*field-path* (cons (list "[" (1+ i) "].") forms::*field-path*)))
-             (let ((field (funcall (forms::list-field-type field))))
-               (forms::renderer-render-field-widget renderer theme field form)))))
+           (let ((forms::*field-path* (cons (format nil "~a[~a]"
+                                                    (string-downcase
+                                                     (string (forms::field-name field)))
+                                                    (1+ i))
+                                            (rest forms::*field-path*)))
+                 (field (funcall (forms::list-field-type field))))
+             (forms::renderer-render-field-widget renderer theme field form))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
