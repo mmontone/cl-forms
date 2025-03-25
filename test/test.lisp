@@ -109,18 +109,6 @@
 		   :use-key-as-value t
 		   :required-p nil)))
 
-(forms:defform subform1 ()
-  ((foo :string :value "")
-   (bar :integer :value 1)
-   (baz :string :value "" :html-name "bazz")))
-
-(forms:defform subform2 ()
-  ((sex :choice :choices (list "Male" "Female") :value "Male")))
-
-(forms:defform subform-test-form ()
-  ((subform1 :subform :subform 'subform1)
-   (subform2 :subform :subform 'subform2)))
-
 (test form-test-1 ()
   (let* ((form (find-form 'test-form-1))
 	 (request (make-instance 'mock-request
@@ -194,6 +182,29 @@
     (with-form-field-values (list) form
       (is (equalp (list "foo" "bar" "baz") list)))))
 
+(forms:defform subform1 ()
+  ((foo :string :value "")
+   (bar :integer :value 1)
+   (baz :string :value "" :html-name "bazz")))
+
+(forms:defform subform2 ()
+  ((sex :string-choice :choices (list "Male" "Female") :value "Male")))
+
+(forms:defform subform-test-form ()
+  ((subform1 :subform :subform 'subform1)
+   (subform2 :subform :subform 'subform2)))
+
+
 (test subform-field-test
-  
-  )
+  (let* ((form (find-form 'subform-test-form))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("subform1.foo" . "foo")
+						    ("subform1.bar" . "22")
+						    ("subform1.bazz" . "baz")
+                                                    ("subform2.sex" . "Male")))))
+    (handle-request form request)
+    (with-form-field-values (subform1 subform2) form
+      (with-form-field-values (foo bar baz) subform1
+        (with-form-field-values (sex) subform2
+          (is (equalp (list "foo" 22 "baz") (list foo bar baz)))
+          (is (equalp "Male" sex)))))))
