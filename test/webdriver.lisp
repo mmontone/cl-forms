@@ -13,6 +13,8 @@
 (forms:defform webdriver-test-form (:action "/" :method :post)
   ((name :string)
    (age :integer)
+   (url :url)
+   (gender :string-choice :choices '("Male" "Female"))
    (submit :submit)))
 
 (forms:find-form 'webdriver-test-form)
@@ -29,13 +31,15 @@
          (let ((form (forms:find-form 'webdriver-test-form)))
            (forms:set-field-value form 'name "Mariano")
            (forms:set-field-value form 'age 41)
+           (forms:set-field-value form 'url "http://common-lisp.net")
+           (forms:set-field-value form 'gender "Male")
            (forms:with-form-renderer :who
              (let ((forms.who:*html* html))
                (forms:render-form form))))))))
     (:post
      (let ((form (forms:find-form 'webdriver-test-form)))
        (forms:handle-request form)
-       (forms:with-form-field-values (name age) form
+       (forms:with-form-field-values (name age gender url) form
          (who:with-html-output-to-string (html)
            (:html
             (:head
@@ -43,7 +47,9 @@
             (:body
              (:textarea :id "result"
                         (who:fmt "~a" (and (equalp name "Mariano")
-                                           (equalp age 41))))))))))
+                                           (equalp age 41)
+                                           (equalp gender "Male")
+                                           (equalp url "http://common-lisp.net"))))))))))
     (t (hunchentoot:abort-request-handler))))
 
 (defvar *acceptor*)
