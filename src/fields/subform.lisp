@@ -24,14 +24,12 @@
 
 (defmethod field-read-from-request ((field subform-form-field) form parameters)
   (let ((field-subform (field-subform field)))
-    (let ((*field-path* (cons "." *field-path*)))
-      (loop for field in (form-fields field-subform)
+    (loop for field in (form-fields field-subform)
           do (field-read-from-request (cdr field) form
                                       parameters))
-      (setf (field-value field) field-subform))))
+      (setf (field-value field) field-subform)))
 
 (defmethod field-add-to-path ((form-field subform-form-field) form &optional (path *field-path*))
-  (cons (list (string-downcase (string (form-name form)))
-              "."
-              (string-downcase (string (field-name form-field))))
-        path))
+  (list* (string-downcase (string (field-name form-field)))
+         (string-downcase (string (form-name form)))
+         path))

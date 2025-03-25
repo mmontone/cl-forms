@@ -446,14 +446,13 @@ Example:
      (field forms::subform-form-field)
      form &rest args)
   (declare (ignore args))
-  (let ((forms::*field-path* (cons "." forms::*field-path*)))
-    ;; Render the fields of the subform (but not the HTML form element - form elements inside other form elements is not supported in HTML)
-    (let ((subform (or (forms:field-value field)
-                       (forms::field-subform field))))
-      (loop for field in (forms::form-fields subform)
-         do
-           (forms::renderer-render-field renderer theme (cdr field)
-                                         subform)))))
+  ;; Render the fields of the subform (but not the HTML form element - form elements inside other form elements is not supported in HTML)
+  (let ((subform (or (forms:field-value field)
+                     (forms::field-subform field))))
+    (loop for field in (forms::form-fields subform)
+          do
+             (forms::renderer-render-field renderer theme (cdr field)
+                                           subform))))
 
 ;; List field
 (defmethod forms::renderer-render-field-widget

@@ -388,8 +388,7 @@ Example:
 
 (defun field-request-name (form-field form)
   (declare (ignorable form form-field))
-  (fmt:fmt nil
-           (:join "" (alexandria:flatten (reverse *field-path*)))))
+  (str:join #\. (remove-if #'str:emptyp (mapcar #'princ-to-string (reverse *field-path*)))))
 
 (defun render-field-request-name (form-field form)
   (let ((request-name (field-request-name form-field form)))

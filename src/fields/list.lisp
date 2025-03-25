@@ -29,12 +29,12 @@
                             (lambda ()
                               (apply #'make-form-field
                                      (first (getf args :type))
-                                     (append (list :name (getf args :name))
+                                     (append (list :name '||)
                                              (rest (getf args :type))))))
                            (keyword (lambda ()
                                       (make-form-field
                                        (getf args :type)
-                                       :name (getf args :name))))
+                                       :name '||)))
                            (function (getf args :type)))))
     (apply #'make-instance 'list-form-field :type list-field-type args)))
 
@@ -58,7 +58,10 @@
       ;; With the indexes posted, read the list items from the request parameters
       (let ((items
               (mapcar (lambda (i)
-                        (let* ((*field-path* (cons (list "[" i "].") *field-path*))
+                        (let* ((*field-path* (cons (format nil "~a[~a]"
+                                                           (string-downcase (string (field-name field)))
+                                                           i)
+                                                   (rest *field-path*)))
                                (item-field (funcall (list-field-type field))))
                           (field-read-from-request item-field
                                                    form
@@ -75,4 +78,7 @@
 
 (defun list-field-values (list-field)
   "Returns the actual values of a list field"
-  (mapcar #'field-value (field-value list-field)))
+  (mapcar #'field-value (slot-value list-field 'value)))
+
+(defmethod field-value ((field list-form-field))
+  (list-field-values field))

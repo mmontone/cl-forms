@@ -181,4 +181,19 @@
     (handle-request form request)
     (is-true (validate-form form))))
 
-;; TODO: implement tests for every field, and subforms
+(defform list-test-form ()
+  ((list :list :type :string)))
+
+(test list-field-test
+  (let* ((form (find-form 'list-test-form))
+	 (request (make-instance 'mock-request
+				 :post-parameters '(("list[0]" . "foo")
+						    ("list[1]" . "bar")
+						    ("list[2]" . "baz")))))
+    (handle-request form request)
+    (with-form-field-values (list) form
+      (is (equalp (list "foo" "bar" "baz") list)))))
+
+(test subform-field-test
+  
+  )
