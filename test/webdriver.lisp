@@ -10,11 +10,21 @@
 
 (in-package :cl-forms.webdriver-test)
 
+(defmethod access:do-access ((form forms:form) (field-name symbol) &key test key type skip-call?)
+  (declare (ignore test key type skip-call?))
+  (forms:get-field-value form field-name))
+
+(forms:defform attachment-form ()
+  ((document-name :string)
+   (document-type :string-choice :choices '("pdf" "odt" "docx"))))
+
 (forms:defform webdriver-test-form (:action "/" :method :post)
   ((name :string)
    (age :integer)
    (url :url)
    (gender :string-choice :choices '("Male" "Female"))
+   (attachment :subform :subform 'attachment-form)
+   (attachments :list :type '(:subform :subform attachment-form))
    (submit :submit)))
 
 (forms:find-form 'webdriver-test-form)
@@ -33,13 +43,17 @@
            (forms:set-field-value form 'age 41)
            (forms:set-field-value form 'url "http://common-lisp.net")
            (forms:set-field-value form 'gender "Male")
+           (let ((attachment (forms:find-form 'attachment-form)))
+             (forms:set-field-value attachment 'document-name "foo.odt")
+             (forms:set-field-value attachment 'document-type "odt")
+             (forms:set-field-value form 'attachment attachment))           
            (forms:with-form-renderer :who
              (let ((forms.who:*html* html))
                (forms:render-form form))))))))
     (:post
      (let ((form (forms:find-form 'webdriver-test-form)))
        (forms:handle-request form)
-       (forms:with-form-field-values (name age gender url) form
+       (forms:with-form-field-values (name age gender url attachment) form
          (who:with-html-output-to-string (html)
            (:html
             (:head
@@ -49,7 +63,9 @@
                         (who:fmt "~a" (and (equalp name "Mariano")
                                            (equalp age 41)
                                            (equalp gender "Male")
-                                           (equalp url "http://common-lisp.net"))))))))))
+                                           (equalp url "http://common-lisp.net")
+                                           (equalp (forms:get-field-value attachment 'document-name) "foo.odt")
+                                           (equalp (forms:get-field-value attachment 'document-type) "odt"))))))))))
     (t (hunchentoot:abort-request-handler))))
 
 (defvar *acceptor*)
