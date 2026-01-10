@@ -22,6 +22,9 @@
            (getf djula::*template-arguments* form-name)))
       (format stream #?'<form action="${(forms::form-action form)}"
               method="${(forms::form-method form)}"
+          ${(if (forms::form-enctype form)
+                (format nil " enctype=\"~A\"" (forms::form-enctype form))
+                "")}
 	      ${(if (getf args :class)
 		    (format nil " class=\"~A\"" (getf args :class))
 		    "")}>')
