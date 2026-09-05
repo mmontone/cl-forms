@@ -54,21 +54,21 @@ Example:
                                               form &rest args)
   "Start form rendering"
   (fmt:with-fmt ((or *html* (error "FORMS.WHO:*HTML* is unbound. Please bind it before rendering forms. See FORMS.WHO:*HTML* documentation.")))
-    "<form id=\"" (forms::form-id form) "\""
-    " action=\"" (forms::form-action form) "\""
-    " method=\"" (forms::form-method form) "\""
+    "<form id=\"" (who:escape-string (forms::form-id form)) "\""
+    " action=\"" (who:escape-string (forms::form-action form)) "\""
+    " method=\"" (who:escape-string (symbol-name (forms::form-method form))) "\""
     (:when (forms::form-enctype form)
-           " enctype=\"" (forms::form-enctype form) "\"")
+           " enctype=\"" (who:escape-string (forms::form-enctype form)) "\"")
     (:when (getf args :class)
-           " class=\"" (getf args :class) "\"" )
+           " class=\"" (who:escape-string (getf args :class)) "\"" )
     (:when (forms::client-validation form)
            " data-parsley-validate")
     ">")
   (when (forms::form-csrf-protection-p form)
     (let ((token (forms::set-form-session-csrf-token form)))
       (format *html* "<input name=\"~A\" type=\"hidden\" value=\"~A\"/>"
-              (forms::form-csrf-field-name form)
-              token))))
+              (who:escape-string (forms::form-csrf-field-name form))
+              (who:escape-string token)))))
 
 (defmethod forms::renderer-render-form-end ((renderer (eql :who))
                                             (theme forms::default-form-theme)
@@ -88,10 +88,11 @@ Example:
       (:ul :class (or (getf args :class) "errors parsley-errors-list filled")
            (loop for error in (forms::form-errors form)
               do
-                (htm (:li (fmt "~A: ~{~A~^, ~}"
-                               (or (forms::field-label (first error))
-                                   (forms::field-name (first error)))
-                               (cdr error)))))))))
+                (htm (:li (str (who:escape-string
+                                (format nil "~A: ~{~A~^, ~}"
+                                        (or (forms::field-label (first error))
+                                            (forms::field-name (first error)))
+                                        (cdr error)))))))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
                                          (theme forms::default-form-theme)
@@ -110,8 +111,8 @@ Example:
     (with-html-output (*html*)
       (:label
        :class (getf args :class)
-       (str (or (forms::field-label field)
-                (forms::field-name field)))))))
+       (str (who:escape-string (princ-to-string (or (forms::field-label field)
+                                                    (forms::field-name field)))))))))
 
 (defmethod forms::renderer-render-field-errors ((renderer (eql :who))
                                                 (theme forms::default-form-theme)
@@ -122,7 +123,7 @@ Example:
     (when errors
       (with-html-output (*html*)
         (:div :class (or (getf args :class) "errors")
-              (fmt "~{~A~^, ~}" errors))))))
+              (str (who:escape-string (format nil "~{~A~^, ~}" errors))))))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -134,7 +135,7 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
@@ -153,7 +154,7 @@ Example:
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (format *html* ">")
   (when (forms::field-value field)
-    (write-string (forms:format-field-value-to-string field) *html*))
+    (write-string (who:escape-string (forms:format-field-value-to-string field)) *html*))
   (format *html* "</textarea>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -165,11 +166,11 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -181,15 +182,15 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (when (forms::date-min field)
-    (format *html* " min=\"~A\"" (forms::date-min field)))
+    (format *html* " min=\"~A\"" (who:escape-string (forms::date-min field))))
   (when (forms::date-max field)
-    (format *html* " max=\"~A\"" (forms::date-max field)))
+    (format *html* " max=\"~A\"" (who:escape-string (forms::date-max field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -201,15 +202,15 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (when (forms::datetime-min field)
-    (format *html* " min=\"~A\"" (forms::datetime-min field)))
+    (format *html* " min=\"~A\"" (who:escape-string (forms::datetime-min field))))
   (when (forms::datetime-max field)
-    (format *html* " max=\"~A\"" (forms::datetime-max field)))
+    (format *html* " max=\"~A\"" (who:escape-string (forms::datetime-max field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -221,11 +222,11 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -237,11 +238,11 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -254,11 +255,8 @@ Example:
   (when (getf args :class)
     (format *html* " class=\"~A\"" (getf args :class)))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
-  (when (forms::field-value field)
-    (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -296,7 +294,9 @@ Example:
   (with-html-output (*html*)
     (:input :type "hidden"
             :name (forms::render-field-request-name field form)
-            :value (forms:field-value field))))
+            :value (if (forms:field-value field)
+                       (who:escape-string (princ-to-string (forms:field-value field)))
+                       ""))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :who))
@@ -323,11 +323,11 @@ Example:
             do
               (htm
                (:input :type "checkbox" :name (forms::render-field-request-name field form)
-                       :value key
+                       :value (who:escape-string (princ-to-string key))
                        :checked (when (member key selected-keys)
                                   "checked")
-                       (str (forms:format-field-value-to-string field
-                                                                choice))))))))
+                       (str (who:escape-string (forms:format-field-value-to-string field
+                                                                                  choice)))))))))
     ((and (forms::field-expanded field)
           (not (forms::field-multiple field)))
      ;; Render radio buttons
@@ -337,12 +337,12 @@ Example:
             do
               (htm
                (:input :type "radio" :name (forms::render-field-request-name field form)
-                       :value (princ-to-string key)
+                       :value (who:escape-string (princ-to-string key))
                        :checked (when (equalp (first selected-value)
                                               key)
                                   "checked")
-                       (str (forms:format-field-value-to-string field
-                                                                choice))))))))
+                       (str (who:escape-string (forms:format-field-value-to-string field
+                                                                                  choice)))))))))
     ((and (not (forms::field-expanded field))
           (forms::field-multiple field))
      ;; A multiple select box
@@ -357,11 +357,11 @@ Example:
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm
-                (:option :value (princ-to-string key)
+                (:option :value (who:escape-string (princ-to-string key))
                          :selected (when (member key selected-keys)
                                      "selected")
-                         (str (forms:format-field-value-to-string field
-                                                                  choice)))))))))
+                         (str (who:escape-string (forms:format-field-value-to-string field
+                                                                                    choice))))))))))
     ((and (not (forms::field-expanded field))
           (not (forms::field-multiple field)))
      ;; A single select box
@@ -375,12 +375,12 @@ Example:
           (loop for (key . choice) in (forms::field-choices-alist field)
              do
                (htm
-                (:option :value (princ-to-string key)
+                (:option :value (who:escape-string (princ-to-string key))
                          :selected (when (equalp (first selected-value)
                                                  key)
                                      "selected")
-                         (str (forms:format-field-value-to-string field
-                                                                  choice)))))))))))
+                         (str (who:escape-string (forms:format-field-value-to-string field
+                                                                                    choice))))))))))))
 
 ;; Attributes and constraints
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
@@ -404,7 +404,9 @@ Example:
   (loop for key in (getf args :attrs) by #'cddr
      for val in (cdr (getf args :attrs)) by #'cddr
      do
-       (format *html* " ~A=\"~A\"" key val))
+       (format *html* " ~A=\"~A\""
+               (who:escape-string (princ-to-string key))
+               (who:escape-string (princ-to-string val))))
   ;; Constraints
   (loop for constraint in (forms::field-constraints field)
      do (renderer-render-field-constraint renderer constraint field form)))

@@ -122,7 +122,7 @@
 	  (apply #'renderer-render-field-attributes renderer theme field form args)
 	  (when (forms::field-value field)
 	    (<value=
-	     (forms:format-field-value-to-string)))))
+	     (forms:format-field-value-to-string field))))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))
@@ -132,10 +132,7 @@
 	  (<name= (forms::render-field-request-name field form))
 	  (when (forms::field-placeholder field)
 	    (<placeholder= (forms::field-placeholder field)))
-	  (apply #'renderer-render-field-attributes renderer theme field form args)
-	  (when (forms::field-value field)
-	    (<value=
-	     (forms:format-field-value-to-string field)))))
+	  (apply #'renderer-render-field-attributes renderer theme field form args)))
 
 (defmethod forms::renderer-render-field-widget
     ((renderer (eql :qimt))

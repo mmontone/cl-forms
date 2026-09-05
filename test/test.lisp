@@ -208,3 +208,29 @@
         (with-form-field-values (sex) subform2
           (is (equalp (list "foo" 22 "baz") (list foo bar baz)))
           (is (equalp "Male" sex)))))))
+
+(forms:defform xss-test-form (:action "/post")
+  ((str :string :value "\"><script>alert(1)</script>")
+   (email :email :value "\"><script>alert(2)</script>")
+   (url :url :value "\"><script>alert(3)</script>")
+   (txt :text :value "</textarea><script>alert(4)</script>")
+   (pwd :password :value "secret-password")
+   (hidden :hidden :value "\"><script>alert(5)</script>")
+   (submit :submit :label "Submit")))
+
+(test who-renderer-xss-and-password-test
+  (let ((form (find-form 'xss-test-form)))
+    (let ((output (forms:with-form-renderer :who
+                    (who:with-html-output-to-string (forms.who:*html*)
+                      (forms:render-form form)))))
+      ;; Verify password value is not output
+      (is (not (search "secret-password" output)))
+      ;; Verify raw script tags are never unescaped in HTML output
+      (is (not (search "<script>" output)))
+      (is (not (search "</textarea><script>" output)))
+      ;; Verify escaping
+      (is (search "&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;" output))
+      (is (search "&quot;&gt;&lt;script&gt;alert(2)&lt;/script&gt;" output))
+      (is (search "&quot;&gt;&lt;script&gt;alert(3)&lt;/script&gt;" output))
+      (is (search "&lt;/textarea&gt;&lt;script&gt;alert(4)&lt;/script&gt;" output))
+      (is (search "&quot;&gt;&lt;script&gt;alert(5)&lt;/script&gt;" output)))))

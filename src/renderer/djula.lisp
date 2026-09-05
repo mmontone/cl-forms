@@ -20,18 +20,9 @@
   (lambda (stream)
     (let ((form
            (getf djula::*template-arguments* form-name)))
-      (format stream #?'<form action="${(forms::form-action form)}"
-              method="${(forms::form-method form)}"
-          ${(if (forms::form-enctype form)
-                (format nil " enctype=\"~A\"" (forms::form-enctype form))
-                "")}
-	      ${(if (getf args :class)
-		    (format nil " class=\"~A\"" (getf args :class))
-		    "")}>')
-      (when (forms::form-csrf-protection-p form)
-	(let ((token (forms::set-form-session-csrf-token form)))
-	  (format stream #?'<input name="${(forms::form-csrf-field-name form)}"
-			type="hidden" value="${token}">'))))))
+      (let ((forms::*form-renderer* :who)
+            (forms.who::*html* stream))
+        (apply #'forms::renderer-render-form-start :who forms::*form-theme* form args)))))
 
 (djula::def-tag-compiler :form-end (&optional form-name)
   "Finish form rendering"

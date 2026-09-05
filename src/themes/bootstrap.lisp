@@ -94,7 +94,7 @@
   (when (forms::field-help-text field)
     (with-html-output (*html*)
       (:p :class "help-block"
-          (who:str (forms::field-help-text field))))))
+          (who:str (who:escape-string (forms::field-help-text field)))))))
 
 (defmethod forms::renderer-render-field ((renderer (eql :who))
                                          (theme bootstrap-form-theme)
@@ -112,7 +112,7 @@
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
@@ -132,7 +132,7 @@
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (format *html* ">")
   (when (forms::field-value field)
-    (write-string (forms:format-field-value-to-string field) *html*))
+    (write-string (who:escape-string (forms:format-field-value-to-string field)) *html*))
   (format *html* "</textarea>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -144,11 +144,11 @@
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 
@@ -204,11 +204,11 @@
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -220,11 +220,11 @@
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
   (when (forms::field-value field)
     (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
+            (who:escape-string (forms:format-field-value-to-string field))))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -237,11 +237,8 @@
   (format *html* " class=\"~A\"" (format-css-classes (list (getf args :class)
                                                            "form-control")))
   (when (forms::field-placeholder field)
-    (format *html* " placeholder=\"~A\"" (forms::field-placeholder field)))
+    (format *html* " placeholder=\"~A\"" (who:escape-string (forms::field-placeholder field))))
   (apply #'renderer-render-field-attributes renderer theme field form args)
-  (when (forms::field-value field)
-    (format *html* " value=\"~A\""
-            (forms:format-field-value-to-string field)))
   (format *html* "></input>"))
 
 (defmethod forms::renderer-render-field-widget
@@ -271,11 +268,11 @@
                    (:div :class "checkbox"
                          (:label
                           (:input :type "checkbox" :name (forms::render-field-request-name field form)
-                                  :value key
+                                  :value (who:escape-string (princ-to-string key))
                                   :checked (when (member key selected-keys)
                                              "checked")
-                                  (str (forms:format-field-value-to-string field
-                                                                           choice))))))))))
+                                  (str (who:escape-string (forms:format-field-value-to-string field
+                                                                           choice)))))))))))
     ((and (forms::field-expanded field)
           (not (forms::field-multiple field)))
      ;; Render radio buttons
@@ -287,12 +284,12 @@
                    (:div :class "radio"
                          (:label
                           (:input :type "radio" :name (forms::render-field-request-name field form)
-                                  :value (princ-to-string key)
+                                  :value (who:escape-string (princ-to-string key))
                                   :checked (when (equalp (first selected-value)
                                                          key)
                                              "checked")
-                                  (str (forms:format-field-value-to-string field
-                                                                           choice))))))))))
+                                  (str (who:escape-string (forms:format-field-value-to-string field
+                                                                           choice)))))))))))
     ((and (not (forms::field-expanded field))
           (forms::field-multiple field))
      ;; A multiple select box
@@ -307,11 +304,11 @@
           (loop for (key . choice) in (forms::field-choices-alist field)
                 do
                    (htm
-                    (:option :value (princ-to-string key)
+                    (:option :value (who:escape-string (princ-to-string key))
                              :selected (when (member key selected-keys)
                                          "selected")
-                             (str (forms:format-field-value-to-string field
-                                                                      choice)))))))))
+                             (str (who:escape-string (forms:format-field-value-to-string field
+                                                                      choice))))))))))
     ((and (not (forms::field-expanded field))
           (not (forms::field-multiple field)))
      ;; A single select box
@@ -327,12 +324,12 @@
           (loop for (key . choice) in (forms::field-choices-alist field)
                 do
                    (htm
-                    (:option :value (princ-to-string key)
+                    (:option :value (who:escape-string (princ-to-string key))
                              :selected (when (equalp (first selected-value)
                                                      key)
                                          "selected")
-                             (str (forms:format-field-value-to-string field
-                                                                      choice)))))))))))
+                             (str (who:escape-string (forms:format-field-value-to-string field
+                                                                      choice))))))))))))
 
 (defmethod renderer-render-field-attributes ((renderer (eql :who))
                                              (theme bootstrap-form-theme)
